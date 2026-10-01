@@ -19,8 +19,8 @@ items:
   - project: projects/a-limit
     title: { en: "A Limit", he: "A Limit" }
     text:
-      en: "Recording the screenplay as an audiobook, read as a screenplay."
-      he: "מקליטים את התסריט כספר שמע, בקריאה כתסריט."
+      en: "Editing the audiobook. The screenplay draft and a first full narration are published; one scene is still to be written."
+      he: "עורכים את ספר השמע. טיוטת התסריט והקראה מלאה ראשונה פורסמו; סצנה אחת עוד לא נכתבה."
   - project: research/the-limit-of-experience
     title: { en: "Writing & research", he: "כתיבה ומחקר" }
     text:

@@ -29,6 +29,48 @@ Which file holds the text? The site has two languages; a Spanish poem goes in `e
 
 Typography on writing pages is set for long-form reading: wider leading, narrower measure, larger size. Use `##` sparingly; blank lines separate stanzas.
 
+### Publishing a draft honestly
+
+A work in progress can be published as it stands — the page then says so. Anything whose `status` is not `complete` shows its status next to the title, and `note:` adds one plain line under it:
+
+```yaml
+status: in-production
+note:
+  en: "Working draft, published as it stands. The bar scene is still to be written."
+  he: "טיוטת עבודה, מתפרסמת כפי שהיא. סצנת הבר עוד לא נכתבה."
+```
+
+Say what is missing and how any recording was made (a synthetic voice is labelled as one). The build log (`content/updates.yaml`) gets a dated entry when a piece is published.
+
+### A reading or narration
+
+Writing entries take the same `audio:` list as music entries; it renders a player above the text, and the writing index shows a NARRATION tag:
+
+```yaml
+audio:
+  - title: { en: "Full narration, 22½ minutes", he: "הקראה מלאה, 22 וחצי דקות" }
+    src: /audio/a-limit-narration.mp3        # file under public/audio/
+    public: true                             # false keeps it off the site
+    note: { en: "Synthetic voice (ElevenLabs) · September 2026", he: "…" }
+```
+
+Keep files small enough to stream from a static host: speech is fine at 64–96 kbps mono MP3 (`ffmpeg -i in.mp3 -ac 1 -b:a 96k out.mp3`). The same `audio:` list on the related project's `meta.yaml` puts the player on the project page too.
+
+### Screenplays
+
+With `type: screenplay`, two shorthands are expanded before markdown:
+
+```
+## INT. KITCHEN — NIGHT          a scene heading (plain ## heading, styled as a slugline)
+### Scene 2 — The First Paradox   a scene label (### heading)
+== A LIMIT ==                    a centred title card
+
+MATHEO (thinking): Where's the car?        a dialogue block: CUE (parenthetical): line
+FATHER: ...Grandpa died today.
+```
+
+Action lines are ordinary paragraphs. A cue must be upper-case and end with a colon; a continuation line inside the same paragraph that is wrapped in parentheses renders as a parenthetical. A missing scene is marked where it belongs with a `<Callout kind="note" title="Still to be written">…</Callout>` rather than silently skipped.
+
 ## Research
 
 ```

@@ -231,6 +231,8 @@ export interface Meta {
   public?: boolean; // writing: false = listed in the drawer without text
   date?: string;
   excerptOnly?: boolean;
+  /** Writing: one honest line under the title — draft status, what is missing, how a recording was made. */
+  note?: L10n;
   // music
   songs?: Song[];
   instrumentation?: L10nList;

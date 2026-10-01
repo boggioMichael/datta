@@ -1,13 +1,18 @@
 title: { en: "A Well-Defined Introduction", he: "A Well-Defined Introduction" }
+subtitle:
+  en: "From A Well-Defined Story, a novel in progress: the front matter, and one finished chapter."
+  he: "מתוך A Well-Defined Story, רומן בכתיבה: החומר הפותח, ופרק אחד גמור."
 summary:
-  en: "A longer-form literary experiment about the rules a story conceals — definitions, first principles, and the characters invented to smuggle them in."
-  he: "ניסוי ספרותי ארוך יותר על הכללים שסיפור מסתיר — הגדרות, עקרונות ראשונים, והדמויות שהומצאו כדי להבריח אותם פנימה."
+  en: "A longer-form literary experiment about the rules a story conceals — definitions, first principles, and the characters invented to smuggle them in. Front matter and Chapter 42 published; the rest follows as it is finished."
+  he: "ניסוי ספרותי ארוך יותר על הכללים שסיפור מסתיר — הגדרות, עקרונות ראשונים, והדמויות שהומצאו כדי להבריח אותם פנימה. החומר הפותח ופרק 42 פורסמו; השאר יבוא כשייגמר."
 category: { en: "Literary experiment", he: "ניסוי ספרותי" }
 status: writing
 type: literary-experiment
 language: en
 date: "2026-08"
 updated: "2026-08-17"
-public: false
-excerptOnly: true
+public: true
 order: 1
+note:
+  en: "Work in progress, published in the order it gets finished rather than the order it will be read. Here: the introduction, the definitions and rules, the participants and initial conditions, and Chapter 42. The remaining chapters are drafts and stay in the drawer."
+  he: "עבודה בתהליך, שמתפרסמת בסדר שבו היא נגמרת ולא בסדר שבו תיקרא. כאן: ההקדמה, ההגדרות והכללים, המשתתפים ותנאי ההתחלה, ופרק 42. שאר הפרקים טיוטות, ונשארים במגירה."

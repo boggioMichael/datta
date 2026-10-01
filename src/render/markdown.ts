@@ -105,6 +105,33 @@ export function expandComponents(md: string, ctx: RenderCtx): string {
   return out;
 }
 
+/**
+ * Screenplay sugar for `type: screenplay` entries. A paragraph that starts with a cue —
+ * `MATHEO: For me?` or `MATHEO (thinking): Where's the car?` — becomes a dialogue block;
+ * a line of the form `== A LIMIT ==` becomes a title card. Everything else is ordinary markdown.
+ */
+export function expandScreenplay(md: string): string {
+  const cue = /^([A-Z][A-Z0-9 .'’\-]{0,40}?)(?:\s*\(([^)]*)\))?:\s+([\s\S]+)$/;
+  return md
+    .split(/\n{2,}/)
+    .map((para) => {
+      const p = para.trim();
+      const card = p.match(/^==\s*(.+?)\s*==$/);
+      if (card) return `<p class="title-card">${esc(card[1])}</p>`;
+      const m = p.match(cue);
+      if (!m) return para;
+      const lines = m[3]
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => (s.startsWith("(") && s.endsWith(")") ? `<span class="paren">${esc(s)}</span>` : esc(s)))
+        .join("<br>");
+      const paren = m[2] ? ` <span class="paren">(${esc(m[2])})</span>` : "";
+      return `<div class="dialogue"><p class="cue">${esc(m[1])}${paren}</p><p class="line">${lines}</p></div>`;
+    })
+    .join("\n\n");
+}
+
 export function createMarked(ctx: RenderCtx): Marked {
   const marked = new Marked({ gfm: true, breaks: false });
   const usedIds = new Map<string, number>();

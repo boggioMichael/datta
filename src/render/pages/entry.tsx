@@ -24,7 +24,7 @@ import {
   formatDate,
 } from "../components.tsx";
 import { RESEARCH_KIND_LABEL, TEXT_LANG_LABEL, WRITING_TYPE_LABEL, type Entry } from "../../content/schema.ts";
-import { readingMinutes } from "../markdown.ts";
+import { expandScreenplay, readingMinutes } from "../markdown.ts";
 import { localePath } from "../urls.ts";
 
 function bodyFor(entry: Entry, locale: "en" | "he"): { md: string; fallback: boolean } {
@@ -74,6 +74,7 @@ export function ProjectPage({ entry }: { entry: Entry }) {
           <Metrics m={m} />
           <EvidenceList m={m} />
           <Videos m={m} />
+          <AudioList m={m} />
           <Gallery m={m} />
           <Timeline m={m} />
           <Economics m={m} />
@@ -141,6 +142,10 @@ export function WritingPage({ entry }: { entry: Entry }) {
   const textLang = m.language ?? "en";
   const bodyLang = fallback ? "en" : locale === "he" ? "he" : textLang;
   const bodyDir = bodyLang === "he" ? "rtl" : "ltr";
+  const isScreenplay = m.type === "screenplay";
+  const text = isScreenplay ? expandScreenplay(body) : body;
+  // A published draft says so: anything not complete carries its status next to the title.
+  const showStatus = m.status !== "complete";
   return (
     <article className="entry entry-writing">
       <header className="entry-head writing-head">
@@ -162,9 +167,21 @@ export function WritingPage({ entry }: { entry: Entry }) {
           {l(m.title)}
         </h1>
         {m.subtitle && <p className="entry-subtitle">{l(m.subtitle)}</p>}
+        {(showStatus || m.note) && (
+          <div className="entry-status writing-status">
+            {showStatus && <StatusBadge status={m.status} />}
+            {m.note && <p className="writing-note">{l(m.note)}</p>}
+          </div>
+        )}
       </header>
       {fallback && <LangNotice />}
-      <div className={`prose prose-literary${m.excerptOnly ? " excerpt" : ""}`} dangerouslySetInnerHTML={{ __html: md(body) }} lang={bodyLang} dir={bodyDir} />
+      <AudioList m={m} />
+      <div
+        className={`prose prose-literary${m.excerptOnly ? " excerpt" : ""}${isScreenplay ? " prose-screenplay" : ""}`}
+        dangerouslySetInnerHTML={{ __html: md(text) }}
+        lang={bodyLang}
+        dir={bodyDir}
+      />
       {m.excerptOnly && <p className="excerpt-note">{locale === "he" ? "קטע מתוך עבודה בתהליך." : "An excerpt from a work in progress."}</p>}
       <Related entry={entry} />
     </article>

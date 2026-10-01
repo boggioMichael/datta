@@ -63,6 +63,7 @@ const dict = {
   "label.songs": { en: "Songs", he: "שירים" },
   "label.instrumentation": { en: "Instrumentation", he: "הרכב" },
   "label.listen": { en: "Listen", he: "האזנה" },
+  "label.narration": { en: "Narration", he: "הקראה" },
   "label.watch": { en: "Watch", he: "צפייה" },
   "label.download": { en: "Download", he: "הורדה" },
   "label.version": { en: "Version", he: "גרסה" },

@@ -16,12 +16,12 @@ When two creative decisions compete, one question decides: *which deepens the au
 
 ## The audiobook
 
-The screenplay is being released first as an audiobook — read as a screenplay, scene headings and all, rather than rewritten into prose. The format is part of the experience: the listener is handed the same instructions a crew would receive, and watches the film in their head. A first full narration was recorded in September 2026; editing follows.
+The screenplay is being released first as an audiobook — read as a screenplay, scene headings and all, rather than rewritten into prose. The format is part of the experience: the listener is handed the same instructions a crew would receive, and watches the film in their head. A first full narration — 22½ minutes, a synthetic voice made with ElevenLabs — was produced in September 2026 as a working version; it is published below and on the screenplay page. Editing follows.
 
 ## The model underneath
 
 The screenplay grew out of a philosophical model about what a conscious subject can represent but never contain — death, other minds, the limit of its own standpoint. That model is written up separately, labelled honestly as a speculative proposal, in [[research/the-limit-of-experience]]. The film does not argue the model; it dramatizes the experience the model describes.
 
 <Callout kind="note" title="Reading the screenplay">
-The text itself is not published yet. It is listed in [[writing/a-limit-screenplay|the writing drawer]] and will appear here when the audiobook is released.
+The screenplay is published as a working draft, with the narration alongside the text: [[writing/a-limit-screenplay|A Limit — screenplay]]. One scene — the bar, before the first crossroads — is still to be written, and the page says so.
 </Callout>

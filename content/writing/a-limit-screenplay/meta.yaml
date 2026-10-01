@@ -1,13 +1,26 @@
 title: { en: "A Limit — screenplay", he: "A Limit — תסריט" }
+subtitle:
+  en: "A psychological mystery about the limits of certainty. Read as a screenplay — scene headings and all."
+  he: "מותחן פסיכולוגי על גבולות הוודאות. בקריאה כתסריט — כולל כותרות הסצנות."
 summary:
-  en: "The screenplay behind the audiobook. Published when the audiobook is released."
-  he: "התסריט שמאחורי ספר השמע. יתפרסם כשספר השמע ישוחרר."
+  en: "The screenplay behind the audiobook, published as a working draft with its full narration. One scene is still to be written."
+  he: "התסריט שמאחורי ספר השמע, מתפרסם כטיוטת עבודה עם ההקראה המלאה. סצנה אחת עוד לא נכתבה."
 category: { en: "Screenplay", he: "תסריט" }
 status: in-production
 type: screenplay
 language: en
 date: "2026-08"
-public: false
+updated: "2026-10-01"
+public: true
 order: 5
+note:
+  en: "Working draft, published as it stands. The bar scene before the first crossroads is still to be written. The narration is a synthetic voice (ElevenLabs), a working version made in September 2026, ahead of the audiobook edit."
+  he: "טיוטת עבודה, מתפרסמת כפי שהיא. סצנת הבר שלפני הצומת הראשון עוד לא נכתבה. ההקראה היא קול סינתטי (ElevenLabs), גרסת עבודה מספטמבר 2026, לפני עריכת ספר השמע."
+audio:
+  - title: { en: "A Limit — full narration, 22½ minutes", he: "A Limit — הקראה מלאה, 22 וחצי דקות" }
+    src: /audio/a-limit-narration.mp3
+    public: true
+    note: { en: "Synthetic voice (ElevenLabs) · September 2026 · MP3, 16 MB", he: "קול סינתטי (ElevenLabs) · ספטמבר 2026 · MP3, 16MB" }
 related:
   - projects/a-limit
+  - research/the-limit-of-experience

@@ -6,25 +6,25 @@ summary:
 category: { en: "Film · screenplay · audiobook", he: "קולנוע · תסריט · ספר שמע" }
 status: in-production
 started: "2026-08"
-updated: "2026-09-28"
+updated: "2026-10-01"
 featured: true
 weight: 3
 order: 6
 accent: "#4A4A46"
 milestone:
-  en: "First full narration recorded; editing toward an audiobook release"
-  he: "הקלטה ראשונה של הקריאה המלאה; עריכה לקראת שחרור ספר שמע"
+  en: "Screenplay draft and first full narration published; editing toward an audiobook release"
+  he: "טיוטת התסריט והקראה מלאה ראשונה פורסמו; עריכה לקראת שחרור ספר שמע"
 languages: ["English"]
 builtLevels:
   built:
     en:
-      - "Screenplay draft (English)"
+      - "Screenplay draft (English) — published, one scene still to be written"
       - "Filmmaker's document, volume I: vision statement and guiding principle"
-      - "First full narration take (September 2026)"
+      - "First full narration, 22½ minutes — synthetic voice, ElevenLabs (September 2026)"
     he:
-      - "טיוטת תסריט (אנגלית)"
+      - "טיוטת תסריט (אנגלית) — פורסמה, סצנה אחת עוד לא נכתבה"
       - "מסמך הבמאי, כרך א׳: הצהרת חזון ועיקרון מנחה"
-      - "טייק ראשון של קריאה מלאה (ספטמבר 2026)"
+      - "הקראה מלאה ראשונה, 22 וחצי דקות — קול סינתטי, ElevenLabs (ספטמבר 2026)"
   researching:
     en:
       - "The philosophical model underneath it — see the research note"
@@ -39,6 +39,11 @@ builtLevels:
     he:
       - "שחרור ספר שמע בפלטפורמות סטרימינג"
       - "הסרט"
+audio:
+  - title: { en: "A Limit — full narration, 22½ minutes", he: "A Limit — הקראה מלאה, 22 וחצי דקות" }
+    src: /audio/a-limit-narration.mp3
+    public: true
+    note: { en: "Synthetic voice (ElevenLabs) · September 2026 · working version", he: "קול סינתטי (ElevenLabs) · ספטמבר 2026 · גרסת עבודה" }
 sponsor:
   - { title: { en: "Audio post-production", he: "פוסט־פרודקשן לאודיו" }, detail: { en: "Editing, mixing and mastering of the audiobook", he: "עריכה, מיקס ומאסטרינג של ספר השמע" } }
   - { title: { en: "Cover art", he: "עטיפה" }, detail: { en: "One commissioned image for the release", he: "דימוי אחד בהזמנה לשחרור" } }

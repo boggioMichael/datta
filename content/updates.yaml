@@ -1,6 +1,20 @@
 # Build log. One entry per real event. Newest can go anywhere — the build sorts by date.
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
 - date: 2026-10-01
+  project: writing/a-limit-screenplay
+  title: { en: "A Limit: the screenplay draft published, with its full narration", he: "A Limit: טיוטת התסריט פורסמה, עם ההקראה המלאה" }
+  text:
+    en: "Read as a screenplay, with the 22½-minute narration playable on the page. One scene is still to be written, and the page says which."
+    he: "בקריאה כתסריט, עם ההקראה בת 22 וחצי הדקות ניתנת להשמעה בעמוד. סצנה אחת עוד לא נכתבה, והעמוד אומר איזו."
+
+- date: 2026-10-01
+  project: writing/a-well-defined-introduction
+  title: { en: "A Well-Defined Introduction: front matter and Chapter 42 published", he: "A Well-Defined Introduction: החומר הפותח ופרק 42 פורסמו" }
+  text:
+    en: "The introduction, definitions, rules, participants and initial conditions of the novel in progress, plus its first finished chapter. The rest stays in the drawer until it is done."
+    he: "ההקדמה, ההגדרות, הכללים, המשתתפים ותנאי ההתחלה של הרומן שבכתיבה, ועוד הפרק הגמור הראשון שלו. השאר נשאר במגירה עד שייגמר."
+
+- date: 2026-10-01
   title: { en: "Datta studio site, first version", he: "אתר הסטודיו של דאטא, גרסה ראשונה" }
   text:
     en: "Bilingual, static, content-driven. Projects, lab, music, writing, research, support, build log, index."
@@ -29,10 +43,10 @@
 
 - date: 2026-09-28
   project: projects/a-limit
-  title: { en: "First full narration of the screenplay recorded", he: "הקלטה ראשונה של קריאת התסריט המלא" }
+  title: { en: "First full narration of the screenplay produced", he: "הקראה מלאה ראשונה של התסריט הופקה" }
   text:
-    en: "A draft audiobook take, read as a screenplay — scene headings and all."
-    he: "טייק טיוטה לספר השמע, בקריאה כתסריט — כולל כותרות הסצנות."
+    en: "A 22½-minute working version, read as a screenplay — scene headings and all — with a synthetic voice (ElevenLabs)."
+    he: "גרסת עבודה של 22 וחצי דקות, בקריאה כתסריט — כולל כותרות הסצנות — בקול סינתטי (ElevenLabs)."
 
 - date: 2026-09-30
   project: music/well-tempered-clavier

@@ -137,6 +137,8 @@ export function WritingIndex() {
                     {e.meta.type && <Mono>{l(WRITING_TYPE_LABEL[e.meta.type]).toUpperCase()}</Mono>}
                     {e.meta.language && <span>{l(TEXT_LANG_LABEL[e.meta.language])}</span>}
                     {e.meta.date && <Mono>{formatDate(e.meta.date, locale)}</Mono>}
+                    {e.meta.audio?.some((a) => a.public) && <Mono className="has-audio">{t("label.narration").toUpperCase()}</Mono>}
+                    {e.meta.status !== "complete" && <StatusBadge status={e.meta.status} />}
                   </span>
                   <span className="text-summary">{l(e.meta.summary)}</span>
                 </a>
