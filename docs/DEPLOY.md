@@ -11,7 +11,7 @@
 
 ## GitHub Pages
 
-`.github/workflows/deploy.yml` builds on every push to `main` and publishes `dist/` to Pages. In the repository settings → Pages, choose "GitHub Actions" as the source. For a custom domain add a `CNAME` file to `public/` and set `SITE_URL` as a repository variable.
+`.github/workflows/deploy.yml` builds on every push to `main` and publishes `dist/` to Pages. In the repository settings → Pages, choose "GitHub Actions" as the source. While the site lives at `boggiomichael.github.io/datta`, the repository variables are `BASE_PATH=/datta` and `SITE_URL=https://boggiomichael.github.io/datta`. For a custom domain: set it in Settings → Pages (no `CNAME` file is needed with the Actions deployment), then set `SITE_URL` to the domain and `BASE_PATH` to empty.
 
 ## Vercel / Netlify / Cloudflare Pages / Render
 
