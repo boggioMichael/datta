@@ -99,7 +99,8 @@ export function expandComponents(md: string, ctx: RenderCtx): string {
     const e = ctx.site.byRef.get(ref);
     if (!e) return label ?? ref;
     const text = label ?? localized(e.meta.title, ctx.locale);
-    return `[${text}](${ctx.href(entryHref(e, ctx.locale))})`;
+    // Site-absolute; the link renderer resolves it exactly once (base path or relative mode).
+    return `[${text}](${entryHref(e, ctx.locale)})`;
   });
   return out;
 }
