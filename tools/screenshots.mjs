@@ -15,7 +15,7 @@ try {
   process.exit(1);
 }
 
-const pages = (process.env.PAGES ?? "/en/,/he/,/en/projects/,/en/projects/rasa/,/he/projects/rasa/,/en/projects/maplesyrup/,/en/projects/doggystyle/,/en/music/,/en/music/neshikot-batzintzenet/,/he/music/neshikot-batzintzenet/,/en/writing/,/en/research/,/en/research/the-limit-of-experience/,/he/research/the-limit-of-experience/,/en/support/,/he/support/,/en/contact/,/en/index/,/en/now/,/en/updates/,/en/about/,/he/about/,/en/lab/,/en/civic/chchchainges/,/en/invest/data-room/,/en/work/").split(",");
+const pages = (process.env.PAGES ?? "/en/,/he/,/en/projects/,/en/projects/rasa/,/he/projects/rasa/,/en/projects/maplesyrup/,/en/projects/doggystyle/,/en/music/,/en/music/well-tempered-clavier/,/he/music/well-tempered-clavier/,/en/writing/,/en/research/,/en/research/the-limit-of-experience/,/he/research/the-limit-of-experience/,/en/support/,/he/support/,/en/contact/,/en/index/,/en/now/,/en/updates/,/en/about/,/he/about/,/en/lab/,/en/civic/chchchainges/,/en/invest/data-room/,/en/work/").split(",");
 const viewports = {
   desktop: { width: 1440, height: 900, deviceScaleFactor: 1 },
   phone: { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true },

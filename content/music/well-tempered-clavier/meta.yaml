@@ -1,0 +1,49 @@
+title: { en: "The Well-Tempered Clavier", he: "הפסנתר המושווה" }
+subtitle: { en: "Bach's Book I — forty-eight preludes and fugues, recorded one at a time and published as each is finished.", he: "ספר א׳ של באך — ארבעים ושמונה פרלודים ופוגות, מוקלטים אחד־אחד ומתפרסמים כשכל אחד גמור." }
+summary:
+  en: "A long-form piano recording project: the whole of Bach's Well-Tempered Clavier Book I, released prelude by prelude on YouTube and Instagram. Six of forty-eight pieces published; the rest in progress."
+  he: "פרויקט הקלטות פסנתר ארוך־טווח: הפסנתר המושווה ספר א׳ של באך במלואו, יוצא פרלוד אחרי פרלוד ביוטיוב ובאינסטגרם. שש מתוך ארבעים ושמונה יצירות פורסמו; השאר בעבודה."
+category: { en: "Classical piano · recording series", he: "פסנתר קלאסי · סדרת הקלטות" }
+status: recording
+started: "2026-08"
+updated: "2026-09-30"
+featured: true
+weight: 2
+order: 4
+accent: "#B8963E"
+milestone: { en: "6 of 48 pieces published; the next preludes and fugues being recorded", he: "6 מתוך 48 יצירות פורסמו; הפרלודים והפוגות הבאים בהקלטה" }
+website: https://www.youtube.com/@michaelboggioneoone
+videos:
+  - { title: { en: "Bach: Preludes in C major (BWV 846), C minor, E minor & E major — Well-Tempered Clavier I", he: "באך: פרלודים בדו מז׳ור (BWV 846), דו מינור, מי מינור ומי מז׳ור — הפסנתר המושווה א׳" }, youtube: "qNIEysn0DEw" }
+  - { title: { en: "Bach: Prelude No. 8 in E-flat minor, BWV 853 — Well-Tempered Clavier I", he: "באך: פרלוד מס׳ 8 במי במול מינור, BWV 853 — הפסנתר המושווה א׳" }, youtube: "UvQznRXrhqI" }
+  - { title: { en: "Bach: Fugue No. 9 in E major, BWV 854 — Well-Tempered Clavier I", he: "באך: פוגה מס׳ 9 במי מז׳ור, BWV 854 — הפסנתר המושווה א׳" }, youtube: "V5cB5LDgxXI" }
+metrics:
+  - { label: { en: "pieces of Book I published (of 48)", he: "יצירות מספר א׳ שפורסמו (מתוך 48)" }, value: "6", kind: verified }
+  - { label: { en: "other works recorded alongside: Chopin, Beethoven, Medtner", he: "יצירות נוספות שהוקלטו לצד הסדרה: שופן, בטהובן, מדטנר" }, value: "7", kind: verified }
+  - { label: { en: "series started", he: "הסדרה התחילה" }, value: "AUG 2026", kind: verified }
+milestones:
+  - { text: { en: "First preludes published", he: "הפרלודים הראשונים פורסמו" }, done: true, date: "2026-09-27" }
+  - { text: { en: "First fugue published", he: "הפוגה הראשונה פורסמה" }, done: true, date: "2026-09-30" }
+  - { text: { en: "Shorts and Reels cut from every finished piece", he: "Shorts ו-Reels נחתכים מכל יצירה גמורה" }, done: true, date: "2026-09-28" }
+  - { text: { en: "All twenty-four preludes", he: "כל עשרים וארבעה הפרלודים" }, done: false }
+  - { text: { en: "All twenty-four fugues", he: "כל עשרים וארבע הפוגות" }, done: false }
+  - { text: { en: "Book I complete — a single playlist in catalogue order", he: "ספר א׳ שלם — פלייליסט אחד בסדר הקטלוג" }, done: false }
+evidence:
+  - { label: { en: "YouTube channel — every recording", he: "ערוץ היוטיוב — כל ההקלטות" }, url: "https://www.youtube.com/@michaelboggioneoone", kind: recording }
+sponsor:
+  - { title: { en: "Recording time for the remaining pieces", he: "זמן הקלטה ליצירות שנותרו" }, detail: { en: "Forty-two preludes and fugues still to record", he: "ארבעים ושניים פרלודים ופוגות עדיין להקלטה" } }
+  - { title: { en: "Mixing and mastering", he: "מיקס ומאסטרינג" }, detail: { en: "One consistent sound across the whole book", he: "צליל אחיד לאורך כל הספר" } }
+  - { title: { en: "A piano and a room", he: "פסנתר וחדר" }, detail: { en: "Sessions on a concert instrument for the fugues", he: "סשנים על כלי קונצרטי לפוגות" } }
+funding:
+  type: patronage
+  public: true
+  stage: { en: "Recording and publishing, piece by piece", he: "הקלטה ופרסום, יצירה אחרי יצירה" }
+  exists: { en: "Six pieces of Book I on the channel, with Shorts and Reels; seven other works recorded alongside", he: "שש יצירות מספר א׳ בערוץ, עם Shorts ו-Reels; שבע יצירות נוספות שהוקלטו לצידן" }
+  next: { en: "The remaining preludes and fugues, in whatever order they are ready", he: "הפרלודים והפוגות שנותרו, בכל סדר שבו הם מוכנים" }
+  useOfFunds: { en: "Recording sessions, mixing and mastering, a concert instrument for the fugues", he: "סשני הקלטה, מיקס ומאסטרינג, כלי קונצרטי לפוגות" }
+related:
+  - music/limos
+  - projects/classical-coloring
+todo:
+  - "WTC: add the Instagram handle and a link to the Reels if it should be public."
+  - "WTC: list upcoming live dates if any."

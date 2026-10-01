@@ -8,7 +8,7 @@ Datta exists because those things were never separate. The same habit runs throu
 
 - **Software and AI research.** [[projects/maplesyrup]] reads a running game through pixels alone and turns them into structured, confidence-scored state; [[projects/syrup-universal]] asks whether a companion can learn *any* game alongside its player. [[lab/syrup]] is the generic engine underneath.
 - **Products.** [[projects/doggystyle]], a conversational service for dog owners, exists end to end as a working local build with a recorded walkthrough. [[projects/rasa]] is a pistachio gelato in product development, with its first sale on the books.
-- **Music.** Performances, a children's album in production ([[music/neshikot-batzintzenet]]) and a recording identity in the making ([[music/limos]]).
+- **Music.** Bach's *Well-Tempered Clavier* recorded prelude by prelude ([[music/well-tempered-clavier]]), and a recording identity in the making ([[music/limos]]).
 - **Writing and research.** Essays, poetry, lyrics and fiction, plus a research notebook where speculative models are labelled as speculative — for instance [[research/the-limit-of-experience]], the philosophical model behind the screenplay [[projects/a-limit]].
 
 ## Background

@@ -404,7 +404,9 @@ tr[hidden] { display: none; }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.2rem; }
 .gallery figure { margin: 0; }
 .gallery img { border-radius: var(--radius); background: var(--bg-soft); width: 100%; }
-.videos { display: grid; gap: 1.5rem; margin: 0 0 1.5rem; }
+.videos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 1.2rem; margin: 0 0 1.5rem; }
+.videos > :first-child { grid-column: 1 / -1; }
+@media (max-width: 640px) { .videos { grid-template-columns: 1fr; } }
 
 /* related */
 .related { margin-top: 4rem; border-top: 1px solid var(--ink); padding-top: 1rem; }

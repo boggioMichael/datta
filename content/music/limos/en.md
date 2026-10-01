@@ -4,7 +4,7 @@ Most classical recordings on the internet are about the pianist. LIMOS is an att
 
 ## What exists
 
-A name, a direction, and the technical questions above. The recordings that exist today live under [[music/performances]] — the Well-Tempered Clavier series — and are the proof that the playing is there. LIMOS is the question of how it should be *heard*.
+A name, a direction, and the technical questions above. The recordings that exist today live under [[music/well-tempered-clavier]] — the Well-Tempered Clavier series — and are the proof that the playing is there. LIMOS is the question of how it should be *heard*.
 
 ## What comes next
 

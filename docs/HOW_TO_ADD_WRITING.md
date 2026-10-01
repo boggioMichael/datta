@@ -20,7 +20,7 @@ date: "2026-08"            # publication / writing date
 public: false              # false = listed in the "In the drawer" table, title only, no page
 excerptOnly: true          # optional: marks the page as an excerpt from a longer work
 related:
-  - music/neshikot-batzintzenet
+  - music/well-tempered-clavier
 ```
 
 **Nothing is published by accident.** A piece with `public: false` has no page and no text on the site — only its title, type, language and status in the drawer. Set `public: true` when it is ready. Links to unpublished pieces resolve to the drawer, never to a missing page.

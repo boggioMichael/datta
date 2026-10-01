@@ -11,11 +11,11 @@ items:
     text:
       en: "Taking the pixel-only perception engine from one game toward a game-agnostic companion. MVP in progress on a branch."
       he: "לוקחים את מנוע התפיסה מבוסס־הפיקסלים ממשחק אחד לעבר מלווה שלא תלוי במשחק. MVP בעבודה על ענף."
-  - project: music/neshikot-batzintzenet
-    title: { en: "Neshikot B'Tzintzenet", he: "נשיקות בצנצנת" }
+  - project: music/well-tempered-clavier
+    title: { en: "Well-Tempered Clavier I", he: "הפסנתר המושווה א׳" }
     text:
-      en: "Preparing an October studio session: three songs with a string quartet, winds and a new singer."
-      he: "הכנות לסשן אולפן באוקטובר: שלושה שירים עם רביעיית כלי קשת, כלי נשיפה וזמרת/זמר חדש."
+      en: "Bach, prelude by prelude: six of the forty-eight pieces published, the next ones being recorded."
+      he: "באך, פרלוד אחרי פרלוד: שש מתוך ארבעים ושמונה היצירות פורסמו, הבאות בהקלטה."
   - project: projects/a-limit
     title: { en: "A Limit", he: "A Limit" }
     text:
@@ -26,11 +26,6 @@ items:
     text:
       en: "Revising “The Limit of Experience” and adding notes as they come."
       he: "עורכים את ״גבול החוויה״ ומוסיפים רשומות ככל שהן מגיעות."
-  - project: music/performances
-    title: { en: "Performances", he: "ביצועים" }
-    text:
-      en: "Bach, Well-Tempered Clavier Book I — prelude by prelude, on YouTube and Instagram."
-      he: "באך, הפסנתר המושווה ספר א׳ — פרלוד אחרי פרלוד, ביוטיוב ובאינסטגרם."
 note:
   en: "Inspired by the [/now page movement](https://nownownow.com/about). Updated by hand."
   he: "בהשראת [תנועת דפי ה-/now](https://nownownow.com/about). מתעדכן ידנית."

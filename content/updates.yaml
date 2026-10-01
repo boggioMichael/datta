@@ -34,9 +34,22 @@
     en: "A draft audiobook take, read as a screenplay — scene headings and all."
     he: "טייק טיוטה לספר השמע, בקריאה כתסריט — כולל כותרות הסצנות."
 
+- date: 2026-09-30
+  project: music/well-tempered-clavier
+  title: { en: "Fugue No. 9 in E major published; Chopin's Ballade No. 1 and two Études alongside it", he: "פוגה מס׳ 9 במי מז׳ור פורסמה; לצידה הבלדה מס׳ 1 של שופן ושני אטיודים" }
+  link: https://www.youtube.com/@michaelboggioneoone
+
 - date: 2026-09-28
-  project: music/performances
-  title: { en: "Well-Tempered Clavier I: Shorts cut from every finished prelude", he: "הפסנתר המושווה א׳: Shorts נחתכו מכל פרלוד גמור" }
+  project: music/well-tempered-clavier
+  title: { en: "Shorts cut from every finished prelude", he: "Shorts נחתכו מכל פרלוד גמור" }
+
+- date: 2026-09-27
+  project: music/well-tempered-clavier
+  title: { en: "Preludes in C major, C minor, E minor and E major, and Prelude No. 8 in E-flat minor published", he: "הפרלודים בדו מז׳ור, דו מינור, מי מינור ומי מז׳ור, והפרלוד מס׳ 8 במי במול מינור פורסמו" }
+  text:
+    en: "The series opens: five preludes of Book I, posted as they were finished rather than held for a complete set."
+    he: "הסדרה נפתחת: חמישה פרלודים מספר א׳, פורסמו כשנגמרו במקום להמתין לסט שלם."
+  link: https://www.youtube.com/@michaelboggioneoone
 
 - date: 2026-09-27
   project: projects/rasa
@@ -44,13 +57,6 @@
   text:
     en: "A month-by-month plan through February 2027, including the next piece of equipment. The first sale was 2.5 litres of the water-based base."
     he: "תוכנית חודש־אחר־חודש עד פברואר 2027, כולל פריט הציוד הבא. המכירה הראשונה: 2.5 ליטר מהבסיס על מים."
-
-- date: 2026-09-24
-  project: music/neshikot-batzintzenet
-  title: { en: "Outreach to producers and illustrators began", he: "התחילה פנייה למפיקים ולמאיירים" }
-  text:
-    en: "Looking for a producer for a one-song pilot and for illustrators for the visual world."
-    he: "מחפשים מפיק/ה לפיילוט של שיר אחד, ומאיירים לעולם הוויזואלי."
 
 - date: 2026-08-17
   project: lab/syrup
@@ -78,3 +84,11 @@
   text:
     en: "Every detector output carries a value, a confidence, a reliability grade and a failure reason. Not real-time yet at that point — the measurements said so."
     he: "כל פלט של גלאי נושא ערך, ביטחון, דירוג אמינות וסיבת כישלון. עדיין לא בזמן אמת באותו שלב — המדידות אמרו את זה."
+
+- date: 2026-08-11
+  project: music/well-tempered-clavier
+  title: { en: "First recordings on the channel: Chopin, Beethoven, Medtner", he: "ההקלטות הראשונות בערוץ: שופן, בטהובן, מדטנר" }
+  text:
+    en: "Nocturne Op. 62 No. 1, Prelude Op. 28 No. 24, the first movement of the Pathétique, and Medtner's Fairy Tale Op. 20 No. 1."
+    he: "נוקטורן אופ׳ 62 מס׳ 1, פרלוד אופ׳ 28 מס׳ 24, הפרק הראשון של הפתטית, ואגדה אופ׳ 20 מס׳ 1 של מדטנר."
+  link: https://www.youtube.com/@michaelboggioneoone

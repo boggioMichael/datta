@@ -5,7 +5,7 @@ export const site = {
   name: "DATTA",
   nameHe: "דאטא",
   // TODO: set to the real domain before deploying (used for canonical URLs, sitemap, OpenGraph).
-  url: process.env.SITE_URL ?? "https://datta.studio",
+  url: process.env.SITE_URL ?? "https://datta.com",
   // Optional base path when hosting under a sub-folder (e.g. GitHub project pages: "/datta").
   basePath: process.env.BASE_PATH ?? "",
   defaultLocale: "en" as Locale,
