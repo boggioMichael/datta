@@ -17,11 +17,12 @@ export const site = {
     youtube: "https://www.youtube.com/@michaelboggioneoone",
   },
   contact: {
-    // TODO: set the public contact e-mail. Until set, the contact page shows the form only.
-    email: process.env.CONTACT_EMAIL ?? "",
-    // TODO: form backend endpoint (Formspree / Netlify Forms / your own). Until set, the form
-    // degrades to a mailto: link (if email is set) or a notice.
-    formEndpoint: process.env.CONTACT_FORM_ENDPOINT ?? "",
+    // Public contact e-mail (shown on /contact and used by the form's mailto: fallback).
+    email: process.env.CONTACT_EMAIL ?? "boggio.michael@gmail.com",
+    // Form backend. FormSubmit (formsubmit.co) forwards the form to the e-mail with no account;
+    // the first submission sends a one-time activation e-mail. After activation, FormSubmit also
+    // offers a random alias endpoint that hides the address from the page source.
+    formEndpoint: process.env.CONTACT_FORM_ENDPOINT ?? "https://formsubmit.co/ajax/boggio.michael@gmail.com",
   },
   analytics: {
     // Privacy-conscious analytics (Plausible or Umami). Leave empty to disable.

@@ -120,34 +120,41 @@
     var email = form.getAttribute("data-email");
     form.addEventListener("submit", function (e) {
       // Spam guard: honeypot filled, or submitted in under 3 seconds → drop silently.
-      var hp = form.querySelector('input[name="website"]');
+      var hp = form.querySelector('input[name="_honey"]');
       var fast = started && Date.now() - Number(started.value) < 3000;
       if ((hp && hp.value) || fast) { e.preventDefault(); return; }
       var data = new FormData(form);
       var chosen = form.querySelector('input[name="intent"]:checked');
+      var subject = "[DATTA] " + (chosen ? chosen.value : "contact") + (data.get("topic") ? " — " + data.get("topic") : "");
       track("contact-submit", { intent: chosen ? chosen.value : "" });
       if (endpoint) {
         e.preventDefault();
         var btn = form.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(endpoint, { method: "POST", body: data, headers: { Accept: "application/json" } })
-          .then(function (r) { if (!r.ok) throw new Error(r.status); status(form.getAttribute("data-sent") || "Sent. Thank you — expect a reply within a few days."); form.reset(); })
-          .catch(function () { status("Could not send. Please e-mail instead."); })
+        status(form.getAttribute("data-sending") || "Sending…");
+        var payload = {};
+        data.forEach(function (v, k) { if (k !== "_honey") payload[k] = v; });
+        payload._subject = subject;
+        payload._replyto = data.get("email");
+        fetch(endpoint, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "application/json", Accept: "application/json" } })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === "false" || j.success === false) throw new Error(j.message || r.status); }); })
+          .then(function () { status(form.getAttribute("data-sent") || "Sent."); form.reset(); if (started) started.value = String(Date.now()); })
+          .catch(function () { status((form.getAttribute("data-failed") || "Could not send. Please e-mail instead:") + (email ? " " + email : ""), email); })
           .then(function () { btn.disabled = false; });
       } else if (email) {
         e.preventDefault();
-        var subject = "[DATTA] " + (chosen ? chosen.value : "contact") + (data.get("topic") ? " — " + data.get("topic") : "");
         var bodyText = "Name: " + data.get("name") + "\nEmail: " + data.get("email") + "\nOrganization: " + (data.get("organization") || "") + "\n\n" + data.get("message");
         location.href = "mailto:" + email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(bodyText);
       } else {
         e.preventDefault();
-        status("The form is not connected yet. Please use the links below.");
+        status(form.getAttribute("data-notconnected") || "The form is not connected yet.");
       }
     });
-    function status(text) {
+    function status(text, mail) {
       var p = form.querySelector(".form-status");
       if (!p) { p = doc.createElement("p"); p.className = "form-status"; p.setAttribute("role", "status"); form.appendChild(p); }
       p.textContent = text;
+      if (mail) { var a = doc.createElement("a"); a.href = "mailto:" + mail; a.textContent = mail; p.textContent = text.replace(mail, "") + " "; p.appendChild(a); }
     }
   }
 })();

@@ -485,7 +485,7 @@ export function ContactPage() {
   return (
     <>
       <PageHeader title={t("contact.title")} intro={t("contact.intro")} />
-      <form className="contact-form" method="post" action={endpoint || undefined} data-contact-form data-endpoint={endpoint} data-email={email} acceptCharset="UTF-8">
+      <form className="contact-form" method="post" action={endpoint || undefined} data-contact-form data-endpoint={endpoint} data-email={email} data-sent={t("contact.sent")} data-failed={t("contact.failed")} data-sending={t("contact.sending")} data-notconnected={t("contact.notConfigured")} acceptCharset="UTF-8">
         <fieldset className="intent">
           <legend>{t("contact.iwant")}</legend>
           <div className="intent-options">
@@ -519,12 +519,14 @@ export function ContactPage() {
           <span>{t("contact.message")}</span>
           <textarea name="message" rows={7} required />
         </label>
-        {/* Spam protection: honeypot + time-to-submit check, handled in site.js */}
+        {/* Spam protection: honeypot (FormSubmit's _honey) + time-to-submit check, handled in site.js */}
         <div className="hp" aria-hidden="true">
           <label>
-            Website <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+            Website <input name="_honey" type="text" tabIndex={-1} autoComplete="off" />
           </label>
         </div>
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_started" value="" data-started />
         <input type="hidden" name="_lang" value={locale} />
         <p className="form-actions">
