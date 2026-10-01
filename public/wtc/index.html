@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="The Well-Tempered Clavier, Book I — support the recordings">
+<meta property="og:description" content="A complete recording of Bach's Well-Tempered Clavier, Book I, by Michael Alberto Boggio — all 24 preludes and 24 fugues, one piece at a time. Ways to support the recordings.">
+<meta property="og:type" content="website">
+<link rel="icon" href="../favicon.svg">
+<title>The Well-Tempered Clavier, Book I — support the recordings · DATTA</title>
+<meta name="description" content="Support page for Michael Alberto Boggio's complete recording of Bach's Well-Tempered Clavier, Book I">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>@font-face{font-family:"Frank Ruhl Libre";src:url("../fonts/frankruhllibre.woff2") format("woff2");font-weight:300 700;font-display:swap}</style>
+<style>
+  html { background: #0d0f15; }
+  /* Layout: one narrow column, like a concert programme — charcoal ground, gold rules, two scripts side by side. Single committed dark look. */
+  :root {
+    --bg: #0d0f15;
+    --bg-2: #141720;
+    --fg: #f1ebdf;
+    --fg-2: #b9b2a3;
+    --gold: #d8b45e;
+    --gold-2: #9a7f3e;
+    --line: #2a2d38;
+    --display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+    --hebrew: "Frank Ruhl Libre", "David", "Times New Roman", serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0; font-family: var(--hebrew), var(--display); font-size: 17px; line-height: 1.55; }
+  .wrap { max-width: 720px; margin: 0 auto; padding-block: 56px 72px; padding-inline: 20px; }
+  .eyebrow { font-family: var(--display); font-size: 14px; letter-spacing: .34em; text-transform: uppercase; color: var(--gold); text-align: center; }
+  h1 { font-family: var(--display); font-weight: 500; font-size: clamp(34px, 6vw, 50px); line-height: 1.08; text-align: center; margin: 14px 0 4px; text-wrap: balance; letter-spacing: .01em; }
+  h1 em { font-style: italic; font-weight: 400; }
+  .he-title { font-family: var(--hebrew); direction: rtl; text-align: center; font-size: clamp(20px, 3.6vw, 26px); color: var(--gold); margin: 0; font-weight: 400; }
+  .byline { font-family: var(--display); text-align: center; font-size: 19px; color: var(--fg-2); margin: 16px 0 0; font-style: italic; }
+  .rule { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 36px 0; color: var(--gold); }
+  .rule::before, .rule::after { content: ""; height: 1px; width: 90px; background: var(--gold-2); }
+  .rule i { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); display: inline-block; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .two > div { min-width: 0; }
+  .en { font-family: var(--display); font-size: 20px; line-height: 1.5; }
+  .he { font-family: var(--hebrew); direction: rtl; text-align: right; font-size: 17px; line-height: 1.7; font-weight: 300; }
+  .en p, .he p { margin: 0 0 12px; }
+  .label { font-family: var(--display); font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin: 0 0 10px; }
+  .label-he { font-family: var(--hebrew); font-size: 14px; color: var(--gold); direction: rtl; text-align: right; margin: 0 0 10px; }
+  .status { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .stat { border-top: 1px solid var(--line); padding-top: 14px; min-width: 0; }
+  .stat b { display: block; font-family: var(--display); font-size: 30px; font-weight: 500; line-height: 1.1; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .stat span { display: block; font-size: 14px; color: var(--fg-2); }
+  .stat .he { font-size: 14px; }
+  .ways { display: grid; gap: 14px; }
+  .way { border: 1px solid var(--line); background: var(--bg-2); padding: 20px 22px; display: grid; grid-template-columns: 1fr auto; gap: 14px 20px; align-items: center; }
+  .way h3 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; letter-spacing: .04em; }
+  .way .sub { margin: 4px 0 0; color: var(--fg-2); font-size: 15px; }
+  .way .sub-he { direction: rtl; text-align: right; }
+  .num { font-family: var(--display); font-size: 30px; font-weight: 500; letter-spacing: .06em; font-variant-numeric: tabular-nums; color: var(--fg); grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  button.copy { font: inherit; font-family: var(--display); font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); background: transparent; border: 1px solid var(--gold-2); padding: 8px 16px; cursor: pointer; }
+  button.copy:hover, button.copy:focus-visible { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(216,180,94,.25); }
+  .note { color: var(--fg-2); font-size: 15px; margin: 18px 0 0; }
+  .note.he { font-size: 15px; }
+  a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-2); }
+  a:hover, a:focus-visible { border-bottom-color: var(--gold); outline: none; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: center; font-family: var(--display); font-size: 19px; }
+  .foot { text-align: center; color: var(--fg-2); font-size: 14px; margin-top: 40px; font-family: var(--display); font-style: italic; }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--gold); color: #1a1507; font-family: var(--display); font-size: 15px; letter-spacing: .18em; text-transform: uppercase; padding: 10px 18px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  @media (max-width: 560px) {
+    .two { grid-template-columns: 1fr; }
+    .way { grid-template-columns: 1fr; }
+    .num { font-size: 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">J. S. Bach</p>
+  <h1><em>The Well-Tempered Clavier</em><br>Book I</h1>
+  <p class="he-title">הפסנתר המושווה · ספר ראשון</p>
+  <p class="byline">Michael Alberto Boggio, piano</p>
+
+  <div class="rule"><i></i></div>
+
+  <div class="two">
+    <div class="en">
+      <p>A complete recording of Book I: all 24 preludes and 24 fugues, one piece at a time.</p>
+      <p>Recorded at Mitzlol Studios, Tel Aviv, and released free on YouTube and Instagram.</p>
+      <p>Every contribution goes to the recordings: studio time, sound, filming and editing.</p>
+    </div>
+    <div class="he">
+      <p>הקלטה שלמה של הספר הראשון: כל 24 הפרלודים ו־24 הפוגות, יצירה אחרי יצירה.</p>
+      <p>מוקלט באולפני מצלול בתל אביב ומתפרסם ביוטיוב ובאינסטגרם, פתוח לכולם.</p>
+      <p>כל תרומה הולכת להקלטות: זמן אולפן, סאונד, צילום ועריכה.</p>
+    </div>
+  </div>
+
+  <div class="rule"><i></i></div>
+
+  <div class="status">
+    <div class="stat"><b>7 / 48</b><span>released so far: Preludes 1 · 2 · 3 · 8 · 9 · 10 and Fugue 9</span><span class="he">יצאו עד כה: פרלודים 1 · 2 · 3 · 8 · 9 · 10 ופוגה 9</span></div>
+    <div class="stat"><b>41</b><span>still to come: 18 preludes and 23 fugues</span><span class="he">נותרו להקלטה: 18 פרלודים ו־23 פוגות</span></div>
+  </div>
+
+  <div class="rule"><i></i></div>
+
+  <p class="label">Support the recordings</p>
+  <p class="label-he">תמיכה בהקלטות</p>
+  <div class="ways">
+    <div class="way">
+      <div><h3>Bit</h3><p class="sub">Send any amount to the number below through the Bit app.</p><p class="sub sub-he">העברה בכל סכום למספר שלמטה דרך אפליקציית ביט.</p></div>
+      <div class="num"><span id="bit-number">058-707-0909</span><button class="copy" type="button" data-copy="0587070909">Copy · העתק</button></div>
+    </div>
+    <div class="way">
+      <div><h3>PayBox</h3><p class="sub">The same number, through the PayBox app.</p><p class="sub sub-he">אותו מספר, דרך אפליקציית פייבוקס.</p></div>
+      <div class="num"><span id="paybox-number">058-707-0909</span><button class="copy" type="button" data-copy="0587070909">Copy · העתק</button></div>
+    </div>
+    <div class="way">
+      <div><h3>Other ways</h3><p class="sub">Bank transfer or any other arrangement: write to <a href="mailto:boggio.michael@gmail.com">boggio.michael@gmail.com</a>.</p><p class="sub sub-he">העברה בנקאית או כל הסדר אחר — כתבו ל־boggio.michael@gmail.com.</p></div>
+      <div class="num"><span style="font-size:20px">boggio.michael@gmail.com</span><button class="copy" type="button" data-copy="boggio.michael@gmail.com">Copy · העתק</button></div>
+    </div>
+  </div>
+  <p class="note">Contributions are a gift to the project, not a purchase.</p>
+  <p class="note he">התרומות הן מתנה לפרויקט, לא רכישה.</p>
+
+  <div class="rule"><i></i></div>
+
+  <div class="links">
+    <a href="https://www.youtube.com/@michaelboggioneoone" target="_blank" rel="noopener">YouTube · @michaelboggioneoone</a>
+    <a href="https://www.instagram.com/boggiomichael/" target="_blank" rel="noopener">Instagram · @boggiomichael</a>
+  </div>
+  <p class="foot">Michael Alberto Boggio · pianist · Tel Aviv · <a href="../">DATTA</a></p>
+</div>
+<div class="toast" id="toast">Copied · הועתק</div>
+
+<script>
+  (function () {
+    var toast = document.getElementById('toast'); var timer;
+    function show(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(timer); timer = setTimeout(function () { toast.classList.remove('show'); }, 1600); }
+    function select(el) { try { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
+    document.querySelectorAll('button.copy').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var text = b.getAttribute('data-copy'); var target = b.previousElementSibling;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { show('Copied · הועתק'); }, function () { select(target); show('Select and copy · סמנו והעתיקו'); });
+        } else { select(target); show('Select and copy · סמנו והעתיקו'); }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
