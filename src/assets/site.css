@@ -86,7 +86,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
 .muted { color: var(--muted); }
 .small { font-size: .875rem; }
 .mono, .kind, .status, .eyebrow { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; }
-[dir="rtl"] .mono, [dir="rtl"] .kind, [dir="rtl"] .status, [dir="rtl"] .eyebrow { letter-spacing: .02em; font-family: var(--font-mono), var(--font-sans); font-size: .78rem; }
+[dir="rtl"] .mono, [dir="rtl"] .kind, [dir="rtl"] .status, [dir="rtl"] .eyebrow { letter-spacing: 0; font-family: var(--font-mono), var(--font-sans); font-size: .78rem; }
 .sep { color: var(--muted); margin: 0 .35em; }
 
 /* ---------- layout ---------- */
