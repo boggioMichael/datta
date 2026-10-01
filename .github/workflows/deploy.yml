@@ -24,10 +24,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --omit=optional
+      - id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - run: npm run validate
         env:
-          SITE_URL: ${{ vars.SITE_URL }}
-          BASE_PATH: ${{ vars.BASE_PATH }}
+          # Repository variables override these; the defaults publish to <user>.github.io/<repo>.
+          SITE_URL: ${{ vars.SITE_URL || 'https://boggiomichael.github.io/datta' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/datta' }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           CONTACT_FORM_ENDPOINT: ${{ vars.CONTACT_FORM_ENDPOINT }}
           ANALYTICS_PROVIDER: ${{ vars.ANALYTICS_PROVIDER }}
