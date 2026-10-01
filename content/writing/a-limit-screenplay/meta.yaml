@@ -1,0 +1,13 @@
+title: { en: "A Limit — screenplay", he: "A Limit — תסריט" }
+summary:
+  en: "The screenplay behind the audiobook. Published when the audiobook is released."
+  he: "התסריט שמאחורי ספר השמע. יתפרסם כשספר השמע ישוחרר."
+category: { en: "Screenplay", he: "תסריט" }
+status: in-production
+type: screenplay
+language: en
+date: "2026-08"
+public: false
+order: 5
+related:
+  - projects/a-limit

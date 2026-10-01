@@ -1,0 +1,30 @@
+title: { en: "Colour Scores", he: "פרטיטורות בצבע" }
+subtitle: { en: "Public-domain classical scores as structured colouring books.", he: "פרטיטורות קלאסיות בנחלת הכלל כספרי צביעה מובנים." }
+summary:
+  en: "A publishing experiment: sheet music of public-domain classical works, laid out with structured colour maps so that voices, motifs and harmony can be seen as well as heard. Concept stage."
+  he: "ניסוי בהוצאה לאור: תווים של יצירות קלאסיות בנחלת הכלל, מעומדים עם מפות צבע מובנות כך שקולות, מוטיבים והרמוניה ייראו וגם יישמעו. בשלב הרעיון."
+category: { en: "Publishing · music education", he: "הוצאה לאור · חינוך מוזיקלי" }
+status: concept
+started: "2026"
+updated: "2026-10-01"
+featured: false
+weight: 3
+order: 20
+accent: "#8C6B9E"
+builtLevels:
+  researching:
+    en:
+      - "Which works: public-domain compositions in public-domain or newly engraved editions"
+      - "A colour grammar: voices, motifs, cadences — consistent across pieces"
+      - "Print and digital formats; what a child colours versus what a student annotates"
+    he:
+      - "אילו יצירות: לחנים בנחלת הכלל במהדורות בנחלת הכלל או בחריטה חדשה"
+      - "דקדוק צבע: קולות, מוטיבים, קדנצות — עקבי בין יצירות"
+      - "פורמטים מודפסים ודיגיטליים; מה ילד צובע לעומת מה שתלמיד מסמן"
+  vision:
+    en:
+      - "A small series of books, each one piece, that teaches structure through colour"
+    he:
+      - "סדרה קטנה של ספרים, כל אחד יצירה אחת, שמלמדת מבנה דרך צבע"
+related:
+  - music/performances

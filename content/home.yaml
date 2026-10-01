@@ -1,0 +1,23 @@
+# Home page copy. Edit freely; markdown is allowed in aboutShort and supportText.
+headline:
+  en: "An independent studio that turns curiosity into things that exist."
+  he: "סטודיו עצמאי שהופך סקרנות לדברים שקיימים."
+subline:
+  en: "Software and AI research, music, writing and a pistachio obsession — Michael Boggio's experiments, each with its status, its evidence and its next step."
+  he: "תוכנה ומחקר בינה מלאכותית, מוזיקה, כתיבה ואובססיה לפיסטוק — הניסויים של מיכאל בוג׳יו, לכל אחד סטטוס, ראיות וצעד הבא."
+aboutShort:
+  en: |
+    Datta is the umbrella under which **Michael Boggio** builds things that do not fit neatly into one discipline: six years of low-level Android and Linux engineering, a pianist recording Bach prelude by prelude, a writer working in Hebrew, English and Spanish, and a founder running small, serious experiments in food, AI and publishing. One person, one studio, a growing number of things that exist.
+  he: |
+    דאטא היא המטרייה שתחתיה **מיכאל בוג׳יו** בונה דברים שלא נכנסים יפה לדיסציפלינה אחת: שש שנים של הנדסת Android ו־Linux ברמה הנמוכה, פסנתרן שמקליט את באך פרלוד אחרי פרלוד, כותב בעברית, באנגלית ובספרדית, ויזם שמריץ ניסויים קטנים ורציניים באוכל, בבינה מלאכותית ובהוצאה לאור. אדם אחד, סטודיו אחד, ומספר הולך וגדל של דברים שקיימים.
+supportText:
+  en: |
+    Datta is an independent laboratory, and some of what is here is early enough to join. The studio is open to:
+  he: |
+    דאטא היא מעבדה עצמאית, וחלק ממה שכאן מוקדם מספיק כדי להצטרף אליו. הסטודיו פתוח ל:
+supportKinds:
+  - { en: "Investment conversations", he: "שיחות השקעה" }
+  - { en: "Project sponsorship", he: "חסות על פרויקטים" }
+  - { en: "Artistic patronage", he: "פטרונות אמנותית" }
+  - { en: "Collaborations", he: "שיתופי פעולה" }
+  - { en: "Commissioned work", he: "עבודה בהזמנה" }

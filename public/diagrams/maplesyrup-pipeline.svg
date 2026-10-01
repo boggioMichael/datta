@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 560" font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="12" fill="currentColor" stroke="currentColor">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker>
+  </defs>
+  <g stroke-width="1.2">
+    <rect x="20" y="16" width="400" height="52" fill="none"/>
+    <text x="220" y="38" text-anchor="middle" stroke="none" font-weight="500">MAPLESTORY WINDOW · OR RECORDED FRAMES</text>
+    <text x="220" y="56" text-anchor="middle" stroke="none" font-size="10" opacity=".7">image fixture for repeatable tests and demos</text>
+    <line x1="220" y1="68" x2="220" y2="96" marker-end="url(#ah)"/>
+    <text x="232" y="86" stroke="none" font-size="10" opacity=".7">pixels only · no memory reads</text>
+    <rect x="20" y="98" width="400" height="44" fill="none"/>
+    <text x="220" y="125" text-anchor="middle" stroke="none" font-weight="500">FRAME CAPTURE LAYER</text>
+    <line x1="220" y1="142" x2="220" y2="168" marker-end="url(#ah)"/>
+    <rect x="20" y="170" width="400" height="150" fill="none" stroke-width="1.6"/>
+    <text x="36" y="194" stroke="none" font-weight="500">PERCEPTION PIPELINE</text>
+    <g stroke-dasharray="3 3" stroke-width="1">
+      <rect x="36" y="206" width="112" height="28" fill="none"/><text x="92" y="224" text-anchor="middle" stroke="none" font-size="10.5">HUD geometry</text>
+      <rect x="156" y="206" width="112" height="28" fill="none"/><text x="212" y="224" text-anchor="middle" stroke="none" font-size="10.5">motion + tracks</text>
+      <rect x="276" y="206" width="128" height="28" fill="none"/><text x="340" y="224" text-anchor="middle" stroke="none" font-size="10.5">dialogs + panels</text>
+      <rect x="36" y="242" width="112" height="28" fill="none"/><text x="92" y="260" text-anchor="middle" stroke="none" font-size="10.5">environment</text>
+      <rect x="156" y="242" width="112" height="28" fill="none"/><text x="212" y="260" text-anchor="middle" stroke="none" font-size="10.5">combat level</text>
+      <rect x="276" y="242" width="128" height="28" fill="none"/><text x="340" y="260" text-anchor="middle" stroke="none" font-size="10.5">OCR (text first)</text>
+    </g>
+    <rect x="36" y="280" width="368" height="26" fill="none" stroke-width="1"/>
+    <text x="220" y="297" text-anchor="middle" stroke="none" font-size="10.5">temporal state · smoothing · stable IDs · occlusion</text>
+    <line x1="220" y1="320" x2="220" y2="346" marker-end="url(#ah)"/>
+    <rect x="20" y="348" width="400" height="66" fill="none"/>
+    <text x="220" y="372" text-anchor="middle" stroke="none" font-weight="500">WORLDSTATE → GAMESTATE (JSON)</text>
+    <text x="220" y="390" text-anchor="middle" stroke="none" font-size="10" opacity=".7">every value: confidence · reliability · failure reason</text>
+    <text x="220" y="404" text-anchor="middle" stroke="none" font-size="10" opacity=".7">“unknown” is a valid answer; guesses are never values</text>
+    <line x1="220" y1="414" x2="220" y2="440" marker-end="url(#ah)"/>
+    <rect x="20" y="442" width="400" height="44" fill="none"/>
+    <text x="220" y="469" text-anchor="middle" stroke="none" font-weight="500">OVERLAY WIDGETS · AI CONSUMER</text>
+    <text x="220" y="520" text-anchor="middle" stroke="none" font-size="10" opacity=".7">Rust · Windows · 11.7k lines · 128 tests · Windows CI</text>
+    <text x="220" y="538" text-anchor="middle" stroke="none" font-size="10" opacity=".7">github.com/boggioMichael/ms</text>
+  </g>
+</svg>

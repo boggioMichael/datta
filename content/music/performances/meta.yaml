@@ -1,0 +1,27 @@
+title: { en: "Performances", he: "ביצועים" }
+subtitle: { en: "Classical piano, recorded and posted as it is made.", he: "פסנתר קלאסי, מוקלט ומתפרסם תוך כדי." }
+summary:
+  en: "Bach's Well-Tempered Clavier Book I recorded prelude by prelude, alongside Chopin, Beethoven and Medtner — on YouTube and Instagram, with more added as they are finished."
+  he: "הפסנתר המושווה ספר א׳ של באך מוקלט פרלוד אחרי פרלוד, לצד שופן, בטהובן ומדטנר — ביוטיוב ובאינסטגרם, ועוד מתווספים כשהם גמורים."
+category: { en: "Classical piano · recordings", he: "פסנתר קלאסי · הקלטות" }
+status: recording
+started: "2026-08"
+updated: "2026-09-30"
+featured: true
+weight: 2
+order: 4
+accent: "#B8963E"
+milestone: { en: "Well-Tempered Clavier I, in progress", he: "הפסנתר המושווה א׳, בתהליך" }
+website: https://www.youtube.com/@michaelboggioneoone
+videos:
+  - { title: { en: "Bach: Preludes in C major (BWV 846), C minor, E minor & E major — Well-Tempered Clavier I", he: "באך: פרלודים בדו מז׳ור (BWV 846), דו מינור, מי מינור ומי מז׳ור — הפסנתר המושווה א׳" }, youtube: "qNIEysn0DEw" }
+  - { title: { en: "Chopin: Ballade No. 1 in G minor, Op. 23", he: "שופן: בלדה מס׳ 1 בסול מינור, אופ׳ 23" }, youtube: "YhMQf2bt86U" }
+  - { title: { en: "Beethoven: Pathétique Sonata, 1st movement · Medtner: Fairy Tale, Op. 20 No. 1", he: "בטהובן: סונטה פתטית, פרק ראשון · מדטנר: אגדה, אופ׳ 20 מס׳ 1" }, youtube: "DJSdKmtNvmo" }
+evidence:
+  - { label: { en: "YouTube channel — all recordings", he: "ערוץ היוטיוב — כל ההקלטות" }, url: "https://www.youtube.com/@michaelboggioneoone", kind: recording }
+related:
+  - music/limos
+  - music/neshikot-batzintzenet
+todo:
+  - "Performances: add the Instagram handle and a link to the Reels if it should be public."
+  - "Performances: list upcoming live dates if any."

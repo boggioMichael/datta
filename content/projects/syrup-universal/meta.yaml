@@ -1,0 +1,56 @@
+title: { en: "Syrup Universal", he: "Syrup Universal" }
+subtitle: { en: "Syrup learns the game with you.", he: "Syrup לומד את המשחק יחד איתך." }
+summary:
+  en: "An AI companion that watches whatever game you are playing, works out what is on the screen, learns the game and you, researches what it does not know, and coaches in short sentences. It only looks and talks."
+  he: "מלווה בינה מלאכותית שצופה בכל משחק שאתם משחקים, מבין מה על המסך, לומד את המשחק ואתכם, חוקר מה שהוא לא יודע, ומאמן במשפטים קצרים. הוא רק מסתכל ומדבר."
+category: { en: "AI · game-learning agent", he: "בינה מלאכותית · סוכן לומד־משחק" }
+status: in-development
+started: "2026-09"
+updated: "2026-09-29"
+featured: true
+weight: 2
+order: 3
+accent: "#B4731F"
+milestone:
+  en: "MVP in progress on a branch; architecture published"
+  he: "MVP בעבודה על ענף; הארכיטקטורה פורסמה"
+github: https://github.com/boggioMichael/us
+languages: ["Rust"]
+builtLevels:
+  built:
+    en:
+      - "Architecture overview: boundaries, pipeline, priorities"
+      - "Reuse analysis: what carries over from MapleSyrup, what is left behind, where each idea now lives"
+    he:
+      - "סקירת ארכיטקטורה: גבולות, צינור, סדרי עדיפויות"
+      - "ניתוח שימוש חוזר: מה עובר מ-MapleSyrup, מה נשאר מאחור, איפה כל רעיון חי עכשיו"
+  prototyped:
+    en:
+      - "MVP under construction on a working branch (not yet merged)"
+      - "The mascot and avatar layers, composed in Rust from a few small images"
+    he:
+      - "MVP בבנייה על ענף עבודה (עדיין לא מוזג)"
+      - "שכבות הקמע והאווטאר, מורכבות ב-Rust מכמה תמונות קטנות"
+  researching:
+    en:
+      - "Finding the HUD by what stays still while the game moves"
+      - "Concept inference: what each stable element probably is, from how it behaves"
+      - "A research agent that reads about the game, with provenance on every fact"
+      - "Interruption and spoiler policies for a coach that talks"
+    he:
+      - "מציאת ה-HUD לפי מה שנשאר קבוע בזמן שהמשחק זז"
+      - "הסקת מושגים: מה כל אלמנט יציב כנראה מייצג, לפי איך שהוא מתנהג"
+      - "סוכן מחקר שקורא על המשחק, עם מקור לכל עובדה"
+      - "מדיניות הפרעה וספוילרים למאמן שמדבר"
+  vision:
+    en:
+      - "Launch a game nobody has ever seen and have the companion learn it alongside you"
+    he:
+      - "להפעיל משחק שאף אחד מעולם לא ראה ולתת למלווה ללמוד אותו לצידכם"
+evidence:
+  - { label: { en: "Repository with the architecture documents", he: "ריפו עם מסמכי הארכיטקטורה" }, url: "https://github.com/boggioMichael/us", kind: code }
+  - { label: { en: "What Syrup Universal takes from MapleSyrup", he: "מה Syrup Universal לוקח מ-MapleSyrup" }, url: "https://github.com/boggioMichael/us/blob/main/docs/architecture/maplesyrup-reuse.md", kind: document }
+related:
+  - projects/maplesyrup
+  - lab/syrup
+  - research/can-a-companion-learn-a-game

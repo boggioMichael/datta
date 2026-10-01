@@ -1,0 +1,12 @@
+title: { en: "Proof (working title)", he: "הוכחה (שם זמני)" }
+summary:
+  en: "Speculative fiction: an advanced intelligence encounters — or proves — something associated with God. Fiction, and labelled as such."
+  he: "פרוזה ספקולטיבית: תבונה מתקדמת פוגשת — או מוכיחה — משהו שמזוהה עם אלוהים. בדיון, ומסומן ככזה."
+category: { en: "Speculative fiction", he: "פרוזה ספקולטיבית" }
+status: concept
+type: fiction
+language: en
+public: false
+order: 4
+related:
+  - research/the-limit-of-experience

@@ -1,0 +1,100 @@
+title: { en: "MapleSyrup", he: "MapleSyrup" }
+subtitle: { en: "Turns pixels from a running game into structured game state.", he: "הופך פיקסלים ממשחק רץ למצב משחק מובנה." }
+summary:
+  en: "A real-time perception engine that watches MapleStory through captured pixels alone — no memory reads, no injection — and produces confidence-scored game state. Rust, Windows, measured."
+  he: "מנוע תפיסה בזמן אמת שצופה ב-MapleStory דרך פיקסלים בלבד — בלי קריאת זיכרון, בלי הזרקה — ומפיק מצב משחק עם ציוני ביטחון. Rust, Windows, נמדד."
+category: { en: "AI · computer vision · game perception", he: "בינה מלאכותית · ראייה ממוחשבת · תפיסת משחקים" }
+status: prototype
+started: "2026"
+updated: "2026-09-30"
+featured: true
+weight: 1
+order: 2
+accent: "#B4731F"
+milestone:
+  en: "Measured on real recordings; generalising into Syrup Universal"
+  he: "נמדד על הקלטות אמיתיות; מוכלל ל-Syrup Universal"
+github: https://github.com/boggioMichael/ms
+demo: https://youtu.be/yXIR59gGKhE
+languages: ["Rust"]
+links:
+  - label: { en: "Evidence branch", he: "ענף הראיות" }
+    url: https://github.com/boggioMichael/ms/tree/demo/real-recording-output
+builtLevels:
+  built:
+    en:
+      - "Window discovery and pixel capture on Windows, with an image fixture as fallback"
+      - "Perception pipeline: HUD geometry, motion and stable entity tracks, dialogs, panels, environment edges, combat inference"
+      - "Every detection carries confidence, reliability and a failure reason"
+      - "Temporal state: smoothing, stable IDs, prediction, occlusion grace"
+      - "Serializable GameState (JSON) for any consumer"
+      - "Live vision debugger with --explain for every value"
+      - "CI on a Windows runner: fmt, clippy, 128 tests, Criterion benchmarks"
+    he:
+      - "איתור חלון ולכידת פיקסלים ב-Windows, עם תמונת fixture כגיבוי"
+      - "צינור תפיסה: גאומטריית HUD, תנועה ועקיבה יציבה אחרי ישויות, דיאלוגים, פאנלים, קצוות סביבה, הסקת קרב"
+      - "כל זיהוי נושא ביטחון, אמינות וסיבת כישלון"
+      - "מצב טמפורלי: החלקה, מזהים יציבים, חיזוי, סובלנות להסתרה"
+      - "GameState ניתן לסריאליזציה (JSON) לכל צרכן"
+      - "דיבאגר ראייה חי עם ‎--explain לכל ערך"
+      - "CI על runner של Windows: fmt, clippy, 128 טסטים, בנצ׳מרקים של Criterion"
+  prototyped:
+    en:
+      - "Transparent overlay with widgets: arrow, notification, text, debug"
+      - "Knowledge module: original-authored dialog, monster and mechanics facts"
+      - "Narrated demo: a labelled simulation on the repository's real gameplay fixture"
+    he:
+      - "שכבת overlay שקופה עם ווידג׳טים: חץ, התראה, טקסט, דיבאג"
+      - "מודול ידע: עובדות על דיאלוגים, מפלצות ומכניקות, נכתבו במקור"
+      - "דמו מוקרא: סימולציה מסומנת על ה-fixture האמיתי שבריפו"
+  researching:
+    en:
+      - "OCR on pixel fonts from compressed captures — measuring legibility instead of guessing"
+      - "A real-time budget: re-read text only when its region changed"
+      - "Generalising beyond one game (see Syrup Universal)"
+    he:
+      - "OCR על פונטים של פיקסלים מהקלטות דחוסות — למדוד קריאוּת במקום לנחש"
+      - "תקציב זמן אמת: לקרוא טקסט מחדש רק כשהאזור שלו השתנה"
+      - "הכללה מעבר למשחק אחד (ראו Syrup Universal)"
+  vision:
+    en:
+      - "A companion that watches, understands, looks things up, learns the mechanics, keeps the state and advises — and improves alongside the player"
+    he:
+      - "מלווה שצופה, מבין, מחפש מידע, לומד את המכניקות, שומר על המצב ומייעץ — ומשתפר יחד עם השחקן"
+metrics:
+  - { label: { en: "mean perception time per frame, 2,700 frames of real gameplay (2026-09-30)", he: "זמן תפיסה ממוצע לפריים, 2,700 פריימים של משחק אמיתי (30.9.2026)" }, value: "43.2 ms", kind: measured }
+  - { label: { en: "median · p95 on the same run", he: "חציון · p95 באותה ריצה" }, value: "35.6 · 44.7 ms", kind: measured }
+  - { label: { en: "frames where OCR ran (0.14–0.73 s each)", he: "פריימים שבהם רץ OCR (0.14–0.73 שניות כל אחד)" }, value: "3.7%", kind: measured }
+  - { label: { en: "tests passing on the Windows runner", he: "טסטים עוברים על ה-runner של Windows" }, value: "128", kind: verified }
+  - { label: { en: "lines of Rust", he: "שורות Rust" }, value: "11.7k", kind: verified }
+evidence:
+  - { label: { en: "Source code, CI, tests and benchmarks", he: "קוד מקור, CI, טסטים ובנצ׳מרקים" }, url: "https://github.com/boggioMichael/ms", kind: code }
+  - { label: { en: "Narrated MVP demo (a labelled simulation on the real fixture)", he: "דמו MVP מוקרא (סימולציה מסומנת על ה-fixture האמיתי)" }, url: "https://youtu.be/yXIR59gGKhE", kind: demo }
+  - { label: { en: "Real-recording run: annotated frames, timings.csv, logs", he: "ריצה על הקלטה אמיתית: פריימים מתויגים, timings.csv, לוגים" }, url: "https://github.com/boggioMichael/ms/tree/demo/real-recording-output", kind: data }
+  - { label: { en: "EVIDENCE.md — every claim tagged measured / verified / designed / planned", he: "EVIDENCE.md — כל טענה מתויגת: נמדד / אומת / תוכנן / מתוכנן" }, url: "https://github.com/boggioMichael/ms/blob/master/EVIDENCE.md", kind: document }
+videos:
+  - title: { en: "MapleStory and MapleSyrup running together — narrated MVP demo", he: "MapleStory ו-MapleSyrup רצים יחד — דמו MVP מוקרא" }
+    youtube: "yXIR59gGKhE"
+    note: { en: "A clearly labelled simulation built on the repository's real gameplay fixture, not a live-session recording.", he: "סימולציה מסומנת בבירור שנבנתה על ה-fixture האמיתי שבריפו, לא הקלטה של סשן חי." }
+gallery:
+  - { src: "/images/maplesyrup/mascot.webp", alt: { en: "The MapleSyrup mascot: a cream fluffy dog wearing a pancake cap with a syrup S.", he: "הקמע של MapleSyrup: כלב שמנמן בצבע שמנת עם כובע פנקייק ו-S של סירופ." }, caption: { en: "The mascot carries over to Syrup Universal; the cap becomes the MapleStory hat.", he: "הקמע עובר ל-Syrup Universal; הכובע הופך לכובע של MapleStory." } }
+funding:
+  type: grant
+  public: true
+  stage: { en: "MVP measured on real recordings", he: "MVP שנמדד על הקלטות אמיתיות" }
+  exists: { en: "A working perception engine with CI, tests, benchmarks and an evidence document; a generic engine (Syrup) split out; a game-agnostic successor (Syrup Universal) in progress", he: "מנוע תפיסה עובד עם CI, טסטים, בנצ׳מרקים ומסמך ראיות; מנוע גנרי (Syrup) שהופרד; יורש שלא תלוי במשחק (Syrup Universal) בעבודה" }
+  next: { en: "Syrup Universal MVP: recognise a game it has never seen, learn its HUD, and coach in short sentences", he: "MVP של Syrup Universal: לזהות משחק שמעולם לא ראה, ללמוד את ה-HUD שלו, ולאמן במשפטים קצרים" }
+  status: { en: "Grant application in progress with the Israel Innovation Authority (Tnufa track), 2026. Not raising equity at this stage.", he: "בקשת מענק בתהליך מול רשות החדשנות (מסלול תנופה), 2026. לא מגייסים הון בשלב הזה." }
+  useOfFunds: { en: "Engineering time on the universal engine; test games; Windows hardware for capture", he: "זמן הנדסה על המנוע האוניברסלי; משחקי בדיקה; חומרת Windows ללכידה" }
+opportunity:
+  what: { en: "A perception layer that turns any screen-rendered game into structured, confidence-scored state without touching the game's memory, code or input.", he: "שכבת תפיסה שהופכת כל משחק שמצויר על המסך למצב מובנה עם ציוני ביטחון, בלי לגעת בזיכרון, בקוד או בקלט של המשחק." }
+  why: { en: "Companions, coaching, accessibility and analytics all need to know what is happening on screen, and most games expose no API for it. Reading pixels honestly — with “unknown” as a valid answer — is the part everyone skips.", he: "מלווים, אימון, נגישות ואנליטיקה — כולם צריכים לדעת מה קורה על המסך, ורוב המשחקים לא חושפים API לזה. לקרוא פיקסלים בכנות — עם ״לא ידוע״ כתשובה לגיטימית — זה החלק שכולם מדלגים עליו." }
+  exists: { en: "An MVP that runs on real recordings at ~43 ms per frame, a published evidence trail, and a generic engine already extracted.", he: "MVP שרץ על הקלטות אמיתיות ב-~43 מילישניות לפריים, שובל ראיות מפורסם, ומנוע גנרי שכבר הופרד." }
+  next: { en: "Make it game-agnostic (Syrup Universal), close the real-time budget on OCR, and put it in front of players.", he: "להפוך אותו לבלתי תלוי במשחק (Syrup Universal), לסגור את תקציב הזמן־אמת על OCR, ולשים אותו מול שחקנים." }
+  support: { en: "Grant or research partnership first; players with a Windows machine who want to test; later, a conversation about pre-seed once the universal MVP works on a game it has never seen.", he: "מענק או שותפות מחקר קודם; שחקנים עם מחשב Windows שרוצים לבדוק; מאוחר יותר, שיחה על pre-seed ברגע שה-MVP האוניברסלי עובד על משחק שמעולם לא ראה." }
+related:
+  - projects/syrup-universal
+  - lab/syrup
+  - research/pixel-only-perception-measured
+todo:
+  - "MapleSyrup: confirm the wording about the Tnufa application (in progress vs submitted)."

@@ -1,0 +1,47 @@
+title: { en: "A Limit", he: "A Limit" }
+subtitle: { en: "A psychological mystery about the limits of certainty.", he: "מותחן פסיכולוגי על גבולות הוודאות." }
+summary:
+  en: "A screenplay, being released first as an audiobook read as a screenplay. Matheo searches for stability, not truth — and the process by which he determines what is real begins to fail."
+  he: "תסריט, שיוצא קודם כספר שמע בקריאה כתסריט. מתיאו מחפש יציבות, לא אמת — והתהליך שבו הוא קובע מה אמיתי מתחיל להיכשל."
+category: { en: "Film · screenplay · audiobook", he: "קולנוע · תסריט · ספר שמע" }
+status: in-production
+started: "2026-08"
+updated: "2026-09-28"
+featured: true
+weight: 3
+order: 6
+accent: "#4A4A46"
+milestone:
+  en: "First full narration recorded; editing toward an audiobook release"
+  he: "הקלטה ראשונה של הקריאה המלאה; עריכה לקראת שחרור ספר שמע"
+languages: ["English"]
+builtLevels:
+  built:
+    en:
+      - "Screenplay draft (English)"
+      - "Filmmaker's document, volume I: vision statement and guiding principle"
+      - "First full narration take (September 2026)"
+    he:
+      - "טיוטת תסריט (אנגלית)"
+      - "מסמך הבמאי, כרך א׳: הצהרת חזון ועיקרון מנחה"
+      - "טייק ראשון של קריאה מלאה (ספטמבר 2026)"
+  researching:
+    en:
+      - "The philosophical model underneath it — see the research note"
+      - "Sound design for a screenplay read aloud: how much of the format to keep"
+    he:
+      - "המודל הפילוסופי שמתחת — ראו את רשומת המחקר"
+      - "עיצוב סאונד לתסריט שנקרא בקול: כמה מהפורמט לשמור"
+  vision:
+    en:
+      - "Audiobook release on streaming platforms"
+      - "The film"
+    he:
+      - "שחרור ספר שמע בפלטפורמות סטרימינג"
+      - "הסרט"
+sponsor:
+  - { title: { en: "Audio post-production", he: "פוסט־פרודקשן לאודיו" }, detail: { en: "Editing, mixing and mastering of the audiobook", he: "עריכה, מיקס ומאסטרינג של ספר השמע" } }
+  - { title: { en: "Cover art", he: "עטיפה" }, detail: { en: "One commissioned image for the release", he: "דימוי אחד בהזמנה לשחרור" } }
+related:
+  - research/the-limit-of-experience
+  - writing/a-limit-screenplay

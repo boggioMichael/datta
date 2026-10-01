@@ -1,0 +1,12 @@
+title: { en: "This site", he: "האתר הזה" }
+subtitle: { en: "A content-driven static site with no framework and no runtime JavaScript worth mentioning.", he: "אתר סטטי מונחה תוכן בלי פריימוורק ובלי JavaScript בזמן ריצה שראוי להזכיר." }
+summary:
+  en: "Datta's own website: React components rendered to static HTML at build time from Markdown and YAML, bilingual with real RTL, self-hosted fonts, a search index and a build log. Everything on it is a file."
+  he: "האתר של דאטא עצמה: קומפוננטות React שמרונדרות ל-HTML סטטי בזמן בנייה מתוך Markdown ו-YAML, דו־לשוני עם RTL אמיתי, פונטים באירוח עצמי, אינדקס חיפוש ויומן בנייה. כל מה שבו הוא קובץ."
+category: { en: "Web · tooling", he: "ווב · כלים" }
+status: live
+started: "2026-10"
+updated: "2026-10-01"
+order: 3
+languages: ["TypeScript", "React"]
+milestone: { en: "Version 1", he: "גרסה 1" }

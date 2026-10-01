@@ -1,0 +1,33 @@
+title: { en: "LIMOS", he: "LIMOS" }
+subtitle: { en: "Intimate piano recordings. The music, not the personality.", he: "הקלטות פסנתר אינטימיות. המוזיקה, לא האישיות." }
+summary:
+  en: "A recording identity in the making: classical piano, close microphones, a retro microphone-and-vinyl aesthetic, and a visual language that may show only hands. Nothing released under the name yet."
+  he: "זהות הקלטה בהתהוות: פסנתר קלאסי, מיקרופונים קרובים, אסתטיקה של מיקרופון ישן ותקליט, ושפה ויזואלית שאולי תראה רק ידיים. עדיין לא יצא כלום תחת השם."
+category: { en: "Recording identity · classical piano", he: "זהות הקלטה · פסנתר קלאסי" }
+status: concept
+started: "2026"
+updated: "2026-10-01"
+featured: false
+weight: 3
+order: 7
+accent: "#8A7A5B"
+milestone: { en: "Defining the identity and the first recordings", he: "מגדירים את הזהות ואת ההקלטות הראשונות" }
+builtLevels:
+  researching:
+    en:
+      - "Recording chain: which microphones, which room, how close"
+      - "Visual identity: hands only, or no image at all"
+      - "Repertoire for a first set of recordings"
+    he:
+      - "שרשרת הקלטה: אילו מיקרופונים, איזה חדר, כמה קרוב"
+      - "זהות ויזואלית: ידיים בלבד, או בלי תמונה בכלל"
+      - "רפרטואר לסט ההקלטות הראשון"
+  vision:
+    en:
+      - "A catalogue of recordings people return to for the sound, with the performer in the background"
+    he:
+      - "קטלוג הקלטות שאנשים חוזרים אליו בשביל הצליל, עם המבצע ברקע"
+related:
+  - music/performances
+todo:
+  - "LIMOS: confirm the spelling (LIMOS vs Limus) and whether the earlier children's-education channel concept is superseded."

@@ -1,0 +1,90 @@
+title: { en: "Rasa", he: "ראסא" }
+subtitle: { en: "One flavour. Pistachio. Rebuilt until it is worth selling.", he: "טעם אחד. פיסטוק. נבנה מחדש עד שהוא שווה למכור." }
+summary:
+  en: "A premium pistachio gelato in product development — formulation, texture and cost worked batch by batch, with the first sale already made."
+  he: "ג׳לאטו פיסטוק פרימיום בפיתוח מוצר — פורמולציה, טקסטורה ועלות נבנות אצווה אחרי אצווה, והמכירה הראשונה כבר נעשתה."
+category: { en: "Food · product R&D", he: "אוכל · מו״פ מוצר" }
+status: product-development
+started: "2026"
+updated: "2026-09-27"
+featured: true
+weight: 1
+order: 1
+accent: "#7E9A5A"
+milestone:
+  en: "Six-month formulation lab, then the next piece of equipment"
+  he: "מעבדת פורמולציה לשישה חודשים, ואז פריט הציוד הבא"
+languages: []
+builtLevels:
+  built:
+    en:
+      - "Milk-based pistachio base"
+      - "Water-based pistachio base"
+      - "Small-batch production on a countertop machine"
+      - "First sale (2.5 L, water-based)"
+    he:
+      - "בסיס פיסטוק על חלב"
+      - "בסיס פיסטוק על מים"
+      - "ייצור באצוות קטנות על מכונה ביתית"
+      - "מכירה ראשונה (2.5 ליטר, על מים)"
+  prototyped:
+    en:
+      - "Costing per litre across ingredients, energy and time"
+      - "Month-by-month R&D budget through February 2027"
+    he:
+      - "תמחור לליטר על פני חומרי גלם, אנרגיה וזמן"
+      - "תקציב מו״פ חודש־אחר־חודש עד פברואר 2027"
+  researching:
+    en:
+      - "Texture: overrun, fat and sugar balance, serving temperature"
+      - "Shelf life and storage of a nut-heavy base"
+      - "Packaging that survives a freezer and still looks like Rasa"
+    he:
+      - "טקסטורה: אוורור, איזון שומן וסוכר, טמפרטורת הגשה"
+      - "חיי מדף ואחסון של בסיס עשיר באגוזים"
+      - "אריזה ששורדת מקפיא ועדיין נראית כמו ראסא"
+  vision:
+    en:
+      - "A packaged product with a single flavour and a quiet label"
+      - "Scaling from litres to a small production line, only after demand is proven"
+    he:
+      - "מוצר ארוז עם טעם אחד ותווית שקטה"
+      - "מעבר מליטרים לקו ייצור קטן — רק אחרי שהביקוש הוכח"
+timeline:
+  - date: "2026-07"
+    text: { en: "First formulation batches; equipment and raw materials bought.", he: "אצוות פורמולציה ראשונות; נרכשו ציוד וחומרי גלם." }
+  - date: "2026-09"
+    text: { en: "First sale: 2.5 litres of the water-based base.", he: "מכירה ראשונה: 2.5 ליטר מהבסיס על מים." }
+  - date: "2026-09-27"
+    text: { en: "Six-month formulation lab costed, month by month, through February 2027.", he: "מעבדת הפורמולציה לשישה חודשים תומחרה, חודש אחר חודש, עד פברואר 2027." }
+milestones:
+  - { text: { en: "A base worth selling", he: "בסיס ששווה למכור" }, done: true, date: "2026-09" }
+  - { text: { en: "Written tasting and texture protocol, applied to every batch", he: "פרוטוקול טעימה וטקסטורה כתוב, שמופעל על כל אצווה" }, done: false }
+  - { text: { en: "Professional micro-batch processor in the lab", he: "מעבד מיקרו־אצוות מקצועי במעבדה" }, done: false }
+  - { text: { en: "Repeatable product: three consecutive batches within spec", he: "מוצר חוזר: שלוש אצוות רצופות בתוך הספק" }, done: false }
+  - { text: { en: "Packaging and label", he: "אריזה ותווית" }, done: false }
+economics:
+  public: false
+  costToDate: { en: "₪1,350 paid to date (countertop machine and raw materials), as of September 2026", he: "₪1,350 שולמו עד היום (מכונה ביתית וחומרי גלם), נכון לספטמבר 2026" }
+  revenue: { en: "₪270 — one sale, 2.5 litres", he: "₪270 — מכירה אחת, 2.5 ליטר" }
+  monthlyBurn: { en: "≈ ₪2,500 per month planned for the lab months", he: "≈ ₪2,500 לחודש מתוכנן לחודשי המעבדה" }
+  target: { en: "₪41,550 planned spend through February 2027, including the six-month lab and a Pacojet", he: "₪41,550 הוצאה מתוכננת עד פברואר 2027, כולל מעבדת שישה חודשים ו-Pacojet" }
+  note: { en: "Figures from the project's cost plan (September 2026 revision).", he: "נתונים מתוכנית העלויות של הפרויקט (גרסת ספטמבר 2026)." }
+funding:
+  type: investment
+  public: true
+  stage: { en: "Formulation lab — small batches, first sale made", he: "מעבדת פורמולציה — אצוות קטנות, מכירה ראשונה נעשתה" }
+  exists: { en: "Two base formulations (milk and water), a costed six-month R&D plan, a first paying customer", he: "שתי פורמולציות בסיס (חלב ומים), תוכנית מו״פ מתומחרת לשישה חודשים, לקוח משלם ראשון" }
+  next: { en: "A professional micro-batch processor and six months of controlled iterations with written tasting and texture notes", he: "מעבד מיקרו־אצוות מקצועי ושישה חודשי איטרציות מבוקרות עם הערות טעימה וטקסטורה כתובות" }
+  ask: { en: "≈ ₪11,000 — the remaining equipment purchase", he: "≈ ₪11,000 — יתרת רכישת הציוד" }
+  useOfFunds: { en: "Equipment (Pacojet-class processor); the lab months themselves are budgeted", he: "ציוד (מעבד מסוג Pacojet); חודשי המעבדה עצמם מתוקצבים" }
+  unlocks: { en: "Repeatable, textured batches at a quality a home machine cannot reach", he: "אצוות חוזרות עם טקסטורה באיכות שמכונה ביתית לא מגיעה אליה" }
+opportunity:
+  what: { en: "A single-flavour pistachio gelato good enough to sell on its own, and a small production method that can grow if people keep buying it.", he: "ג׳לאטו פיסטוק בטעם יחיד שטוב מספיק כדי להימכר בזכות עצמו, ושיטת ייצור קטנה שיכולה לגדול אם אנשים ימשיכו לקנות." }
+  why: { en: "Pistachio is the flavour people pay the most for and are most often disappointed by. Doing one thing obsessively is a defensible position for a very small producer.", he: "פיסטוק הוא הטעם שאנשים משלמים עליו הכי הרבה ומתאכזבים ממנו הכי הרבה. לעשות דבר אחד באובססיביות היא עמדה שאפשר להגן עליה כיצרן קטן מאוד." }
+  exists: { en: "Working formulations, a first sale, a costed plan, and a lab that runs every week.", he: "פורמולציות עובדות, מכירה ראשונה, תוכנית מתומחרת, ומעבדה שעובדת כל שבוע." }
+  next: { en: "Equipment, then six months of measured iteration, then a packaging decision driven by what the batches say.", he: "ציוד, אחר כך שישה חודשים של איטרציה נמדדת, ואז החלטת אריזה לפי מה שהאצוות אומרות." }
+  support: { en: "A small equipment investment now; later, a conversation about a first production line if demand is proven. Also useful: an introduction to a food technologist or a packaging designer.", he: "השקעת ציוד קטנה עכשיו; מאוחר יותר, שיחה על קו ייצור ראשון אם הביקוש יוכח. מועיל גם: היכרות עם טכנולוג/ית מזון או מעצב/ת אריזות." }
+todo:
+  - "Rasa: confirm the public ask (≈ ₪11,000) and whether to show the economics block."
+  - "Rasa: add photos of a batch and of the label direction when they exist."

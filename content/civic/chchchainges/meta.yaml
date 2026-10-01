@@ -1,0 +1,23 @@
+title: { en: "Ch-ch-chain-ges", he: "Ch-ch-chain-ges" }
+subtitle: { en: "A multiplayer phone game of human chains on the real streets of 55 Israeli cities.", he: "משחק רשת לטלפון: שרשראות אנושיות ברחובות האמיתיים של 55 ערים בישראל." }
+summary:
+  en: "An open-source browser game built for a political party's campaign: collect people, hold hands, grow a chain — on OpenStreetMap maps of real municipalities, with a single-player story mode, bots named after rival parties, and no registration, cookies or tracking."
+  he: "משחק דפדפן בקוד פתוח שנבנה לקמפיין של מפלגה: אוספים אנשים, נותנים יד, מגדלים שרשרת — על מפות OpenStreetMap של רשויות אמיתיות, עם מצב סיפור לשחקן יחיד, בוטים על שם מפלגות יריבות, ובלי הרשמה, עוגיות או מעקב."
+category: { en: "Civic · game · campaign software", he: "אזרחי · משחק · תוכנת קמפיין" }
+status: live
+started: "2026-09"
+updated: "2026-09-29"
+order: 1
+noFunnel: true
+accent: "#2B5BB8"
+website: https://chchchains.onrender.com
+github: https://github.com/boggioMichael/chchchains
+languages: ["JavaScript", "Node", "WebGL"]
+hero:
+  src: "/images/chchchainges/share.webp"
+  alt: { en: "The game's share image: two human chains in blue and red on a street map, with the game's name and the slogan in Hebrew.", he: "תמונת השיתוף של המשחק: שתי שרשראות אנושיות בכחול ובאדום על מפת רחובות, עם שם המשחק והסלוגן בעברית." }
+  caption: { en: "Share image from the repository. Map data © OpenStreetMap contributors.", he: "תמונת השיתוף מהריפו. נתוני מפה © תורמי OpenStreetMap." }
+milestone: { en: "Live; street view and story mode shipped in September 2026", he: "באוויר; תצוגת רחוב ומצב סיפור יצאו בספטמבר 2026" }
+evidence:
+  - { label: { en: "Play it", he: "לשחק" }, url: "https://chchchains.onrender.com", kind: demo }
+  - { label: { en: "Source (MIT): simulation, server, map builder, art tools", he: "קוד (MIT): סימולציה, שרת, בונה מפות, כלי אמנות" }, url: "https://github.com/boggioMichael/chchchains", kind: code }

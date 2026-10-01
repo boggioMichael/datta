@@ -1,0 +1,32 @@
+title: { en: "The Limit of Experience", he: "גבול החוויה" }
+subtitle:
+  en: "Recursive consciousness, finitude, and asymptotic death — a speculative metaphysical model of knowledge, freedom, and the unexperienced boundary."
+  he: "תודעה רקורסיבית, סופיות ומוות אסימפטוטי — מודל מטאפיזי ספקולטיבי של ידיעה, חירות והגבול שאינו נחווה."
+summary:
+  en: "Consciousness lets us know that we exist, understand that we are finite, and think about death, infinity, God and other minds — but not fully experience or contain them. Death is an objective ending and a subjective boundary: the world can finish a person; the person cannot experience themselves as already finished."
+  he: "התודעה מאפשרת לנו לדעת שאנחנו קיימים, להבין שאנחנו סופיים, ולחשוב על מוות, אינסוף, אלוהים ותודעות אחרות — אבל לא לחוות או להכיל אותם בשלמות. המוות הוא סוף אובייקטיבי וגבול סובייקטיבי: העולם יכול לסיים את האדם; האדם אינו יכול לחוות את עצמו כמי שכבר הסתיים."
+category: { en: "Philosophy of mind · metaphysics", he: "פילוסופיה של התודעה · מטאפיזיקה" }
+status: active
+kind: speculative-model
+started: "2026"
+updated: "2026-10-01"
+date: "2026-10-01"
+order: 1
+languages: ["English", "Hebrew"]
+references:
+  - "Aristotle. Physics, VI.9."
+  - "Buber, M. Ich und Du [I and Thou]. 1923."
+  - "Epicurus. Letter to Menoeceus, §§124–125."
+  - "Hebrew Bible: Genesis 2–3; Deuteronomy 30:19; Ezekiel 18:20; Job 42:7."
+  - "Leibniz, G. W. Monadology. 1714, esp. §7."
+  - "Maimonides. Guide for the Perplexed I.2, I.54; II.36–45; Mishneh Torah, Hilkhot Teshuvah 5."
+  - "Rashi and Nahmanides (Ramban), commentaries on Genesis 3:22."
+  - "Rohde, D. L. T., Olson, S., & Chang, J. T. (2004). “Modelling the recent common ancestry of all living humans.” Nature 431, 562–566. doi:10.1038/nature02842."
+  - "Nagel, T. (1974). “What Is It Like to Be a Bat?” Philosophical Review 83(4), 435–450."
+  - "Jonas, H. “The Concept of God after Auschwitz”; Fackenheim, E. L., post-Holocaust writings on Jewish existence and responsibility."
+revisions:
+  - { date: "2026-10-01", text: { en: "Published on the Datta site in English and Hebrew.", he: "פורסם באתר דאטא באנגלית ובעברית." } }
+  - { date: "2026-09", text: { en: "Paper version with TL;DR and abstract; a longer draft, “Recursive Consciousness and the Asymptotic Boundary of Death”, preceded it.", he: "גרסת מאמר עם תקציר; קדמה לה טיוטה ארוכה יותר, “Recursive Consciousness and the Asymptotic Boundary of Death”." } }
+related:
+  - projects/a-limit
+  - writing/agi-god-fiction

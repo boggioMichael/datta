@@ -1,0 +1,36 @@
+title: { en: "TheLip", he: "TheLip" }
+subtitle: { en: "Lip reading from video — as an experiment, with its ethics written first.", he: "קריאת שפתיים מווידאו — כניסוי, עם האתיקה כתובה קודם." }
+summary:
+  en: "An experimental computer-vision project exploring what can be recovered from mouth movement in ordinary video: who is speaking, in which language, and candidate text. Research stage; no capability claims."
+  he: "פרויקט ניסיוני בראייה ממוחשבת שבוחן מה אפשר לשחזר מתנועת הפה בווידאו רגיל: מי מדבר, באיזו שפה, וטקסט מועמד. בשלב מחקר; בלי טענות על יכולות."
+category: { en: "Research prototype · computer vision", he: "אב־טיפוס מחקרי · ראייה ממוחשבת" }
+status: research
+started: "2026"
+updated: "2026-10-01"
+order: 2
+accent: "#9A4B5A"
+milestone: { en: "Problem definition and ethics boundary written; no public code yet", he: "הגדרת הבעיה וגבול האתיקה כתובים; עדיין אין קוד פומבי" }
+builtLevels:
+  researching:
+    en:
+      - "Speaker detection: which face is talking, with several people in frame"
+      - "Temporal mouth tracking that survives head turns and compression"
+      - "Language identification from visemes alone"
+      - "Speech reconstruction as ranked candidate text, never as a transcript presented as fact"
+      - "Browser and video-file workflows"
+    he:
+      - "זיהוי דובר: איזה פנים מדברות, כשיש כמה אנשים בפריים"
+      - "עקיבה טמפורלית אחרי הפה ששורדת סיבובי ראש ודחיסה"
+      - "זיהוי שפה מוויזמות בלבד"
+      - "שחזור דיבור כטקסט מועמד מדורג, לעולם לא כתמלול שמוצג כעובדה"
+      - "תהליכי עבודה בדפדפן ועל קובצי וידאו"
+  vision:
+    en:
+      - "A tool that helps where audio is missing — accessibility, archival footage, noisy rooms — and refuses to be a surveillance tool"
+    he:
+      - "כלי שעוזר איפה שאין אודיו — נגישות, חומרי ארכיון, חדרים רועשים — ומסרב להיות כלי מעקב"
+related:
+  - lab/syrup
+  - research/lip-reading-what-should-a-prototype-refuse
+todo:
+  - "TheLip: add the repository link when the code becomes public; confirm whether thelip.ai should be linked."

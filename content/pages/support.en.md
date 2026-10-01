@@ -1,0 +1,1 @@
+Everything on this page points at a specific project, a specific stage and a specific next step. Nothing is a promise of returns, a valuation, or a deadline invented to hurry anyone. If something here is interesting, the next step is a conversation.

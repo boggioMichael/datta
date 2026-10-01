@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="12" fill="currentColor" stroke="currentColor">
+  <defs>
+    <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker>
+  </defs>
+  <g stroke-width="1.2">
+    <rect x="150" y="14" width="180" height="44" fill="none"/>
+    <text x="240" y="34" text-anchor="middle" stroke="none" font-weight="500">FORMULATION</text>
+    <text x="240" y="49" text-anchor="middle" stroke="none" font-size="10" opacity=".7">nut % · fat · sugars · water</text>
+    <rect x="318" y="118" width="150" height="44" fill="none"/>
+    <text x="393" y="138" text-anchor="middle" stroke="none" font-weight="500">SMALL BATCH</text>
+    <text x="393" y="153" text-anchor="middle" stroke="none" font-size="10" opacity=".7">litres, not tonnes</text>
+    <rect x="262" y="236" width="196" height="44" fill="none"/>
+    <text x="360" y="256" text-anchor="middle" stroke="none" font-weight="500">TASTE + TEXTURE</text>
+    <text x="360" y="271" text-anchor="middle" stroke="none" font-size="10" opacity=".7">notes against the last batch</text>
+    <rect x="22" y="236" width="196" height="44" fill="none"/>
+    <text x="120" y="256" text-anchor="middle" stroke="none" font-weight="500">COST PER LITRE</text>
+    <text x="120" y="271" text-anchor="middle" stroke="none" font-size="10" opacity=".7">ingredients · energy · time</text>
+    <rect x="12" y="118" width="150" height="44" fill="none"/>
+    <text x="87" y="138" text-anchor="middle" stroke="none" font-weight="500">DECIDE</text>
+    <text x="87" y="153" text-anchor="middle" stroke="none" font-size="10" opacity=".7">keep · change one thing</text>
+    <path d="M330 36 C370 40 393 72 393 116" fill="none" marker-end="url(#ah3)"/>
+    <path d="M393 162 C393 196 385 218 370 234" fill="none" marker-end="url(#ah3)"/>
+    <path d="M262 258 L220 258" fill="none" marker-end="url(#ah3)"/>
+    <path d="M110 236 C95 215 87 196 87 164" fill="none" marker-end="url(#ah3)"/>
+    <path d="M87 118 C87 72 110 40 148 36" fill="none" marker-end="url(#ah3)"/>
+    <text x="240" y="172" text-anchor="middle" stroke="none" font-weight="500">ONE FLAVOUR.</text>
+    <text x="240" y="190" text-anchor="middle" stroke="none" font-size="10" opacity=".7">rebuilt until it is worth selling</text>
+    <text x="240" y="322" text-anchor="middle" stroke="none" font-size="10" opacity=".7">milk-based and water-based formulations run in parallel</text>
+  </g>
+</svg>

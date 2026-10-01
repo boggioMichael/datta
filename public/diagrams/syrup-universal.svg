@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 660" font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="12" fill="currentColor" stroke="currentColor">
+  <defs>
+    <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker>
+  </defs>
+  <g stroke-width="1.2">
+    <rect x="20" y="16" width="400" height="44" fill="none"/>
+    <text x="220" y="43" text-anchor="middle" stroke="none" font-weight="500">ANY GAME WINDOW · VIDEO · SYNTHETIC GAME</text>
+    <line x1="220" y1="60" x2="220" y2="84" marker-end="url(#ah2)"/>
+    <rect x="20" y="86" width="400" height="44" fill="none"/>
+    <text x="220" y="106" text-anchor="middle" stroke="none" font-weight="500">CAPTURE → FRAME SAMPLER</text>
+    <text x="220" y="122" text-anchor="middle" stroke="none" font-size="10" opacity=".7">change probe · adaptive budget</text>
+    <line x1="220" y1="130" x2="220" y2="154" marker-end="url(#ah2)"/>
+    <rect x="20" y="156" width="400" height="118" fill="none" stroke-width="1.6"/>
+    <text x="36" y="178" stroke="none" font-weight="500">SCENE ANALYZER</text>
+    <text x="36" y="196" stroke="none" font-size="10" opacity=".8">what stays still while the game moves → the HUD</text>
+    <g stroke-dasharray="3 3" stroke-width="1">
+      <rect x="36" y="206" width="84" height="24" fill="none"/><text x="78" y="222" text-anchor="middle" stroke="none" font-size="10">stability</text>
+      <rect x="128" y="206" width="84" height="24" fill="none"/><text x="170" y="222" text-anchor="middle" stroke="none" font-size="10">bars</text>
+      <rect x="220" y="206" width="84" height="24" fill="none"/><text x="262" y="222" text-anchor="middle" stroke="none" font-size="10">text + OCR</text>
+      <rect x="312" y="206" width="92" height="24" fill="none"/><text x="358" y="222" text-anchor="middle" stroke="none" font-size="10">icons</text>
+      <rect x="36" y="238" width="84" height="24" fill="none"/><text x="78" y="254" text-anchor="middle" stroke="none" font-size="10">minimap</text>
+      <rect x="128" y="238" width="84" height="24" fill="none"/><text x="170" y="254" text-anchor="middle" stroke="none" font-size="10">dialogue</text>
+      <rect x="220" y="238" width="84" height="24" fill="none"/><text x="262" y="254" text-anchor="middle" stroke="none" font-size="10">character</text>
+      <rect x="312" y="238" width="92" height="24" fill="none"/><text x="358" y="254" text-anchor="middle" stroke="none" font-size="10">motion</text>
+    </g>
+    <line x1="220" y1="274" x2="220" y2="298" marker-end="url(#ah2)"/>
+    <text x="232" y="292" stroke="none" font-size="10" opacity=".7">Observation (IR)</text>
+    <rect x="20" y="300" width="190" height="60" fill="none"/>
+    <text x="115" y="322" text-anchor="middle" stroke="none" font-weight="500">GAME RECOGNIZER</text>
+    <text x="115" y="338" text-anchor="middle" stroke="none" font-size="10" opacity=".7">title · exe · HUD signature</text>
+    <text x="115" y="352" text-anchor="middle" stroke="none" font-size="10" opacity=".7">→ profile store (learned)</text>
+    <rect x="230" y="300" width="190" height="60" fill="none"/>
+    <text x="325" y="322" text-anchor="middle" stroke="none" font-weight="500">TEMPORAL TRACKER</text>
+    <text x="325" y="338" text-anchor="middle" stroke="none" font-size="10" opacity=".7">tracks · trends · transitions</text>
+    <line x1="115" y1="360" x2="200" y2="396" marker-end="url(#ah2)"/>
+    <line x1="325" y1="360" x2="240" y2="396" marker-end="url(#ah2)"/>
+    <rect x="20" y="398" width="400" height="56" fill="none" stroke-width="1.6"/>
+    <text x="220" y="420" text-anchor="middle" stroke="none" font-weight="500">GAME STATE ENGINE</text>
+    <text x="220" y="438" text-anchor="middle" stroke="none" font-size="10" opacity=".7">a bar that falls when the screen shakes is probably health</text>
+    <line x1="220" y1="454" x2="220" y2="478" marker-end="url(#ah2)"/>
+    <rect x="20" y="480" width="124" height="60" fill="none"/>
+    <text x="82" y="504" text-anchor="middle" stroke="none" font-weight="500" font-size="11">PLAYER MODEL</text>
+    <text x="82" y="520" text-anchor="middle" stroke="none" font-size="10" opacity=".7">skills, confidence</text>
+    <rect x="158" y="480" width="124" height="60" fill="none"/>
+    <text x="220" y="504" text-anchor="middle" stroke="none" font-weight="500" font-size="11">COACH ENGINE</text>
+    <text x="220" y="520" text-anchor="middle" stroke="none" font-size="10" opacity=".7">when to speak</text>
+    <rect x="296" y="480" width="124" height="60" fill="none"/>
+    <text x="358" y="504" text-anchor="middle" stroke="none" font-weight="500" font-size="11">KNOWLEDGE</text>
+    <text x="358" y="520" text-anchor="middle" stroke="none" font-size="10" opacity=".7">graph + research</text>
+    <line x1="220" y1="540" x2="220" y2="564" marker-end="url(#ah2)"/>
+    <rect x="20" y="566" width="400" height="44" fill="none"/>
+    <text x="220" y="586" text-anchor="middle" stroke="none" font-weight="500">SHORT TEXT · SPEECH · MARKS IN ITS OWN WINDOW</text>
+    <text x="220" y="602" text-anchor="middle" stroke="none" font-size="10" opacity=".7">it only looks and talks — never sends input to the game</text>
+    <text x="220" y="630" text-anchor="middle" stroke="none" font-size="10" opacity=".7">priorities: universality › modularity › correctness</text>
+    <text x="220" y="646" text-anchor="middle" stroke="none" font-size="10" opacity=".7">› debuggability › realtime › polish</text>
+  </g>
+</svg>

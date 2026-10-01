@@ -1,0 +1,1 @@
+A small 2019 program that draws sorting algorithms while they run — bars swapping, the slow ones visibly slow. It is here because it is the earliest surviving example of a habit that runs through everything since: if you can see what the code is doing, you can judge it.

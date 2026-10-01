@@ -1,0 +1,19 @@
+title: { en: "Syrup", he: "Syrup" }
+subtitle: { en: "Turning captured frames into confidence-scored observations.", he: "הפיכת פריימים שנלכדו לתצפיות עם ציוני ביטחון." }
+summary:
+  en: "A small Rust toolkit for reading a screen the way a person does — “there is a bar here and it is about 60% full” — without pretending to more certainty than the pixels support. The generic engine under MapleSyrup."
+  he: "ערכת כלים קטנה ב-Rust לקריאת מסך כמו שאדם קורא אותו — ״יש כאן פס והוא מלא בערך ב-60%״ — בלי להעמיד פנים שיש יותר ודאות ממה שהפיקסלים מאפשרים. המנוע הגנרי שמתחת ל-MapleSyrup."
+category: { en: "Library · computer vision", he: "ספרייה · ראייה ממוחשבת" }
+status: active
+started: "2026-08"
+updated: "2026-08-17"
+order: 1
+accent: "#B4731F"
+github: https://github.com/boggioMichael/syrup
+languages: ["Rust"]
+milestone: { en: "Standalone crate; consumed by MapleSyrup", he: "crate עצמאי; בשימוש MapleSyrup" }
+evidence:
+  - { label: { en: "Repository: ~3k lines, synthetic-fixture tests, Criterion benchmarks", he: "ריפו: ~3 אלף שורות, טסטים על fixtures סינתטיים, בנצ׳מרקים של Criterion" }, url: "https://github.com/boggioMichael/syrup", kind: code }
+related:
+  - projects/maplesyrup
+  - projects/syrup-universal

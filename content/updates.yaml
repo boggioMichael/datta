@@ -1,0 +1,80 @@
+# Build log. One entry per real event. Newest can go anywhere — the build sorts by date.
+# Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
+- date: 2026-10-01
+  title: { en: "Datta studio site, first version", he: "אתר הסטודיו של דאטא, גרסה ראשונה" }
+  text:
+    en: "Bilingual, static, content-driven. Projects, lab, music, writing, research, support, build log, index."
+    he: "דו־לשוני, סטטי, מונחה תוכן. פרויקטים, מעבדה, מוזיקה, כתיבה, מחקר, תמיכה, יומן בנייה, אינדקס."
+
+- date: 2026-09-30
+  project: projects/maplesyrup
+  title: { en: "Real-recording demo workflow: 2,700 frames, 43.2 ms mean perception per frame", he: "תהליך דמו על הקלטה אמיתית: 2,700 פריימים, 43.2 מילישניות תפיסה לפריים בממוצע" }
+  text:
+    en: "Annotated runs with timings recorded on a GitHub Windows runner; all 128 tests passed there. HUD text in the compressed capture is flagged unreliable rather than read."
+    he: "ריצות מתויגות עם זמנים הוקלטו על runner של GitHub ב-Windows; כל 128 הטסטים עברו שם. טקסט ה-HUD בהקלטה הדחוסה מסומן כלא אמין במקום להיקרא."
+  link: https://github.com/boggioMichael/ms/tree/demo/real-recording-output
+
+- date: 2026-09-29
+  project: civic/chchchainges
+  title: { en: "Street view: someone who joins walks round you, not through you", he: "תצוגת רחוב: מי שמצטרף הולך סביבך, לא דרכך" }
+  link: https://github.com/boggioMichael/chchchains
+
+- date: 2026-09-29
+  project: projects/syrup-universal
+  title: { en: "Architecture overview and the MapleSyrup reuse notes published", he: "סקירת הארכיטקטורה והערות השימוש החוזר מ-MapleSyrup פורסמו" }
+  text:
+    en: "What carries over from MapleSyrup, what is left behind on purpose, and where each idea now lives."
+    he: "מה עובר מ-MapleSyrup, מה נשאר מאחור בכוונה, ואיפה כל רעיון חי עכשיו."
+  link: https://github.com/boggioMichael/us
+
+- date: 2026-09-28
+  project: projects/a-limit
+  title: { en: "First full narration of the screenplay recorded", he: "הקלטה ראשונה של קריאת התסריט המלא" }
+  text:
+    en: "A draft audiobook take, read as a screenplay — scene headings and all."
+    he: "טייק טיוטה לספר השמע, בקריאה כתסריט — כולל כותרות הסצנות."
+
+- date: 2026-09-28
+  project: music/performances
+  title: { en: "Well-Tempered Clavier I: Shorts cut from every finished prelude", he: "הפסנתר המושווה א׳: Shorts נחתכו מכל פרלוד גמור" }
+
+- date: 2026-09-27
+  project: projects/rasa
+  title: { en: "Six-month formulation lab costed; first sale on the books", he: "מעבדת הפורמולציה לשישה חודשים תומחרה; מכירה ראשונה בספרים" }
+  text:
+    en: "A month-by-month plan through February 2027, including the next piece of equipment. The first sale was 2.5 litres of the water-based base."
+    he: "תוכנית חודש־אחר־חודש עד פברואר 2027, כולל פריט הציוד הבא. המכירה הראשונה: 2.5 ליטר מהבסיס על מים."
+
+- date: 2026-09-24
+  project: music/neshikot-batzintzenet
+  title: { en: "Outreach to producers and illustrators began", he: "התחילה פנייה למפיקים ולמאיירים" }
+  text:
+    en: "Looking for a producer for a one-song pilot and for illustrators for the visual world."
+    he: "מחפשים מפיק/ה לפיילוט של שיר אחד, ומאיירים לעולם הוויזואלי."
+
+- date: 2026-08-17
+  project: lab/syrup
+  title: { en: "The generic engine became its own crate: syrup", he: "המנוע הגנרי הפך ל-crate משלו: syrup" }
+  text:
+    en: "Pixel-level building blocks with confidence, reliability and failure reasons — no game knowledge inside."
+    he: "אבני בניין ברמת הפיקסל עם ביטחון, אמינות וסיבת כישלון — בלי ידע על משחקים בפנים."
+  link: https://github.com/boggioMichael/syrup
+
+- date: 2026-08-16
+  project: projects/doggystyle
+  title: { en: "Complete React app, PWA install, demo video, one-command launcher", he: "אפליקציית React מלאה, התקנת PWA, סרטון דמו, הפעלה בפקודה אחת" }
+  text:
+    en: "The end-to-end journey — photos in, profile out, ranked matches, mutual introduction, messaging, meetup — recorded from the running system."
+    he: "המסע המלא — תמונות נכנסות, פרופיל יוצא, התאמות מדורגות, היכרות הדדית, הודעות, מפגש — מוקלט מהמערכת הרצה."
+  link: https://github.com/boggioMichael/doggystyle
+
+- date: 2026-08-07
+  project: projects/a-limit
+  title: { en: "Filmmaker's document, volume I: the vision statement", he: "מסמך הבמאי, כרך א׳: הצהרת החזון" }
+
+- date: 2026-08-06
+  project: projects/maplesyrup
+  title: { en: "Vision system expansion complete: confidence-aware perception layer, 37 tests", he: "הרחבת מערכת הראייה הושלמה: שכבת תפיסה מודעת־ביטחון, 37 טסטים" }
+  text:
+    en: "Every detector output carries a value, a confidence, a reliability grade and a failure reason. Not real-time yet at that point — the measurements said so."
+    he: "כל פלט של גלאי נושא ערך, ביטחון, דירוג אמינות וסיבת כישלון. עדיין לא בזמן אמת באותו שלב — המדידות אמרו את זה."

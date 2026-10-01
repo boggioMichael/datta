@@ -1,0 +1,17 @@
+title: { en: "What a real-time claim costs", he: "כמה עולה טענה על זמן אמת" }
+subtitle: { en: "Measured latency of a pixel-only game perception pipeline, and the claim it falsified.", he: "השהיה מדודה של צינור תפיסת משחק מבוסס־פיקסלים, והטענה שהוא הפריך." }
+summary:
+  en: "A perception pipeline that reads a game through pixels was documented as “real-time at 60 FPS”. Measuring it gave 11.6 FPS. This note records the numbers, the cause, and what the next measurement looked like."
+  he: "צינור תפיסה שקורא משחק דרך פיקסלים תועד כ״זמן אמת ב-60 FPS״. מדידה נתנה 11.6 FPS. הרשומה הזאת מתעדת את המספרים, את הסיבה, ואיך נראתה המדידה הבאה."
+category: { en: "Computer vision · engineering practice", he: "ראייה ממוחשבת · פרקטיקה הנדסית" }
+status: active
+kind: technical-note
+updated: "2026-09-30"
+date: "2026-09-30"
+order: 2
+evidence:
+  - { label: { en: "EVIDENCE.md and the raw measurements (CSV, JSON)", he: "EVIDENCE.md והמדידות הגולמיות (CSV, JSON)" }, url: "https://github.com/boggioMichael/ms/blob/master/EVIDENCE.md", kind: data }
+  - { label: { en: "Real-recording output branch (frames, timings.csv, logs)", he: "ענף הפלט של ההקלטה האמיתית (פריימים, timings.csv, לוגים)" }, url: "https://github.com/boggioMichael/ms/tree/demo/real-recording-output", kind: data }
+related:
+  - projects/maplesyrup
+  - lab/syrup

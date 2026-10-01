@@ -1,0 +1,12 @@
+title: { en: "Sofi", he: "סופי" }
+summary:
+  en: "Hebrew children's writing around endings, childhood, autumn, fear, sweetness, bitterness and renewal. A song in Neshikot B'Tzintzenet and a text of its own."
+  he: "כתיבה לילדים בעברית סביב סופים, ילדות, סתיו, פחד, מתיקות, מרירות והתחדשות. שיר ב״נשיקות בצנצנת״ וטקסט בפני עצמו."
+category: { en: "Children's lyrics · poem", he: "מילים לילדים · שיר" }
+status: writing
+type: lyrics
+language: he
+public: false
+order: 2
+related:
+  - music/neshikot-batzintzenet

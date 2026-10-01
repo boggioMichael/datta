@@ -1,0 +1,17 @@
+title: { en: "Sorting, Visualized", he: "מיון, מומחש" }
+summary:
+  en: "An early experiment from 2019: sorting algorithms drawn as they run. Kept as a record of where the habit of showing the work started."
+  he: "ניסוי מוקדם מ-2019: אלגוריתמי מיון מצוירים בזמן ריצה. נשמר כתיעוד של המקום שבו התחיל ההרגל להראות את העבודה."
+category: { en: "Experiment · visualization", he: "ניסוי · ויזואליזציה" }
+status: archived
+started: "2019"
+updated: "2019-10-22"
+order: 90
+github: https://github.com/boggioMichael/Sorting-Visualized
+lessons:
+  en:
+    - "Seeing an algorithm run teaches more than reading it; the same instinct became the vision debugger in MapleSyrup."
+  he:
+    - "לראות אלגוריתם רץ מלמד יותר מלקרוא אותו; אותו אינסטינקט הפך לדיבאגר הראייה ב-MapleSyrup."
+related:
+  - projects/maplesyrup

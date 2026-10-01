@@ -1,0 +1,11 @@
+title: { en: "saca", he: "saca" }
+subtitle: { en: "A static AI code analyzer.", he: "מנתח קוד סטטי מבוסס בינה מלאכותית." }
+summary:
+  en: "An idea with a name and a repository: static analysis that uses a language model where rules run out, and says which findings came from which. Nothing built yet."
+  he: "רעיון עם שם וריפו: ניתוח סטטי שמשתמש במודל שפה איפה שהחוקים נגמרים, ואומר אילו ממצאים הגיעו מאיפה. עדיין לא נבנה."
+category: { en: "Developer tools · concept", he: "כלי פיתוח · רעיון" }
+status: concept
+started: "2025-09"
+updated: "2025-09-12"
+order: 4
+github: https://github.com/boggioMichael/saca

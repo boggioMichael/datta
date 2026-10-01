@@ -1,0 +1,83 @@
+title: { en: "Doggystyle", he: "Doggystyle" }
+subtitle: { en: "Tell us what you want for your dog. We do the rest.", he: "תגידו מה אתם רוצים בשביל הכלב. אנחנו עושים את השאר." }
+summary:
+  en: "A conversational service for dog owners: it builds your dog's profile from photos you already have, finds genuinely compatible dogs nearby, explains why, and helps arrange the meetup — all inside one chat box."
+  he: "שירות שיחתי לבעלי כלבים: בונה את הפרופיל של הכלב מתמונות שכבר יש לכם, מוצא כלבים מתאימים באמת בסביבה, מסביר למה, ועוזר לקבוע את המפגש — הכול בתוך תיבת צ׳אט אחת."
+category: { en: "Product · social · AI", he: "מוצר · חברתי · בינה מלאכותית" }
+status: prototype
+started: "2026-08"
+updated: "2026-08-16"
+featured: true
+weight: 2
+order: 4
+accent: "#C98A4B"
+milestone:
+  en: "End-to-end journey works locally; a public pilot needs production infrastructure and a rename"
+  he: "המסע המלא עובד מקומית; פיילוט ציבורי צריך תשתית פרודקשן ושינוי שם"
+github: https://github.com/boggioMichael/doggystyle
+languages: ["TypeScript", "React", "PostgreSQL"]
+hero:
+  src: "/images/doggystyle/01-landing.webp"
+  alt: { en: "The Doggystyle landing screen: a single prompt box asking what you would like for your dog, with suggestions like find a walking buddy or arrange a playdate.", he: "מסך הנחיתה של Doggystyle: תיבת פרומפט אחת ששואלת מה תרצו בשביל הכלב, עם הצעות כמו למצוא חבר לטיול או לקבוע פלייידייט." }
+  caption: { en: "The whole product is one prompt box. Everything else appears inside the conversation. Frame from the recorded walkthrough.", he: "כל המוצר הוא תיבת פרומפט אחת. כל השאר מופיע בתוך השיחה. פריים מתוך ההקלטה." }
+gallery:
+  - { src: "/images/doggystyle/02-profile.webp", alt: { en: "A generated dog profile: Max, Border Collie, 4 years, with provenance for each field and a prompt to confirm or correct.", he: "פרופיל כלב שנוצר אוטומטית: מקס, בורדר קולי, בן 4, עם מקור לכל שדה ואפשרות לאשר או לתקן." }, caption: { en: "The profile is proposed from photos; the owner confirms or corrects it by talking.", he: "הפרופיל מוצע מתוך תמונות; הבעלים מאשר או מתקן בדיבור." } }
+  - { src: "/images/doggystyle/03-matches.webp", alt: { en: "Ranked matches with reasons: both high energy, both enjoy a good chase, within a couple of years in age.", he: "התאמות מדורגות עם סיבות: שניהם אנרגטיים, שניהם אוהבים מרדף, בטווח של כמה שנים בגיל." }, caption: { en: "Matching is deterministic; the model only phrases the reasons.", he: "ההתאמה דטרמיניסטית; המודל רק מנסח את הסיבות." } }
+  - { src: "/images/doggystyle/04-provenance.webp", alt: { en: "A profile attribute table: each value with its source, confidence and whether the owner confirmed it; breeding information stays blank unless entered by the owner.", he: "טבלת תכונות פרופיל: כל ערך עם המקור, הביטחון והאם הבעלים אישר; מידע על הרבעה נשאר ריק אלא אם הבעלים הזין." }, caption: { en: "Every attribute carries provenance. Health, genetics and reproductive facts cannot be written by a model — a database constraint, not a convention.", he: "לכל תכונה יש מקור. עובדות על בריאות, גנטיקה ורבייה לא יכולות להיכתב על ידי מודל — אילוץ במסד הנתונים, לא מוסכמה." } }
+builtLevels:
+  built:
+    en:
+      - "Sign-up, photo import and classification, auto-generated profile with provenance"
+      - "Deterministic matching with explained reasons; confirmation-gated introductions"
+      - "Messaging and meetup scheduling at a public midpoint; nobody's address is shared"
+      - "Admin, moderation queue, audit log, blocking, EXIF stripping, coarse location"
+      - "One-command launcher with a self-contained PostgreSQL; iPhone home-screen PWA"
+      - "32-assertion end-to-end smoke suite plus Playwright browser tests"
+    he:
+      - "הרשמה, ייבוא וסיווג תמונות, פרופיל אוטומטי עם מקורות"
+      - "התאמה דטרמיניסטית עם סיבות מוסברות; היכרויות מותנות באישור"
+      - "הודעות וקביעת מפגש בנקודת אמצע ציבורית; הכתובת של אף אחד לא משותפת"
+      - "ניהול, תור מודרציה, יומן ביקורת, חסימה, הסרת EXIF, מיקום גס"
+      - "הפעלה בפקודה אחת עם PostgreSQL עצמאי; PWA למסך הבית של אייפון"
+      - "סוויטת smoke מקצה לקצה עם 32 בדיקות, ובדיקות דפדפן ב-Playwright"
+  prototyped:
+    en:
+      - "Instagram and Google Photos adapters behind credential flags"
+      - "Billing seams: plan and entitlement columns, a BillingService interface"
+    he:
+      - "מתאמים ל-Instagram ול-Google Photos מאחורי דגלי הרשאות"
+      - "תפרים לחיוב: עמודות plan ו-entitlements, ממשק BillingService"
+  researching:
+    en:
+      - "A pilot in one dense city: how many profiles make the first match useful?"
+      - "Content moderation that is intelligent rather than structural"
+      - "Age assurance beyond self-attestation"
+    he:
+      - "פיילוט בעיר צפופה אחת: כמה פרופילים הופכים את ההתאמה הראשונה למועילה?"
+      - "מודרציה חכמה ולא רק מבנית"
+      - "אימות גיל מעבר להצהרה עצמית"
+  vision:
+    en:
+      - "The place dog owners go to find the right dog for a walk, a playdate, or a litter — with coordination in the product, not off it"
+    he:
+      - "המקום שבעלי כלבים הולכים אליו כדי למצוא את הכלב הנכון לטיול, לפלייידייט או להמלטה — עם התיאום בתוך המוצר, לא מחוצה לו"
+evidence:
+  - { label: { en: "Source, architecture, ADRs, threat model, privacy and security docs", he: "קוד, ארכיטקטורה, ADRs, מודל איומים, מסמכי פרטיות ואבטחה" }, url: "https://github.com/boggioMichael/doggystyle", kind: code }
+  - { label: { en: "Recorded walkthrough of the running system (no mockups)", he: "הקלטה של המערכת הרצה (בלי מוקאפים)" }, url: "https://github.com/boggioMichael/doggystyle/raw/main/docs/media/doggystyle-demo.mp4", kind: recording }
+  - { label: { en: "Plan ⇄ build reconciliation: the honest gap list before a pilot", he: "תוכנית ⇄ בנייה: רשימת הפערים הכנה לפני פיילוט" }, url: "https://github.com/boggioMichael/doggystyle/blob/main/docs/business/PLAN_VS_BUILD.md", kind: document }
+funding:
+  type: bootstrapped
+  public: true
+  stage: { en: "Working end-to-end local build; pre-pilot", he: "בנייה מקומית עובדת מקצה לקצה; לפני פיילוט" }
+  exists: { en: "The full journey — photos in, profile out, ranked matches, mutual introduction, messaging, meetup — verified on every run of the smoke suite; a Hebrew business plan with scenarios, not forecasts", he: "המסע המלא — תמונות נכנסות, פרופיל יוצא, התאמות מדורגות, היכרות הדדית, הודעות, מפגש — מאומת בכל ריצה של סוויטת ה-smoke; תוכנית עסקית בעברית עם תרחישים, לא תחזיות" }
+  next: { en: "A pilot in one city: production environment (TLS, backups, monitoring), per-module tests, real moderation, stronger age assurance, and a rename with trademark clearance", he: "פיילוט בעיר אחת: סביבת פרודקשן (TLS, גיבויים, ניטור), טסטים לכל מודול, מודרציה אמיתית, אימות גיל חזק יותר, ושינוי שם עם בדיקת סימן מסחר" }
+  status: { en: "Bootstrapped. Source-available under BUSL-1.1, converting to Apache 2.0 in 2030.", he: "מימון עצמי. הקוד זמין תחת BUSL-1.1, עובר ל-Apache 2.0 ב-2030." }
+  useOfFunds: { en: "Pilot infrastructure, moderation, legal clearance for the name, and the first local partnerships", he: "תשתית לפיילוט, מודרציה, בדיקה משפטית לשם, והשותפויות המקומיות הראשונות" }
+opportunity:
+  what: { en: "A dog-social product that fixes the three ways the category fails: profile creation is a chore, matching is appearance-first swiping, and coordination happens off-platform.", he: "מוצר חברתי לכלבים שמתקן את שלוש הדרכים שבהן הקטגוריה נכשלת: יצירת פרופיל היא מטלה, ההתאמה היא החלקה לפי מראה, והתיאום קורה מחוץ לפלטפורמה." }
+  why: { en: "This is a density-and-trust business, not an algorithm business. The build already has the trust part — provenance on every attribute, mutual-consent introductions, no exact locations ever served — so the pilot can test density alone.", he: "זה עסק של צפיפות ואמון, לא עסק של אלגוריתם. בבנייה כבר יש את חלק האמון — מקור לכל תכונה, היכרויות בהסכמה הדדית, אף פעם לא מיקומים מדויקים — כך שהפיילוט יכול לבדוק צפיפות בלבד." }
+  exists: { en: "A working local product with a recorded walkthrough, a documented threat model, ADRs for every significant decision, and a licence that keeps the commercial path exclusive until 2030.", he: "מוצר מקומי עובד עם הקלטה, מודל איומים מתועד, ADR לכל החלטה משמעותית, ורישיון ששומר את הנתיב המסחרי בלעדי עד 2030." }
+  next: { en: "Decide the name, stand up production, and run a pilot in one neighbourhood with real owners.", he: "להחליט על השם, להקים פרודקשן, ולהריץ פיילוט בשכונה אחת עם בעלים אמיתיים." }
+  support: { en: "A partner who knows the local pet market; a small amount of pilot capital; an introduction to a trademark attorney.", he: "שותף/ה שמכיר/ה את שוק חיות המחמד המקומי; הון קטן לפיילוט; היכרות עם עו״ד לסימני מסחר." }
+todo:
+  - "Doggystyle: decide whether to show a capital ask on the funding card (none shown now)."

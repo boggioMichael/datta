@@ -1,0 +1,14 @@
+title: { en: "Can an AI learn a game alongside the player?", he: "האם בינה מלאכותית יכולה ללמוד משחק לצד השחקן?" }
+subtitle: { en: "The research direction behind MapleSyrup and Syrup Universal, stated as a question.", he: "כיוון המחקר שמאחורי MapleSyrup ו-Syrup Universal, מנוסח כשאלה." }
+summary:
+  en: "Not “can an agent play a game” — that is well studied — but can a companion that only watches and talks become an expert in whatever its player is playing, without an API, without training per game, and without ever touching the input?"
+  he: "לא ״האם סוכן יכול לשחק משחק״ — זה נחקר היטב — אלא האם מלווה שרק צופה ומדבר יכול להפוך למומחה בכל מה שהשחקן משחק, בלי API, בלי אימון לכל משחק, ובלי לגעת בקלט אף פעם?"
+category: { en: "AI · perception · human–computer interaction", he: "בינה מלאכותית · תפיסה · אינטראקציית אדם־מחשב" }
+status: active
+kind: question
+updated: "2026-09-29"
+date: "2026-09-29"
+order: 3
+related:
+  - projects/syrup-universal
+  - projects/maplesyrup

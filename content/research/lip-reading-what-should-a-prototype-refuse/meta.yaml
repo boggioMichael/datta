@@ -1,0 +1,12 @@
+title: { en: "Lip reading: what should a prototype refuse to do?", he: "קריאת שפתיים: מה אב־טיפוס צריך לסרב לעשות?" }
+summary:
+  en: "A dual-use technology forces the ethics question before the engineering one. This note sets the lines a lip-reading prototype should hold — and argues they make the engineering better, not weaker."
+  he: "טכנולוגיה דו־שימושית מכריחה לשאול את שאלת האתיקה לפני שאלת ההנדסה. הרשומה הזאת מציבה את הקווים שאב־טיפוס לקריאת שפתיים צריך להחזיק — וטוענת שהם משפרים את ההנדסה, לא מחלישים אותה."
+category: { en: "Ethics · computer vision", he: "אתיקה · ראייה ממוחשבת" }
+status: active
+kind: question
+updated: "2026-10-01"
+date: "2026-10-01"
+order: 4
+related:
+  - lab/thelip
