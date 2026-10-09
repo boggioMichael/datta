@@ -1,6 +1,9 @@
 import { Marked, type Tokens } from "marked";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { resolve, sep } from "node:path";
+import sanitizeHtml from "sanitize-html";
+import katex from "katex";
 import type { Locale } from "../site.ts";
 import type { Site } from "../content/load.ts";
 import { localized } from "../i18n.ts";
@@ -74,7 +77,8 @@ export function expandComponents(md: string, ctx: RenderCtx): string {
   });
   out = out.replace(/<Diagram\s+((?:"[^"]*"|'[^']*'|[^>])*?)\/>/g, (_, a: string) => {
     const p = attrs(a);
-    const file = join(ctx.publicDir, p.src ?? "");
+    const file = resolve(ctx.publicDir, (p.src ?? "").replace(/^\/+/, ""));
+    if (!file.startsWith(resolve(ctx.publicDir) + sep) || !file.endsWith('.svg')) return '';
     let svg = "";
     // Collapse whitespace so the inlined SVG stays one HTML block for the markdown parser.
     if (p.src && existsSync(file)) svg = readFileSync(file, "utf8").replace(/<\?xml[^>]*>/, "").replace(/\s*\n\s*/g, " ").trim();
@@ -137,6 +141,11 @@ export function createMarked(ctx: RenderCtx): Marked {
   const usedIds = new Map<string, number>();
   marked.use({
     renderer: {
+      code({text,lang}: Tokens.Code) {
+        if(lang==='mermaid')return `<pre class="mermaid">${esc(text)}</pre>`;
+        if(lang==='math'||lang==='latex')return `<div class="math-block">${katex.renderToString(text,{displayMode:true,throwOnError:false,trust:false})}</div>`;
+        return `<pre><code${lang?` class="language-${esc(lang)}"`:''}>${esc(text)}</code></pre>`;
+      },
       heading({ tokens, depth }: Tokens.Heading) {
         const text = this.parser.parseInline(tokens);
         let id = slugify(text) || `section-${depth}`;
@@ -175,7 +184,14 @@ export function createMarked(ctx: RenderCtx): Marked {
 export function renderMarkdown(md: string, ctx: RenderCtx): string {
   const marked = createMarked(ctx);
   const expanded = expandComponents(md, ctx);
-  return marked.parse(expanded) as string;
+  const html=marked.parse(expanded) as string;
+  return sanitizeHtml(html, {
+    allowedTags: [...sanitizeHtml.defaults.allowedTags,'img','figure','figcaption','video','audio','source','iframe','svg','g','path','rect','circle','ellipse','line','polyline','polygon','text','tspan','defs','marker','title','desc','math','semantics','mrow','mi','mo','mn','mfrac','msup','msub','annotation','mtext','mspace','msqrt','mtable','mtr','mtd'],
+    allowedAttributes: {'*':['class','id','role','aria-label','aria-hidden','tabindex','dir','lang','style'],a:['href','target','rel','title'],img:['src','alt','width','height','loading','decoding'],iframe:['src','title','loading','allow','allowfullscreen','referrerpolicy'],video:['src','poster','controls','preload','playsinline','muted','loop'],audio:['src','controls','preload'],source:['src','type'],svg:['viewBox','width','height','xmlns','fill','stroke'],g:['transform','fill','stroke','stroke-width'],path:['d','fill','stroke','stroke-width','marker-end','stroke-dasharray'],rect:['x','y','width','height','rx','fill','stroke'],circle:['cx','cy','r','fill','stroke'],line:['x1','x2','y1','y2','stroke','stroke-width','marker-end'],text:['x','y','fill','font-size','font-family','text-anchor'],marker:['id','viewBox','refX','refY','markerWidth','markerHeight','orient'],math:['xmlns','display'],annotation:['encoding']},
+    allowedIframeHostnames:['www.youtube-nocookie.com'],allowedSchemes:['https','http','mailto'],allowProtocolRelative:false,
+    parser:{lowerCaseAttributeNames:false},
+    allowedStyles:{'*':{'text-align':[/^(left|right|center)$/], 'height':[/^[\d.]+em$/], 'width':[/^[\d.]+em$/], 'vertical-align':[/^-?[\d.]+em$/], 'top':[/^-?[\d.]+em$/], 'margin-right':[/^-?[\d.]+em$/], 'margin-left':[/^-?[\d.]+em$/], 'position':[/^relative$/]}}
+  });
 }
 
 export function readingMinutes(md: string): number {

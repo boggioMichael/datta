@@ -90,6 +90,8 @@ export function loadSite(root: string): Site {
         continue;
       }
       const raw = (yaml.load(readFileSync(metaPath, "utf8"), { schema: yaml.CORE_SCHEMA }) ?? {}) as Record<string, unknown>;
+      // A draft has no public page, search entry, sitemap row, or listing.
+      if (raw.publication === "draft") continue;
       const meta = normalizeMeta(raw, collection, slug, warnings);
       const en = readIf(join(entryDir, "en.md"));
       const he = readIf(join(entryDir, "he.md"));

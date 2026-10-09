@@ -6,3 +6,8 @@ dist-preview/
 .env
 .env.*
 screenshots/
+.dev.vars*
+*.pem
+.wrangler/
+.sites-runtime/
+*.tsbuildinfo
