@@ -1,6 +1,6 @@
 // DATTA static site build. Run: npm run build (or: tsx build.ts --serve --watch)
 // Renders React components to static HTML for every locale, copies /public, and writes
-// search index, sitemap, robots, RSS. No framework, no client-side rendering.
+// search index, sitemap, robots, RSS. The admin editor is a separate client bundle.
 import { mkdirSync, writeFileSync, cpSync, existsSync, readdirSync, readFileSync, statSync, rmSync, watch } from "node:fs";
 import { dirname, join, relative, posix, extname } from "node:path";
 import { createServer } from "node:http";
@@ -90,7 +90,7 @@ function buildLocale(siteData: Site, locale: Locale, pagesOut: Built[], searchRo
   page(localePath(locale, "/"), { title: site.name, description: L(home.subline), accent: undefined }, createElement(HomePage, { home }), { priority: 1.0 });
 
   // Sections
-  page(localePath(locale, "/play/"), { title: locale === "he" ? "קונטרפונקט" : "Counterpoint", description: locale === "he" ? "פאזל מוזיקלי לך ולשותף סקרן" : "A musical puzzle for you and a curious companion" }, createElement(PlayPage));
+  page(localePath(locale, "/play/"), { title: locale === "he" ? "פרטימנטו" : "Partimento", description: locale === "he" ? "משחק הלחנה בפרטימנטו וקונטרפונקט" : "A progressive partimento and counterpoint composition game" }, createElement(PlayPage));
   page(localePath(locale, "/projects/"), { title: t(locale, "projects.title"), description: t(locale, "projects.intro") }, createElement(ProjectsIndex), { priority: 0.9 });
   page(localePath(locale, "/lab/"), { title: t(locale, "lab.title"), description: t(locale, "lab.intro") }, createElement(LabIndex));
   page(localePath(locale, "/music/"), { title: t(locale, "music.title"), description: t(locale, "music.intro") }, createElement(MusicIndex), { priority: 0.8 });
@@ -220,8 +220,15 @@ export function build(): { warnings: string[]; todos: string[]; problems: string
   if (existsSync(PUBLIC)) cpSync(PUBLIC, OUT, { recursive: true });
   cpSync(join(ROOT, "src", "assets"), join(OUT, "assets"), { recursive: true });
   buildSync({entryPoints:[join(ROOT,'src/assets/research.js')],outdir:join(OUT,'assets'),chunkNames:'diagrams/[name]-[hash]',splitting:true,bundle:true,minify:true,format:'esm',platform:'browser'});
+  buildSync({entryPoints:[join(ROOT,'src/assets/partimento.js')],outfile:join(OUT,'assets/partimento.js'),bundle:true,minify:true,format:'esm',platform:'browser'});
   cpSync(join(ROOT,'node_modules/katex/dist'),join(OUT,'assets/katex'),{recursive:true});
-  write(join(OUT,'admin/index.html'), `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=https://datta-publishing-studio.mikebojio.chatgpt.site"><title>DATTA Studio</title><a href="https://datta-publishing-studio.mikebojio.chatgpt.site">Open the private publishing studio / לסטודיו הפרטי</a></html>`);
+  // The editor lives on GitHub Pages. An authenticated top-level window handles
+  // private API calls; no API key, session token, or draft enters this build.
+  const backend = process.env.STUDIO_BACKEND || 'https://datta-publishing-studio.mikebojio.chatgpt.site';
+  if (!/^https:\/\/datta-publishing-studio\.mikebojio\.chatgpt\.site$|^http:\/\/(localhost|127\.0\.0\.1):5173$/.test(backend)) throw new Error('Invalid studio backend.');
+  buildSync({entryPoints:[join(ROOT,'src/assets/admin.tsx')],outdir:join(OUT,'assets/studio'),chunkNames:'chunks/[name]-[hash]',assetNames:'fonts/[name]-[hash]',splitting:true,bundle:true,minify:true,format:'esm',platform:'browser',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},loader:{'.woff':'file','.woff2':'file','.ttf':'file'}});
+  write(join(OUT,'assets/studio/studio.css'),readFileSync(join(ROOT,'studio/app/globals.css'),'utf8').replaceAll("url('/fonts/","url('../../fonts/")+readFileSync(join(ROOT,'src/assets/admin.css'),'utf8'));
+  write(join(OUT,'admin/index.html'), `<!doctype html><html lang="en" data-studio-host="pages" data-studio-backend="${backend}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action https://github.com"><title>Publishing Studio · DATTA</title><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/studio/admin.css"><link rel="stylesheet" href="../assets/studio/studio.css"></head><body><div id="studio-root"></div><noscript>JavaScript is needed for the private editor. / יש להפעיל JavaScript לשימוש בעורך.</noscript><script type="module" src="../assets/studio/admin.js"></script></body></html>`);
 
   const pages: Built[] = [];
   for (const locale of site.locales) {
