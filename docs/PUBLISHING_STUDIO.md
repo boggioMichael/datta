@@ -2,13 +2,17 @@
 
 Public site: https://boggiomichael.github.io/datta/
 
-Private studio: https://datta-publishing-studio.mikebojio.chatgpt.site
+Studio: https://boggiomichael.github.io/datta/admin/
 
-The public website keeps its static React/Markdown build, English/Hebrew routes, fonts and GitHub Pages hosting. The studio is a small Git-backed CMS built around Tiptap. It runs separately on Sites with managed ChatGPT sign-in, owner-only access, D1 private drafts and R2 private media. Its source is in `studio/`; it is not part of the public Pages build.
+Private backend: https://datta-publishing-studio.mikebojio.chatgpt.site
+
+The public website keeps its static React/Markdown build, English/Hebrew routes, fonts and GitHub Pages hosting. The studio is a small Git-backed CMS built around Tiptap. Its editor is built into `/datta/admin/`; writing, previews, and the AI panel stay at that address. The private backend runs on Sites with managed ChatGPT sign-in, owner-only access, D1 private drafts and R2 private media. The Pages build includes only client components from `studio/`, never server code, credentials, or draft data.
+
+GitHub Pages cannot run the private backend. Select **Connect private session** to open a small authenticated window, and leave it open while editing. Requests pass through this window to its own backend, with exact origin, window, channel, method, and path checks. Authentication cookies never pass to GitHub Pages. This avoids third-party cookie restrictions and keeps the platform's existing login. If sign-in disconnects the opener, return to DATTA and select Connect again. Closing the window disconnects saving and publishing; unsaved editor text remains in memory for reconnection. **Lock studio** clears the editor; **Sign out** in the session window ends the backend login.
 
 ## First connection
 
-1. Open the studio and sign in with the ChatGPT account that owns the Site.
+1. Open `/datta/admin/`, select **Connect private session**, and sign in with the ChatGPT account that owns the Site.
 2. In **Connections**, choose **Connect GitHub App**. Register the private app and install it on **only boggioMichael/datta**. The app requests Contents, Pull requests and Issues write access; Checks and Actions read access. It does not need organization, account administration, or repository secrets access. A fine-grained token with the same repository permissions is an alternative.
 3. Enter each provider's API key and model ID in the private connection form. OpenAI, Gemini, Anthropic and xAI are independent connections. Model availability follows your provider account; entering a key does not prove its quota or model access. A first successful writing request verifies that connection.
 
@@ -37,7 +41,13 @@ Collaborator communication uses an explicit Send public comment action on a datt
 
 ## Game
 
-Counterpoint lives at `/en/play/` and `/he/play/`. It is an original 2048-inspired implementation with musical merge sounds, undo, hints, a bot and duet mode. The local expected-value bot works without credentials or network calls. Its behavior is algorithmic, not a claim of connection to any paid AI provider. Progress stays in the visitor's browser; there is no server leaderboard or tracking.
+Partimento lives at `/en/play/` and `/he/play/`. Its 24 original studies progress through missing bass notes, one upper voice, three-part writing, four-part writing, 4–3 suspensions, and a short fugal subject/real answer. Each chapter reduces the given notes. Complete studies in order to unlock the course, or use **Explore a study** to practice any difficulty. Exploration earns stars without skipping course prerequisites.
+
+Click an empty beat or editable note, then use the pitch palette or A–G keys. Arrow keys move between editable beats or scale degrees; Shift with up/down changes a semitone. The notation, keyboard entry, undo, solo, tempo, synthesized playback and printable score work locally. Matching suspension notes are tied in the score, playback, MusicXML and MIDI. Export MusicXML to continue in MuseScore or another notation program; this is a VexFlow web editor, not an embedded desktop application.
+
+The local analyzer checks ranges, assigned bass degrees, chord tones, crossing, parallel perfect intervals, large leaps, the final cadence, prepared suspensions and the specified real answer. Suggestions propose one note for explicit insertion, and the companion can play one complete realization. Different solutions can pass. It grades these limited exercise rules, not artistic quality or a complete fugue; it does not claim machine-learning or paid-provider access. Its study references link to Fenaroli's *Regole musicali*, Fux's *Gradus ad Parnassum*, Gjerdingen's Rule of the Octave guide, and Bach's BWV 578 score. The exercises and explanations are original.
+
+Progress and compositions stay in the visitor's browser. Use exports as backups; clearing browser storage clears progress. There is no server leaderboard or tracking. The four configurable AI providers remain in the authenticated research/writing studio.
 
 ## Operations
 

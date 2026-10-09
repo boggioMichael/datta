@@ -69,7 +69,7 @@ export function Document({ meta, children }: { meta: PageMeta; children?: ReactN
         <link rel="preload" href={asset("/fonts/newsreader.woff2")} as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href={asset(locale === "he" ? "/fonts/frankruhllibre.woff2" : "/fonts/assistant.woff2")} as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="stylesheet" href={asset("/assets/site.css")} />
-        <link rel="stylesheet" href={asset("/assets/counterpoint.css")} />
+        <link rel="stylesheet" href={asset("/assets/partimento.css")} />
         <link rel="stylesheet" href={asset("/assets/katex/katex.min.css")} />
         <link rel="alternate" type="application/rss+xml" title="DATTA build log" href={asset(`/${locale}/updates/feed.xml`)} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g,'\\u003c') }} />
@@ -187,7 +187,7 @@ function Footer() {
           </ul>
         </nav>
         <div className="footer-social">
-          <a href={href(localePath(locale, "/play/"))}>{locale === "he" ? "קונטרפונקט · לשחק" : "Counterpoint · Play"}</a>
+          <a href={href(localePath(locale, "/play/"))}>{locale === "he" ? "פרטימנטו · לנגן" : "Partimento · Play"}</a>
           <a href={href("/admin/")}>{locale === "he" ? "סטודיו" : "Studio"}</a>
           <a href={site.founder.github} rel="noopener me" target="_blank">
             GitHub
