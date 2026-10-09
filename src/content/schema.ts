@@ -182,6 +182,8 @@ export interface BuiltLevels {
 }
 
 export interface Meta {
+  tags?: string[];
+  publication?: "draft" | "published";
   // identity
   slug: string; // derived from folder name
   collection: Collection; // derived from folder

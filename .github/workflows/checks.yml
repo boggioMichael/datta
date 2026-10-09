@@ -1,0 +1,24 @@
+name: Validate studio changes
+on:
+  pull_request:
+  push:
+    branches: ['studio/**', 'codex/**']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=optional --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - run: node --test studio/tests/*.test.mjs
+      - run: npm run validate
+        env:
+          SITE_URL: https://boggiomichael.github.io/datta
+          BASE_PATH: /datta

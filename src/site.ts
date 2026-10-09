@@ -1,13 +1,15 @@
 // Site-wide configuration. Everything a deploy might change lives here.
 export type Locale = "en" | "he";
 
+const configuredBase = (process.env.BASE_PATH || "").replace(/\/$/, "");
+const configuredUrl = (process.env.SITE_URL || "https://datta.com").replace(/\/$/, "");
 export const site = {
   name: "DATTA",
   nameHe: "דאטא",
   // TODO: set to the real domain before deploying (used for canonical URLs, sitemap, OpenGraph).
-  url: process.env.SITE_URL || "https://datta.com",
+  url: configuredBase && configuredUrl.endsWith(configuredBase) ? configuredUrl.slice(0, -configuredBase.length) : configuredUrl,
   // Optional base path when hosting under a sub-folder (e.g. GitHub project pages: "/datta").
-  basePath: process.env.BASE_PATH || "",
+  basePath: configuredBase,
   defaultLocale: "en" as Locale,
   locales: ["en", "he"] as Locale[],
   founder: {

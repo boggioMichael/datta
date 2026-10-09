@@ -176,6 +176,7 @@ export function WritingPage({ entry }: { entry: Entry }) {
       </header>
       {fallback && <LangNotice />}
       <AudioList m={m} />
+      {!!m.tags?.length && <div className="tag-list">{m.tags.map(tag=><span key={tag} dir="auto">{tag}</span>)}</div>}
       <div
         className={`prose prose-literary${m.excerptOnly ? " excerpt" : ""}${isScreenplay ? " prose-screenplay" : ""}`}
         dangerouslySetInnerHTML={{ __html: md(text) }}
@@ -209,6 +210,7 @@ export function ResearchPage({ entry }: { entry: Entry }) {
         <p className="research-disclaimer mono">{t("research.disclaimer")}</p>
       </header>
       {fallback && <LangNotice />}
+      {!!m.tags?.length && <div className="tag-list">{m.tags.map(tag=><span key={tag} dir="auto">{tag}</span>)}</div>}
       <div className="research-grid">
         <div className="prose prose-research" dangerouslySetInnerHTML={{ __html: md(body) }} lang={fallback ? "en" : locale} dir={fallback ? "ltr" : undefined} />
         <aside className="research-side">

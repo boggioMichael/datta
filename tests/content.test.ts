@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';import {join,resolve} from 'node:path';import {tmpdir} from 'node:os';
+import {loadSite} from '../src/content/load.ts';import {renderMarkdown} from '../src/render/markdown.ts';
+const site=loadSite(process.cwd());const ctx={locale:'en' as const,site,href:(p:string)=>'/datta'+p,asset:(p:string)=>'/datta'+p,publicDir:join(process.cwd(),'public')};
+test('script, event handler, and unsafe URL injection are removed',()=>{const html=renderMarkdown('<script>alert(1)</script>\n<img src="x" onerror="alert(1)">\n\n[click](javascript:alert(1))',ctx);assert.ok(!html.includes('<script'));assert.ok(!html.includes('onerror'));assert.ok(!html.includes('javascript:'));});
+test('math, diagrams and bilingual text render',()=>{const h=renderMarkdown('שלום English Español\n\n```mermaid\nflowchart LR\n A --> B\n```\n\n```math\nE=mc^2\n```',ctx);assert.ok(h.includes('שלום'));assert.ok(h.includes('class="mermaid"'));assert.ok(h.includes('katex'));});
+test('Diagram component cannot read outside public',()=>{assert.equal(renderMarkdown('<Diagram src="../../package.json"/>',ctx).trim(),'');});
+test('drafts do not enter the public content model',()=>{const root=mkdtempSync(join(tmpdir(),'datta-test-'));try{const d=join(root,'content/research/secret');mkdirSync(d,{recursive:true});writeFileSync(join(d,'meta.yaml'),'publication: draft\ntitle: Never publish');writeFileSync(join(d,'en.md'),'private marker');const s=loadSite(root);assert.equal(s.entries.length,0);assert.equal(s.byRef.size,0);}finally{const target=resolve(root);assert.ok(target.startsWith(resolve(tmpdir())));rmSync(target,{recursive:true,force:true});}});

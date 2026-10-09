@@ -4,6 +4,9 @@
 import { mkdirSync, writeFileSync, cpSync, existsSync, readdirSync, readFileSync, statSync, rmSync, watch } from "node:fs";
 import { dirname, join, relative, posix, extname } from "node:path";
 import { createServer } from "node:http";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+import { buildSync } from "esbuild";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import { site, type Locale } from "./src/site.ts";
@@ -12,6 +15,7 @@ import { loadHome } from "./src/content/home.ts";
 import { Ctx, makeCtx, type PageCtx } from "./src/render/context.tsx";
 import { Document, type PageMeta } from "./src/render/layout.tsx";
 import { HomePage } from "./src/render/pages/home.tsx";
+import { PlayPage } from "./src/render/pages/play.tsx";
 import { EntryPage } from "./src/render/pages/entry.tsx";
 import {
   ArchivePage, CivicIndex, ContactPage, DataRoomPage, IndexPage, LabIndex, MarkdownPage, MusicIndex, NotFoundPage, NowPage,
@@ -23,7 +27,7 @@ import { plainText } from "./src/render/markdown.ts";
 import { STATUS_LABEL } from "./src/content/schema.ts";
 
 const args = new Set(process.argv.slice(2));
-const ROOT = dirname(new URL(import.meta.url).pathname);
+const ROOT = dirname(fileURLToPath(import.meta.url));
 const OUT = args.has("--relative") ? join(ROOT, "dist-preview") : join(ROOT, process.env.OUT_DIR ?? "dist");
 const RELATIVE = args.has("--relative");
 const PUBLIC = join(ROOT, "public");
@@ -86,6 +90,7 @@ function buildLocale(siteData: Site, locale: Locale, pagesOut: Built[], searchRo
   page(localePath(locale, "/"), { title: site.name, description: L(home.subline), accent: undefined }, createElement(HomePage, { home }), { priority: 1.0 });
 
   // Sections
+  page(localePath(locale, "/play/"), { title: locale === "he" ? "קונטרפונקט" : "Counterpoint", description: locale === "he" ? "פאזל מוזיקלי לך ולשותף סקרן" : "A musical puzzle for you and a curious companion" }, createElement(PlayPage));
   page(localePath(locale, "/projects/"), { title: t(locale, "projects.title"), description: t(locale, "projects.intro") }, createElement(ProjectsIndex), { priority: 0.9 });
   page(localePath(locale, "/lab/"), { title: t(locale, "lab.title"), description: t(locale, "lab.intro") }, createElement(LabIndex));
   page(localePath(locale, "/music/"), { title: t(locale, "music.title"), description: t(locale, "music.intro") }, createElement(MusicIndex), { priority: 0.8 });
@@ -208,11 +213,15 @@ function checkLinks(outDir: string, pages: Built[]): string[] {
 
 export function build(): { warnings: string[]; todos: string[]; problems: string[]; pages: number } {
   const siteData = loadSite(ROOT);
+  if (![resolve(ROOT,'dist'),resolve(ROOT,'dist-preview')].includes(resolve(OUT))) throw new Error('Output must be dist or dist-preview inside this checkout.');
   rmSync(OUT, { recursive: true, force: true });
   mkdirSync(OUT, { recursive: true });
   // Static assets
   if (existsSync(PUBLIC)) cpSync(PUBLIC, OUT, { recursive: true });
   cpSync(join(ROOT, "src", "assets"), join(OUT, "assets"), { recursive: true });
+  buildSync({entryPoints:[join(ROOT,'src/assets/research.js')],outdir:join(OUT,'assets'),chunkNames:'diagrams/[name]-[hash]',splitting:true,bundle:true,minify:true,format:'esm',platform:'browser'});
+  cpSync(join(ROOT,'node_modules/katex/dist'),join(OUT,'assets/katex'),{recursive:true});
+  write(join(OUT,'admin/index.html'), `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=https://datta-publishing-studio.mikebojio.chatgpt.site"><title>DATTA Studio</title><a href="https://datta-publishing-studio.mikebojio.chatgpt.site">Open the private publishing studio / לסטודיו הפרטי</a></html>`);
 
   const pages: Built[] = [];
   for (const locale of site.locales) {
