@@ -40,7 +40,15 @@ window.PREP_CONFIG = {
   // ---- Firebase (מצב חי) ----
   // דוגמה:
   // firebase: { apiKey: "...", authDomain: "xxx.firebaseapp.com", projectId: "xxx", storageBucket: "xxx.appspot.com", messagingSenderId: "...", appId: "..." },
-  firebase: null,
+  firebase: {
+    apiKey: "AIzaSyCtydHf1kmzKJ8FJTCFNj5iig_q-YW7j-E",
+    authDomain: "computer-lessons-45c96.firebaseapp.com",
+    projectId: "computer-lessons-45c96",
+    storageBucket: "computer-lessons-45c96.firebasestorage.app",
+    messagingSenderId: "291112758507",
+    appId: "1:291112758507:web:aa82c8ef54044cab0d62ae",
+    measurementId: "G-GJFTTFVFF9",
+  },
   // מפתח VAPID של Cloud Messaging (Project settings → Cloud Messaging → Web Push certificates)
   vapidKey: "",
 
