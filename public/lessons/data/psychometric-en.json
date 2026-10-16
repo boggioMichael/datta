@@ -1,0 +1,1613 @@
+{
+  "pack": "psychometric-en",
+  "category": "english",
+  "title": "פסיכומטרי — אנגלית (קשה מאוד)",
+  "lessons": [
+    {
+      "id": "psychometric-en-lesson-1",
+      "title": "Restatement: לזהות את ההיפוך הלוגי שמפיל אותך",
+      "minutes": 5,
+      "md": "## מה בודקים ב-Restatement\nבשאלת Restatement מוצג משפט אחד באנגלית, ולצידו ארבעה משפטים. עליכם לבחור את המשפט **הקרוב ביותר במשמעותו** למקור. רק אחד שומר על אותו תוכן לוגי; שלושת האחרים הופכים פרט קטן אך מכריע.\n\n## השיטה בארבעה צעדים\n1. **זקקו את השלד הלוגי** של המקור: מי עושה למי, מה הגורם ומה התוצאה, מה נשלל ומה מותנה.\n2. **סמנו את מילות המפתח הלוגיות**: ויתור (although, however, far from), שלילה (not, no, none), תנאי (only if, unless), כמתים (all, not all, few, a few, none) והשוואה (rather than, not so much...as).\n3. **בדקו כל מסיח מול השלד** וחפשו את המילה האחת שמשנה כיוון.\n4. היזהרו ממסיח ש'נשמע' כמו המקור אך הפוך בפרט אחד.\n\n## המלכודות הנפוצות\n- **היפוך גורם-תוצאה**: המקור אומר ש-X גרם ל-Y, והמסיח אומר ש-Y גרם ל-X.\n- **הכרחי מול מספיק**: הצירוף only if מציין תנאי *הכרחי* ('בלי זה לא'), לא *מספיק* ('זה מבטיח'). מסיח קלאסי הופך את האחד לשני.\n- **טווח השלילה**: not all (לפחות אחד לא) שונה מ-none (אף אחד). few (כמעט אף אחד) שונה מ-a few (אחדים כן).\n- **ויתור שהתהפך**: הצירוף far from X-ing, it Y-ed פירושו *לא זו בלבד שלא X, אלא ההפך*.\n\n## דוגמה פתורה\n**מקור:** The vaccine is effective only if it is stored below a certain temperature.\n\nהשלד: קירור הוא תנאי *הכרחי* לאפקטיביות ('בלי קירור לא יעיל'), אך אינו *מבטיח* אפקטיביות.\n\n- If it is stored cold, it is guaranteed to work — הופך הכרחי למספיק. (לא נכון)\n- Unless it is stored cold, it will not work — שקול לוגית למקור (קונטרפוזיציה). (נכון)\n\nהדרך המהירה: תרגמו 'only if A, then B' ל'בלי A אין B', ובדקו איזה מסיח אומר בדיוק את זה."
+    },
+    {
+      "id": "psychometric-en-lesson-2",
+      "title": "קריאה אקדמית מהירה באנגלית: סריקה, עמדת הכותב, מלכודות היסק",
+      "minutes": 6,
+      "md": "## לפני שקוראים את הקטע\n1. **קראו קודם את סוג השאלות**, לא את כל האפשרויות. דעו אם מחפשים רעיון מרכזי, פרט, היסק או עמדת הכותב - כל סוג דורש קריאה אחרת.\n2. **סרקו את מבנה הקטע**: משפט פתיחה (לרוב התזה), מילות מעבר (however, yet, paradoxically, none of this is inevitable) ומשפט סיום (לרוב המסקנה).\n\n## לזהות את עמדת הכותב\nהכותב האקדמי כמעט אף פעם אינו 'בעד' או 'נגד' באופן מוחלט. חפשו **מילות הסתייגות**: tentatively, may, suggests, insofar as. חפשו **פניות ויתור** כמו not that X, but rather Y - משפט כזה כמעט תמיד נושא את עמדת הכותב בחלקו השני.\n\n## רעיון מרכזי מול פרט\n- **רעיון מרכזי** חייב לכסות את *כל* הקטע. מסיח שהוא נכון אך צר (פרט טכני, דוגמה בודדת) איננו התשובה.\n- **פרט** חייב להיות כתוב במפורש. אם הניסוח 'חזק מדי' (always, never, proves, entirely) - חשדו.\n\n## שלוש מלכודות היסק\n1. **נכון בעולם, לא בקטע**: אפשרות שהיא עובדה אמיתית אך אינה נובעת מהקטע.\n2. **הגזמה**: הקטע אמר might harbor (עשוי להכיל), והמסיח הופך זאת ל-does contain (מכיל בוודאות).\n3. **עונה על שאלה אחרת**: אפשרות נכונה כשלעצמה שאינה עונה על מה שנשאל.\n\n## דוגמה פתורה\nאם בקטע נכתב שעד שנות ה-70 הניחו שאור השמש הוא מקור כל האנרגיה לחיים, ונשאלים מה היו החוקרים מניחים אז - ההיסק הישיר הוא שסביבות חשוכות נחשבו 'לא מבטיחות' לחיפוש חיים. היזהרו ממסיח שמתאר דווקא את התפיסה *החדשה* (חיפוש בירחים קפואים) - הוא הפוך לתקופה הנשאלת."
+    }
+  ],
+  "items": [
+    {
+      "id": "psy-rst-001",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Although the committee endorsed the proposal, it stopped short of allocating any funds for it.\"",
+      "options": [
+        "The committee approved the proposal but did not provide money to carry it out.",
+        "The committee refused to endorse the proposal until funds had been allocated.",
+        "The committee provided funds for the proposal without formally endorsing it.",
+        "The committee rejected both the proposal and its funding."
+      ],
+      "answer": 0,
+      "explanation": "המבנה 'endorsed ... but stopped short of allocating funds' = תמכו רעיונית אך לא נתנו כסף. התשובה הנכונה שומרת על שני החלקים. מסיח 1 הופך את סדר התנאי (מתנה תמיכה בהקצאת כסף), מסיח 2 מחליף מי עשה מה (כסף בלי תמיכה), ומסיח 3 שולל גם את התמיכה עצמה.",
+      "timeSec": 50,
+      "tags": [
+        "restatement",
+        "logic",
+        "concession"
+      ],
+      "pro": false
+    },
+    {
+      "id": "psy-rst-002",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The vaccine is effective only if it is stored below a specific temperature.\"",
+      "options": [
+        "If the vaccine is kept below that temperature, it is guaranteed to be effective.",
+        "Unless the vaccine is kept below that temperature, it will not be effective.",
+        "The vaccine is effective whether or not it is stored below that temperature.",
+        "The vaccine must be kept below that temperature, which by itself makes it effective."
+      ],
+      "answer": 1,
+      "explanation": "'only if' מציין תנאי הכרחי ולא מספיק: הקירור דרוש לאפקטיביות אך אינו מבטיח אותה. התשובה הנכונה שקולה ל'אם לא יקורר, לא יהיה יעיל' (קונטרפוזיציה). מסיחים 1 ו-3 הופכים את ההכרחי למספיק ('guaranteed'/'by itself makes it'), ומסיח 2 מבטל את התנאי לגמרי.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "conditional"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-003",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Not all of the senators who opposed the bill belonged to the ruling party.\"",
+      "options": [
+        "None of the senators who opposed the bill belonged to the ruling party.",
+        "Every senator who opposed the bill belonged to the ruling party.",
+        "At least one senator who opposed the bill did not belong to the ruling party.",
+        "No senator from the ruling party opposed the bill."
+      ],
+      "answer": 2,
+      "explanation": "'Not all' שולל רק את ה'כולם', כלומר לפחות אחד איננו, אך ייתכן שחלקם כן. התשובה הנכונה בדיוק זו. מסיח 1 ('none') הוא שלילה מוחלטת חזקה מדי, מסיח 2 הוא ההפך, ומסיח 3 מדבר על קבוצה אחרת (חברי המפלגה) ולא על המתנגדים.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "quantifier"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-004",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The collapse of the bee population has been attributed largely to pesticide use rather than to climate change.\"",
+      "options": [
+        "Climate change, rather than pesticides, is held responsible for the decline in bees.",
+        "Both pesticides and climate change are considered equally responsible for the decline.",
+        "Neither pesticides nor climate change can explain the decline in bees.",
+        "Pesticides, more than climate change, are blamed for the decline in bees."
+      ],
+      "answer": 3,
+      "explanation": "'attributed largely to X rather than Y' מציב את X כגורם העיקרי ואת Y כמשני. התשובה שומרת על הכיוון (חומרי הדברה מעל אקלים). מסיח 1 הופך את הכיוון, מסיח 2 משווה ביניהם, ומסיח 3 שולל את שניהם.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "causation"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-005",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"It is not uncommon for seasoned negotiators to feign indifference.\"",
+      "options": [
+        "Experienced negotiators quite often pretend not to care.",
+        "Experienced negotiators almost never pretend to be indifferent.",
+        "It is unusual for skilled negotiators to hide their true feelings.",
+        "Seasoned negotiators are genuinely indifferent most of the time."
+      ],
+      "answer": 0,
+      "explanation": "'not uncommon' היא לשון המעטה (ליטוטס) שמשמעה 'די שכיח', ו'feign indifference' = להעמיד פני אדישות. התשובה משקפת 'לעיתים קרובות מעמידים פנים'. מסיחים 1 ו-2 הופכים לנדיר, ומסיח 3 הופך העמדת פנים לאדישות אמיתית.",
+      "timeSec": 50,
+      "tags": [
+        "restatement",
+        "logic",
+        "litotes"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-006",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Few of the participants had anticipated how demanding the task would turn out to be.\"",
+      "options": [
+        "A few participants had correctly predicted how demanding the task would be.",
+        "Most of the participants were surprised by how demanding the task proved to be.",
+        "Almost all the participants had expected the task to be demanding.",
+        "The participants found the task far easier than they had expected."
+      ],
+      "answer": 1,
+      "explanation": "'Few' (בלי 'a') משמעו 'כמעט אף אחד לא', ולכן הרוב לא צפו והופתעו. שימו לב להבדל מ'a few' (אחדים כן) שבמסיח 1. מסיח 2 הופך למצב שבו כמעט כולם צפו, ומסיח 3 הופך את כיוון ההפתעה (קל במקום תובעני).",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "quantifier"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-007",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Far from discouraging dissent, the new policy actually invited it.\"",
+      "options": [
+        "The policy succeeded in discouraging dissent, just as it was meant to.",
+        "The policy neither encouraged nor discouraged dissent.",
+        "Rather than suppressing disagreement, the policy ended up encouraging it.",
+        "Dissent declined sharply once the new policy came into force."
+      ],
+      "answer": 2,
+      "explanation": "'Far from X-ing, it actually Y-ed' = לא זו בלבד שלא X, אלא ההפך, Y. כאן: לא דיכא מחאה אלא עודד אותה. מסיחים 1 ו-3 טוענים שהמחאה דוכאה (ההפך), ומסיח 2 טוען לנייטרליות.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "concession"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-008",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"However compelling the evidence may appear, it falls short of establishing causation.\"",
+      "options": [
+        "The evidence is so convincing that it clearly proves causation.",
+        "The evidence is far too weak to be taken seriously at all.",
+        "The evidence establishes causation precisely because it is so compelling.",
+        "No matter how convincing the evidence seems, it does not prove that one thing causes the other."
+      ],
+      "answer": 3,
+      "explanation": "'However compelling ... may appear' = לא משנה כמה משכנעת תיראה, ו'falls short of establishing causation' = אינה מוכיחה סיבתיות. התשובה שומרת על הויתור ועל השלילה. מסיחים 1 ו-3 הופכים לכך שהיא כן מוכיחה, ומסיח 2 טוען שהיא חלשה (בעוד המקור מודה שהיא נראית משכנעת).",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "concession"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-009",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"No sooner had the treaty been signed than both sides began to violate its terms.\"",
+      "options": [
+        "Almost immediately after the treaty was signed, both sides started breaking it.",
+        "The treaty was violated by both sides well before it was ever signed.",
+        "Both sides honored the treaty for a long time before violating it.",
+        "The treaty was signed only after both sides had stopped violating its terms."
+      ],
+      "answer": 0,
+      "explanation": "'No sooner had X than Y' = מיד לאחר ש-X, קרה Y. כאן ההפרות החלו מיד אחרי החתימה. מסיח 1 מקדים את ההפרה לחתימה, מסיח 2 מכניס פרק זמן ארוך, ומסיח 3 הופך את סדר האירועים.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "sequence"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-010",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"All but a handful of the manuscripts were destroyed in the fire.\"",
+      "options": [
+        "Only a small number of the manuscripts were destroyed in the fire.",
+        "Nearly all of the manuscripts were lost in the fire, though a small number survived.",
+        "Every single manuscript was destroyed in the fire.",
+        "None of the manuscripts was affected by the fire at all."
+      ],
+      "answer": 1,
+      "explanation": "'All but a handful' = הכול חוץ ממעטים, כלומר כמעט הכול נהרס ומעטים שרדו. מסיח 1 הופך את היחס (רק מעטים נהרסו), מסיח 2 טוען שהכול נהרס בלי יוצא מן הכלל, ומסיח 3 טוען ששום דבר לא נפגע.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "quantifier"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-011",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Had the warning been issued earlier, the casualties might have been avoided.\"",
+      "options": [
+        "The warning was issued early, and as a result the casualties were avoided.",
+        "Even a much earlier warning could not have prevented the casualties.",
+        "Because the warning came too late, the casualties were probably not avoided.",
+        "The casualties occurred despite the warning being issued very early."
+      ],
+      "answer": 2,
+      "explanation": "משפט תנאי בטל (counterfactual): 'לו ניתנה אזהרה מוקדם יותר' מלמד שבפועל היא לא ניתנה מוקדם, ולכן הנפגעים כנראה לא נמנעו. מסיח 1 טוען שהאזהרה כן ניתנה מוקדם, מסיח 2 שולל שאזהרה מוקדמת הייתה עוזרת (המקור מרמז שכן), ומסיח 3 סותר את משמעות התנאי.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "conditional"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-012",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The more heavily the government subsidized the industry, the less competitive it became.\"",
+      "options": [
+        "Government subsidies made the industry steadily more competitive.",
+        "The industry's competitiveness was unaffected by the level of subsidies.",
+        "The industry became more competitive only after subsidies were withdrawn.",
+        "Greater government subsidies went hand in hand with a decline in the industry's competitiveness."
+      ],
+      "answer": 3,
+      "explanation": "המבנה 'the more X, the less Y' מתאר יחס הפוך: ככל שהסובסידיות גדלו, התחרותיות ירדה. התשובה שומרת על הקשר השלילי. מסיח 1 הופך לקשר חיובי, מסיח 2 מבטל כל קשר, ומסיח 3 מוסיף טענה על ביטול סובסידיות שאינה במקור.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "correlation"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-013",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The findings suggest, albeit tentatively, that the compound may slow the progression of the disease.\"",
+      "options": [
+        "There is preliminary and not yet conclusive evidence that the compound might slow the disease.",
+        "The findings prove conclusively that the compound slows the disease.",
+        "The findings show that the compound has no effect on the disease.",
+        "The findings suggest that the disease slows the action of the compound."
+      ],
+      "answer": 0,
+      "explanation": "'suggest, albeit tentatively, ... may' הוא ניסוח זהיר כפול: רמז ולא הוכחה, ובהסתייגות. התשובה שומרת על הזהירות. מסיח 1 הופך לוודאות ('prove conclusively'), מסיח 2 הופך לשלילת השפעה, ומסיח 3 הופך את כיוון הסיבתיות (המחלה מאטה את התרכובת).",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "hedging"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-014",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"Were it not for the intervention of a few private donors, the museum would have closed its doors.\"",
+      "options": [
+        "The museum closed down in spite of help from a few private donors.",
+        "The museum stayed open only thanks to a small group of private donors.",
+        "A few private donors tried to help, but the museum closed anyway.",
+        "The museum would have stayed open even without the donors' intervention."
+      ],
+      "answer": 1,
+      "explanation": "'Were it not for X, Y would have happened' = לולא X, היה קורה Y (הרע); כלומר X מנע את Y. כאן התורמים מנעו את הסגירה, והמוזיאון נשאר פתוח. מסיחים 1 ו-2 טוענים שהמוזיאון נסגר, ומסיח 3 שולל את תרומת התורמים.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "conditional"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-015",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"None of the proposals was without merit, yet none was entirely satisfactory either.\"",
+      "options": [
+        "Some of the proposals had no merit at all, and none was satisfactory.",
+        "Each proposal was entirely satisfactory and full of merit.",
+        "Every proposal had some value, but not one of them was completely adequate.",
+        "Only one proposal had any merit, and it was completely satisfactory."
+      ],
+      "answer": 2,
+      "explanation": "'None was without merit' = לכל אחת יש ערך מסוים (שלילה כפולה), ו'none was entirely satisfactory' = אף אחת אינה מספקת לגמרי. מסיח 1 טוען שלחלק אין ערך כלל, מסיח 2 הופך לכך שכולן מצוינות, ומסיח 3 ממקד באחת בלבד.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "negation"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-016",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The historian attributes the uprising to economic grievances rather than to ideological fervor.\"",
+      "options": [
+        "The historian believes ideology, not economic hardship, caused the uprising.",
+        "The historian denies that economic grievances played any role in the uprising.",
+        "The historian claims economics and ideology were equally to blame for the uprising.",
+        "In the historian's view, economic hardship, more than ideology, lay behind the uprising."
+      ],
+      "answer": 3,
+      "explanation": "'attributes to X rather than to Y' = מייחס בעיקר ל-X ולא ל-Y. כאן X הוא מצוקה כלכלית ו-Y אידאולוגיה. מסיח 1 הופך את הכיוון, מסיח 2 שולל לגמרי את הגורם הכלכלי (המקור דווקא מדגיש אותו), ומסיח 3 משווה ביניהם.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "causation"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-017",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"While the new method is considerably faster, it is no more accurate than the method it replaces.\"",
+      "options": [
+        "The new method saves a lot of time but is not any more accurate than the old one.",
+        "The new method is both faster and more accurate than the old one.",
+        "The new method is more accurate but no faster than the old one.",
+        "The new method is slower yet more accurate than the old one."
+      ],
+      "answer": 0,
+      "explanation": "'faster, but no more accurate' = מהיר יותר אך לא מדויק יותר (דיוק שווה). שימו לב ל-'no more accurate than' שמשמעו 'לכל היותר מדויק באותה מידה'. מסיח 1 מוסיף דיוק גבוה יותר, ומסיחים 2 ו-3 מחליפים בין המהירות לדיוק.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "concession"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-018",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"All too often, ambitious reforms are announced with great fanfare and then quietly abandoned.\"",
+      "options": [
+        "On rare occasions, modest reforms are introduced quietly and then loudly celebrated.",
+        "Far too frequently, bold reforms are launched loudly and later dropped without notice.",
+        "Reforms are usually announced quietly but then carried out with great publicity.",
+        "Ambitious reforms are almost always announced and then fully implemented."
+      ],
+      "answer": 1,
+      "explanation": "'All too often' = בתדירות גבוהה מדי, ולא לעיתים נדירות. 'announced with fanfare ... then quietly abandoned' = מוכרזות ברעש וננטשות בשקט. מסיח 1 הופך לתדירות נדירה ולסדר הפוך, מסיח 2 מחליף בין הרעש לשקט, ומסיח 3 טוען שהן מיושמות.",
+      "timeSec": 60,
+      "tags": [
+        "restatement",
+        "logic",
+        "frequency"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-019",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The model is valuable insofar as it yields predictions that can actually be tested.\"",
+      "options": [
+        "The model is valuable precisely because its predictions cannot be tested.",
+        "The model is valuable regardless of whether its predictions can be tested.",
+        "The model's value extends only as far as its ability to produce testable predictions.",
+        "The model yields testable predictions, but these add nothing to its value."
+      ],
+      "answer": 2,
+      "explanation": "'valuable insofar as' = בעל ערך במידה ש / רק עד כמה ש. הערך מותנה ביכולת להפיק תחזיות בנות-בדיקה. מסיח 1 הופך את התנאי (ערך דווקא כשאי אפשר לבדוק), מסיח 2 מבטל את ההתניה, ומסיח 3 שולל את הקשר בין התחזיות לערך.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "condition"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rst-020",
+      "sub": "psy-restate",
+      "subTitle": "ניסוח מחדש — Restatement",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המשפט הקרוב ביותר במשמעותו למשפט הבא:\n\n\"The crisis was caused not so much by a shortage of resources as by their mismanagement.\"",
+      "options": [
+        "A shortage of resources, rather than mismanagement, was the main cause of the crisis.",
+        "Both a shortage of resources and their mismanagement contributed equally to the crisis.",
+        "Neither a shortage of resources nor mismanagement had much to do with the crisis.",
+        "Poor management of the resources, more than any shortage of them, brought on the crisis."
+      ],
+      "answer": 3,
+      "explanation": "'not so much X as Y' = לא כל כך בגלל X אלא יותר בגלל Y; כלומר Y (ניהול כושל) הוא הגורם המרכזי. מסיח 1 הופך את הכיוון (מחסור הוא הגורם), מסיח 2 משווה, ומסיח 3 שולל את שניהם.",
+      "timeSec": 70,
+      "tags": [
+        "restatement",
+        "logic",
+        "causation"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-001",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\n______ its longstanding reputation for precision, the instrument produced wildly inconsistent readings throughout the trial.",
+      "options": [
+        "Notwithstanding",
+        "Owing to",
+        "By virtue of",
+        "In keeping with"
+      ],
+      "answer": 0,
+      "explanation": "הפער בין 'מוניטין של דיוק' ל'קריאות לא עקביות' דורש מילת ויתור. 'Notwithstanding' = למרות. 'Owing to' ו-'By virtue of' מציינים סיבה (כאילו המוניטין גרם לחוסר הדיוק, לא הגיוני), ו-'In keeping with' מציין התאמה (סותר את הניגוד).",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": false
+    },
+    {
+      "id": "psy-sc-002",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nThe senator's statement was studiously ______: it neither endorsed the plan nor ______ it outright.",
+      "options": [
+        "unambiguous ... supported",
+        "equivocal ... rejected",
+        "forthright ... condemned",
+        "emphatic ... opposed"
+      ],
+      "answer": 1,
+      "explanation": "המבנה 'neither ... nor' מלמד שהעמדה עמומה; 'equivocal' = דו-משמעי, ומתאים ל'לא תמך ולא דחה'. 'unambiguous', 'forthright' ו-'emphatic' פירושם חד-משמעי/ישיר/נחרץ, הפך העמימות, ולכן אינם מתיישבים עם 'neither...nor'.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-003",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nAlthough the report claims to be objective, its tone is distinctly ______, betraying the author's sympathies at every turn.",
+      "options": [
+        "dispassionate",
+        "impartial",
+        "tendentious",
+        "understated"
+      ],
+      "answer": 2,
+      "explanation": "'betraying the author's sympathies' מלמד על הטיה. 'tendentious' = מגמתי/נוטה. 'dispassionate' ו-'impartial' פירושם חסר פניות (סותר את ההטיה), ו-'understated' (מאופק) אינו קשור להטיה.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-004",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nThe board's vote was largely ______; the substantive decisions had already been reached behind closed doors weeks before.",
+      "options": [
+        "contentious",
+        "meticulous",
+        "unprecedented",
+        "perfunctory"
+      ],
+      "answer": 3,
+      "explanation": "אם ההחלטות כבר התקבלו מראש, ההצבעה היא טקסית וריקה מתוכן. 'perfunctory' = שגרתי, לצאת ידי חובה. 'contentious' (שנוי במחלוקת), 'meticulous' (קפדני) ו-'unprecedented' (חסר תקדים) אינם מתאימים למעשה טקסי-ריק.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-005",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nThe treatment is palliative ______ curative: it eases the patient's suffering but does nothing to remove its cause.",
+      "options": [
+        "rather than",
+        "as well as",
+        "by means of",
+        "no less than"
+      ],
+      "answer": 0,
+      "explanation": "'eases suffering but does nothing to remove the cause' מנגיד הקלה מול ריפוי. 'palliative rather than curative' = מקל ולא מרפא. 'as well as' ו-'no less than' היו הופכים לטיפול שגם מרפא (סותר), ו-'by means of' חסר היגיון תחבירי כאן.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-006",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nThe climbers pressed on toward the summit, ______ exhausted and dangerously low on supplies.",
+      "options": [
+        "because",
+        "albeit",
+        "provided that",
+        "so that"
+      ],
+      "answer": 1,
+      "explanation": "'albeit' = אם כי / הגם ש, ויתור קצר: המשיכו למרות התשישות. 'because' הופך את התשישות לסיבה להמשך (לא הגיוני), 'provided that' מציב תנאי, ו-'so that' מציין מטרה.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-007",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nReviewers dismissed the debut novel as derivative, ______ a later generation of critics hailed it as quietly revolutionary.",
+      "options": [
+        "because",
+        "therefore",
+        "whereas",
+        "in case"
+      ],
+      "answer": 2,
+      "explanation": "ניגוד בין דחייה להלל דורש מילת ניגוד: 'whereas' = בעוד ש. 'because' ו-'therefore' מציינים סיבה או תוצאה (אין קשר סיבתי כזה), ו-'in case' מציין חשש או תנאי.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-008",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nShe lowered her voice almost to a whisper, ______ the sleeping infant in the next room should wake.",
+      "options": [
+        "unless",
+        "albeit",
+        "whereby",
+        "lest"
+      ],
+      "answer": 3,
+      "explanation": "'lest' = פן / שמא (כדי שלא): הנמיכה קול כדי שהתינוק לא יתעורר. 'unless' (אלא אם) הופך את ההיגיון, 'albeit' (אם כי) ו-'whereby' (שבאמצעותו) אינן מתאימות למשמעות 'שמא יקרה דבר לא רצוי'.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-009",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\n\nAfter years of relentless drought, the once-fertile valley had grown utterly ______, its soil cracked and lifeless.",
+      "options": [
+        "arid",
+        "verdant",
+        "fecund",
+        "lush"
+      ],
+      "answer": 0,
+      "explanation": "'drought ... cracked and lifeless' מחייב משמעות של יובש וצחיחות. 'arid' = צחיח. 'verdant', 'fecund' ו-'lush' פירושם ירוק / פורה / שופע, הפך הצחיחות.",
+      "timeSec": 40,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-010",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nThe minister's ______ refusal to release the figures only ______ the suspicion that they had been doctored.",
+      "options": [
+        "candid ... allayed",
+        "obstinate ... fueled",
+        "gracious ... aroused",
+        "reluctant ... dispelled"
+      ],
+      "answer": 1,
+      "explanation": "'only ______ the suspicion' מרמז שהחשד גבר. 'obstinate' (עיקש) מתלבש על סירוב, ו-'fueled' = הזין / החריף. 'allayed' ו-'dispelled' פירושם הפיגו / הפריכו (הפך 'גבר'), ו-'candid' / 'gracious' (גלוי / אדיב) אינם מתיישבים עם סירוב שמגביר חשד.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-011",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nThe truce brought only a brief ______ before hostilities resumed with even greater ferocity.",
+      "options": [
+        "escalation",
+        "armistice",
+        "respite",
+        "provocation"
+      ],
+      "answer": 2,
+      "explanation": "'brief ... before hostilities resumed' מורה על הפוגה זמנית. 'respite' = הפוגה / מנוחה קצרה. 'escalation' (הסלמה) ו-'provocation' (התגרות) הם ההפך מהפוגה, ו-'armistice' (שביתת נשק) הוא כמעט שם נרדף ל-truce עצמו, לא ל'פרק הזמן הקצר שלפני חידוש הקרבות'.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-012",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nThe philosopher was notorious for her ______ prose, so dense with jargon and clauses that even specialists struggled to follow it.",
+      "options": [
+        "lucid",
+        "limpid",
+        "terse",
+        "turgid"
+      ],
+      "answer": 3,
+      "explanation": "'dense with jargon ... hard to follow' מורה על כתיבה מסורבלת. 'turgid' = נפוח / מסורבל. 'lucid' ו-'limpid' פירושם בהיר / צלול (הפך), ו-'terse' (תמציתי) סותר את 'dense'.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-013",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nRather than ______ the opposition, the government's heavy-handed crackdown served only to ______ it, swelling the protesters' ranks.",
+      "options": [
+        "quelling ... embolden",
+        "provoking ... silence",
+        "appeasing ... placate",
+        "inciting ... inflame"
+      ],
+      "answer": 0,
+      "explanation": "'Rather than X, served only to Y' מחייב ש-X ו-Y הפוכים, ו'swelling the ranks' מלמד שהמחאה גברה. 'quelling' (לדכא) מול 'embolden' (לעודד / להעז) יוצר את הניגוד הנכון. 'provoking ... silence' הפוך בסדר, ו-'appeasing ... placate' וגם 'inciting ... inflame' הן זוגות נרדפים (אין ניגוד).",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-014",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\n\nThe support for the sweeping claim is ______ at best: a single secondhand anecdote can hardly establish a general law.",
+      "options": [
+        "conclusive",
+        "anecdotal",
+        "overwhelming",
+        "exhaustive"
+      ],
+      "answer": 1,
+      "explanation": "'a single secondhand anecdote' מצביע על ראיה חלשה ונקודתית. 'anecdotal' = מבוסס על סיפור יחיד ולא על נתונים. 'conclusive', 'overwhelming' ו-'exhaustive' פירושם מכריע / מוחץ / ממצה, הפך החולשה שהמשפט מתאר.",
+      "timeSec": 40,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-015",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nEconomists remain sharply divided: some foresee a swift rebound, ______ others warn of a protracted slump.",
+      "options": [
+        "because",
+        "hence",
+        "while",
+        "so"
+      ],
+      "answer": 2,
+      "explanation": "'sharply divided' ושתי עמדות מנוגדות דורשים מילת ניגוד / השוואה: 'while' = בעוד ש. 'because', 'hence' ו-'so' מציינים סיבה או תוצאה, ואין כאן יחס סיבתי בין שתי התחזיות.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-016",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nHer central argument, ______ elegant, rests on an assumption that nearly every expert in the field now rejects.",
+      "options": [
+        "moreover",
+        "because",
+        "whenever",
+        "however"
+      ],
+      "answer": 3,
+      "explanation": "'however elegant' הוא מבנה ויתור = 'ככל שתהיה אלגנטית'. הניגוד הוא בין האלגנטיות להנחה הפגומה. 'moreover' מוסיף, 'because' מנמק, ו-'whenever' מציין זמן, ואף אחת אינה יוצרת את הויתור הנדרש.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-017",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\n\nThe regime tolerated no ______ whatsoever, jailing journalists and silencing anyone who dared to question it.",
+      "options": [
+        "dissent",
+        "allegiance",
+        "compliance",
+        "conformity"
+      ],
+      "answer": 0,
+      "explanation": "'jailing journalists and silencing critics' מלמד שמה שלא נסבל הוא ההתנגדות. 'dissent' = מחאה / אי-הסכמה. 'allegiance' (נאמנות), 'compliance' (ציות) ו-'conformity' (הליכה בתלם) הם דווקא מה שמשטר כזה היה מעודד.",
+      "timeSec": 40,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-018",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\n______ the data at their disposal were fragmentary, the researchers managed to reach ______ conclusions that have since withstood every challenge.",
+      "options": [
+        "Because ... provisional",
+        "Although ... robust",
+        "Since ... tenuous",
+        "Unless ... firm"
+      ],
+      "answer": 1,
+      "explanation": "'withstood every challenge' מורה על מסקנות חזקות, והניגוד לנתונים החלקיים דורש מילת ויתור. 'Although ... robust' = למרות ... איתנות. 'Because / Since ... provisional / tenuous' הופכים לקשר סיבתי עם מסקנות חלשות (סותר 'withstood every challenge'), ו-'Unless' חסר היגיון כאן.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-019",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\n\nMany found the executive's public apology ______, since it came only after the scandal had grown impossible to hide.",
+      "options": [
+        "heartfelt",
+        "spontaneous",
+        "disingenuous",
+        "magnanimous"
+      ],
+      "answer": 2,
+      "explanation": "'only after it became impossible to hide' מלמד שההתנצלות אינטרסנטית ולא כנה. 'disingenuous' = מתחזה לכן / לא כן. 'heartfelt' (כן), 'spontaneous' (ספונטני) ו-'magnanimous' (רחב-לב) כולם חיוביים וסותרים את העיתוי המחושב.",
+      "timeSec": 50,
+      "tags": [
+        "sentence-completion",
+        "vocabulary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-sc-020",
+      "sub": "psy-scomp",
+      "subTitle": "השלמת משפטים — Sentence Completion",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\n\nUnder the ruling, the constitution shields such speech ______ it does not incite imminent lawless action.",
+      "options": [
+        "even though",
+        "regardless of whether",
+        "as though",
+        "insofar as"
+      ],
+      "answer": 3,
+      "explanation": "ההגנה מותנית בכך שאין הסתה, כלומר תקפה 'במידה ש'. 'insofar as' = ככל ש / במידה ש. 'even though' (אף על פי ש) הוא ויתור ולא התניה, 'regardless of whether' מבטל את ההתניה, ו-'as though' = כאילו.",
+      "timeSec": 60,
+      "tags": [
+        "sentence-completion",
+        "connectors"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-001",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nUntil the 1970s, biologists held almost universally that sunlight was the ultimate source of energy for all life on Earth. The discovery of thriving communities clustered around deep-sea hydrothermal vents overturned this assumption. In the perpetual darkness of the ocean floor, where no photon ever reaches, dense colonies of tube worms, clams, and microbes flourish. They depend not on photosynthesis but on chemosynthesis: certain bacteria oxidize the hydrogen sulfide spewing from the vents and harness the released energy to fix carbon. These bacteria form the base of a food web entirely independent of the sun. The finding carried implications far beyond marine biology. If life could subsist on chemical energy alone, then the subsurface oceans of icy moons such as Europa and Enceladus, long dismissed as sterile, might harbor ecosystems of their own. What had seemed an exotic curiosity thus reframed the very criteria by which scientists search for life elsewhere.",
+      "group": "psy-rdg-g1",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nWhich of the following best expresses the main idea of the passage?",
+      "options": [
+        "A discovery on the ocean floor overturned the belief that all life ultimately depends on sunlight and reshaped the search for life elsewhere.",
+        "Tube worms and clams are the most unusual animals found near deep-sea hydrothermal vents.",
+        "Certain bacteria are able to oxidize hydrogen sulfide and use the energy to fix carbon.",
+        "The icy moons Europa and Enceladus are now known to contain living ecosystems."
+      ],
+      "answer": 0,
+      "explanation": "רעיון מרכזי צריך לכסות את כל הקטע: הגילוי סתר את ההנחה שהחיים תלויים באור השמש, ולכן שינה את החיפוש אחר חיים. מסיחים 2-3 נכונים אך צרים מדי (פרט טכני, שם קבוצת בעלי חיים), ומסיח 4 טוען כעובדה את מה שהקטע מעלה רק כאפשרות ('might harbor').",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "main-idea"
+      ],
+      "pro": false
+    },
+    {
+      "id": "psy-rdg-002",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nUntil the 1970s, biologists held almost universally that sunlight was the ultimate source of energy for all life on Earth. The discovery of thriving communities clustered around deep-sea hydrothermal vents overturned this assumption. In the perpetual darkness of the ocean floor, where no photon ever reaches, dense colonies of tube worms, clams, and microbes flourish. They depend not on photosynthesis but on chemosynthesis: certain bacteria oxidize the hydrogen sulfide spewing from the vents and harness the released energy to fix carbon. These bacteria form the base of a food web entirely independent of the sun. The finding carried implications far beyond marine biology. If life could subsist on chemical energy alone, then the subsurface oceans of icy moons such as Europa and Enceladus, long dismissed as sterile, might harbor ecosystems of their own. What had seemed an exotic curiosity thus reframed the very criteria by which scientists search for life elsewhere.",
+      "group": "psy-rdg-g1",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAs used in the passage, the word 'sterile' most nearly means:",
+      "options": [
+        "free of all germs",
+        "incapable of supporting life",
+        "extremely cold",
+        "entirely without water"
+      ],
+      "answer": 1,
+      "explanation": "בהקשר, הירחים הקפואים 'נפסלו כ-sterile' אך אולי בכל זאת מכילים מערכות אקולוגיות, כלומר 'sterile' כאן = חסר חיים. 'נקי מחיידקים' הוא המובן הרפואי שאינו מתאים כאן, ו'קר מאוד' ו'ללא מים' אינם המשמעות של המילה.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-003",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nUntil the 1970s, biologists held almost universally that sunlight was the ultimate source of energy for all life on Earth. The discovery of thriving communities clustered around deep-sea hydrothermal vents overturned this assumption. In the perpetual darkness of the ocean floor, where no photon ever reaches, dense colonies of tube worms, clams, and microbes flourish. They depend not on photosynthesis but on chemosynthesis: certain bacteria oxidize the hydrogen sulfide spewing from the vents and harness the released energy to fix carbon. These bacteria form the base of a food web entirely independent of the sun. The finding carried implications far beyond marine biology. If life could subsist on chemical energy alone, then the subsurface oceans of icy moons such as Europa and Enceladus, long dismissed as sterile, might harbor ecosystems of their own. What had seemed an exotic curiosity thus reframed the very criteria by which scientists search for life elsewhere.",
+      "group": "psy-rdg-g1",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nIt can be inferred from the passage that, before the 1970s, most scientists searching for life would have:",
+      "options": [
+        "focused their efforts on the subsurface oceans of icy moons",
+        "assumed that chemosynthesis was far more common than photosynthesis",
+        "regarded sunless environments as unpromising places to look for life",
+        "believed that hydrothermal vents could not exist on the ocean floor"
+      ],
+      "answer": 2,
+      "explanation": "אם עד שנות ה-70 הניחו שאור השמש הוא מקור כל האנרגיה, הרי שסביבות חשוכות נחשבו לא-מבטיחות, וזה ההיסק הישיר. מסיח 1 הוא ההפך ממה שהקטע מרמז (זה הכיוון החדש), מסיח 2 סותר את התפיסה הישנה, ומסיח 3 עוסק בעצם קיום הפתחים ולא במקור האנרגיה.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-004",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nThe 'bystander effect' — the tendency of individuals to be less likely to help a victim when others are present — became one of social psychology's most cited findings. The standard explanation is 'diffusion of responsibility': as the number of witnesses grows, each feels a smaller share of the obligation to act. Recent analyses, however, complicate this tidy picture. A review of surveillance footage from real public conflicts found that bystanders intervened in the large majority of cases, and that the likelihood of intervention actually rose as the number of people present increased. The discrepancy suggests that laboratory studies, which typically stage ambiguous, low-stakes emergencies, may capture hesitation rather than indifference. When danger is unmistakable, a crowd may supply not diffused responsibility but a pool of potential helpers. The lesson is not that the classic experiments were wrong, but that their findings are narrower in scope than decades of textbook summaries have implied.",
+      "group": "psy-rdg-g2",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nThe writer's primary purpose in the passage is to:",
+      "options": [
+        "demonstrate that the bystander effect was an error that has now been completely refuted",
+        "explain in detail how diffusion of responsibility operates within very large crowds",
+        "argue that laboratory experiments are essentially useless for studying human behavior",
+        "qualify a famous psychological finding by arguing that its scope is narrower than is commonly believed"
+      ],
+      "answer": 3,
+      "explanation": "המשפט האחרון הוא המפתח: 'לא שהניסויים טעו, אלא שתחולתם צרה מהמשתמע'. זו מטרה של סיוג, לא הפרכה. מסיח 1 חזק מדי ('completely refuted'), מסיח 2 הוא רקע ולא המטרה, ומסיח 3 הכללה קיצונית שהקטע אינו טוען.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "purpose"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-005",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nThe 'bystander effect' — the tendency of individuals to be less likely to help a victim when others are present — became one of social psychology's most cited findings. The standard explanation is 'diffusion of responsibility': as the number of witnesses grows, each feels a smaller share of the obligation to act. Recent analyses, however, complicate this tidy picture. A review of surveillance footage from real public conflicts found that bystanders intervened in the large majority of cases, and that the likelihood of intervention actually rose as the number of people present increased. The discrepancy suggests that laboratory studies, which typically stage ambiguous, low-stakes emergencies, may capture hesitation rather than indifference. When danger is unmistakable, a crowd may supply not diffused responsibility but a pool of potential helpers. The lesson is not that the classic experiments were wrong, but that their findings are narrower in scope than decades of textbook summaries have implied.",
+      "group": "psy-rdg-g2",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAccording to the passage, the review of surveillance footage found that:",
+      "options": [
+        "bystanders intervened in most real conflicts, and the chance of intervention rose as more people were present",
+        "bystanders almost never intervened once a crowd had gathered",
+        "intervention became steadily less likely as the number of witnesses increased",
+        "victims were helped only when a single witness happened to be present"
+      ],
+      "answer": 0,
+      "explanation": "זהו פרט מפורש בקטע: התערבות ברוב המקרים, וסיכוי ההתערבות עלה עם מספר הנוכחים. מסיחים 2-3 מתארים את התבנית ההפוכה (זו שהניסויים המעבדתיים ניבאו), ומסיח 1 סותר את 'רוב המקרים'.",
+      "timeSec": 45,
+      "tags": [
+        "reading",
+        "detail"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-006",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nThe 'bystander effect' — the tendency of individuals to be less likely to help a victim when others are present — became one of social psychology's most cited findings. The standard explanation is 'diffusion of responsibility': as the number of witnesses grows, each feels a smaller share of the obligation to act. Recent analyses, however, complicate this tidy picture. A review of surveillance footage from real public conflicts found that bystanders intervened in the large majority of cases, and that the likelihood of intervention actually rose as the number of people present increased. The discrepancy suggests that laboratory studies, which typically stage ambiguous, low-stakes emergencies, may capture hesitation rather than indifference. When danger is unmistakable, a crowd may supply not diffused responsibility but a pool of potential helpers. The lesson is not that the classic experiments were wrong, but that their findings are narrower in scope than decades of textbook summaries have implied.",
+      "group": "psy-rdg-g2",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nThe writer's attitude toward the classic bystander experiments can best be described as:",
+      "options": [
+        "openly contemptuous of their methods and their conclusions",
+        "respectful of their value but wary of how broadly they have been applied",
+        "uncritically admiring of everything they are said to have established",
+        "entirely indifferent to whether they were ever valid"
+      ],
+      "answer": 1,
+      "explanation": "'לא שהניסויים טעו' מלמד על כבוד לערכם; 'צרים מהמשתמע' מלמד על הסתייגות מהכללת-יתר. לכן היחס מכבד אך זהיר. 'contemptuous' שלילי מדי, 'uncritically admiring' חיובי מדי, ו'indifferent' סותר את העיסוק המעמיק בהם.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "attitude"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-007",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nWhen movable-type printing spread across Europe in the late fifteenth century, its most profound consequences were linguistic rather than merely technological. Before print, a single language might be written in dozens of regional spellings, each scribe following local habit. Printers, seeking the widest possible market for every edition, had a powerful incentive to settle on one form of a language that readers across a broad territory could understand. Over a few generations, the spellings and grammar that appeared in printed books hardened into standards, while rival dialects were relegated to speech alone. Paradoxically, a technology prized for multiplying copies of texts thereby narrowed the diversity of written language. Nor was the effect confined to grammar: by fixing a prestigious 'correct' form, print lent authority to the dialects of commercial capitals and, implicitly, to the people who spoke them. The humble economics of the print shop thus helped draw the linguistic map of modern Europe.",
+      "group": "psy-rdg-g3",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nWhat is the central point of the passage?",
+      "options": [
+        "Movable-type printing was the single most important technological advance of the fifteenth century.",
+        "Scribes who worked before the age of print were careless and inconsistent in their spelling.",
+        "Commercial pressures in printing standardized written languages, reducing their variety and lending prestige to certain dialects.",
+        "Regional dialects disappeared entirely once printed books became widespread across Europe."
+      ],
+      "answer": 2,
+      "explanation": "הקטע טוען שהשיקול המסחרי של הדפוס תקנן את השפה הכתובה וצמצם את גיוונה. מסיח 1 הכללה טכנולוגית שאינה הטיעון, מסיח 2 מעוות (הקטע אומר שהסופרים עקבו אחר מנהג מקומי, לא שהיו רשלנים), ומסיח 3 חזק מדי ('entirely' - הקטע אומר שהניבים נדחקו לדיבור, לא נעלמו).",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "main-idea"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-008",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nWhen movable-type printing spread across Europe in the late fifteenth century, its most profound consequences were linguistic rather than merely technological. Before print, a single language might be written in dozens of regional spellings, each scribe following local habit. Printers, seeking the widest possible market for every edition, had a powerful incentive to settle on one form of a language that readers across a broad territory could understand. Over a few generations, the spellings and grammar that appeared in printed books hardened into standards, while rival dialects were relegated to speech alone. Paradoxically, a technology prized for multiplying copies of texts thereby narrowed the diversity of written language. Nor was the effect confined to grammar: by fixing a prestigious 'correct' form, print lent authority to the dialects of commercial capitals and, implicitly, to the people who spoke them. The humble economics of the print shop thus helped draw the linguistic map of modern Europe.",
+      "group": "psy-rdg-g3",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAs used in the passage, 'relegated to speech alone' most nearly means:",
+      "options": [
+        "carefully preserved in both speech and writing",
+        "translated into the new standardized written language",
+        "formally forbidden from being spoken in public",
+        "pushed down to the lesser status of being spoken but not written"
+      ],
+      "answer": 3,
+      "explanation": "'relegated' = הורד בדרגה / נדחק. ניבים מתחרים נדחקו למעמד נחות של דיבור בלבד. 'preserved' הפוך, 'translated' אינו המשמעות, ו'forbidden from being spoken' סותר שכן הם דווקא נותרו בדיבור.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-009",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nWhen movable-type printing spread across Europe in the late fifteenth century, its most profound consequences were linguistic rather than merely technological. Before print, a single language might be written in dozens of regional spellings, each scribe following local habit. Printers, seeking the widest possible market for every edition, had a powerful incentive to settle on one form of a language that readers across a broad territory could understand. Over a few generations, the spellings and grammar that appeared in printed books hardened into standards, while rival dialects were relegated to speech alone. Paradoxically, a technology prized for multiplying copies of texts thereby narrowed the diversity of written language. Nor was the effect confined to grammar: by fixing a prestigious 'correct' form, print lent authority to the dialects of commercial capitals and, implicitly, to the people who spoke them. The humble economics of the print shop thus helped draw the linguistic map of modern Europe.",
+      "group": "psy-rdg-g3",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nWhy does the writer describe the effect of printing as 'paradoxical'?",
+      "options": [
+        "because a technology that multiplied copies of texts ended up reducing the variety of written language",
+        "because printing turned out to be far more expensive than copying texts by hand",
+        "because printers consistently preferred rare dialects over the languages of major cities",
+        "because readers across Europe rejected the standardized spellings that printers introduced"
+      ],
+      "answer": 0,
+      "explanation": "הפרדוקס: טכנולוגיה שנועדה להרבות עותקים דווקא צמצמה את גיוון השפה הכתובה. מסיח 1 עוסק בעלות (לא בקטע), מסיח 2 הפוך (הדפוס העדיף את ניבי מרכזי המסחר), ומסיח 3 סותר שכן התקן דווקא השתרש.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-010",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nIt seems intuitive that a nation blessed with abundant oil, gas, or minerals should prosper. Yet economists have long observed a troubling pattern they call the 'resource curse': countries whose exports are dominated by a single natural resource often grow more slowly than their resource-poor neighbors. Several mechanisms have been proposed. A sudden inflow of commodity revenue can drive up a country's exchange rate, making its other industries uncompetitive abroad — a syndrome known as 'Dutch disease.' Resource wealth, moreover, can be captured by a narrow elite, financing repression and corruption rather than schools and roads. Because the revenue flows in regardless of whether ordinary citizens are productive, governments feel little pressure to cultivate a diversified, tax-paying economy. None of this is inevitable: a handful of states have harnessed their windfalls to build lasting prosperity, usually by saving the proceeds and investing them abroad. The curse, such as it is, lies less in the resource than in the institutions that govern it.",
+      "group": "psy-rdg-g4",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nWhich statement best captures the main idea of the passage?",
+      "options": [
+        "Countries rich in oil and minerals always grow faster than their poorer neighbors.",
+        "Abundant natural resources often fail to bring prosperity, for institutional and economic reasons, yet this outcome is not unavoidable.",
+        "Dutch disease is by far the single most important cause of slow growth worldwide.",
+        "No country has ever managed to turn its natural resources into lasting wealth."
+      ],
+      "answer": 1,
+      "explanation": "הקטע מציג את 'קללת המשאבים' ומדגיש שאינה בלתי נמנעת ('None of this is inevitable'). מסיח 1 הפוך לטענת הקטע, מסיח 2 מגזים בחשיבות גורם יחיד, ומסיח 3 סותר את הדוגמאות של מדינות שהצליחו.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "main-idea"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-011",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nIt seems intuitive that a nation blessed with abundant oil, gas, or minerals should prosper. Yet economists have long observed a troubling pattern they call the 'resource curse': countries whose exports are dominated by a single natural resource often grow more slowly than their resource-poor neighbors. Several mechanisms have been proposed. A sudden inflow of commodity revenue can drive up a country's exchange rate, making its other industries uncompetitive abroad — a syndrome known as 'Dutch disease.' Resource wealth, moreover, can be captured by a narrow elite, financing repression and corruption rather than schools and roads. Because the revenue flows in regardless of whether ordinary citizens are productive, governments feel little pressure to cultivate a diversified, tax-paying economy. None of this is inevitable: a handful of states have harnessed their windfalls to build lasting prosperity, usually by saving the proceeds and investing them abroad. The curse, such as it is, lies less in the resource than in the institutions that govern it.",
+      "group": "psy-rdg-g4",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAccording to the passage, 'Dutch disease' refers to:",
+      "options": [
+        "the capture of a country's resource revenue by a small and corrupt elite",
+        "the tendency of resource-rich governments to avoid taxing their own citizens",
+        "a rise in the exchange rate caused by commodity revenue, which makes a country's other industries uncompetitive",
+        "the gradual physical exhaustion of a country's natural resource deposits"
+      ],
+      "answer": 2,
+      "explanation": "זהו פרט מפורש: הכנסות הסחורות מעלות את שער החליפין ופוגעות בתעשיות האחרות. מסיחים 1-2 הם מנגנונים אחרים שהקטע מונה (אליטה מושחתת; היעדר תמריץ למסות), ומסיח 3 אינו מופיע כלל.",
+      "timeSec": 45,
+      "tags": [
+        "reading",
+        "detail"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-012",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nIt seems intuitive that a nation blessed with abundant oil, gas, or minerals should prosper. Yet economists have long observed a troubling pattern they call the 'resource curse': countries whose exports are dominated by a single natural resource often grow more slowly than their resource-poor neighbors. Several mechanisms have been proposed. A sudden inflow of commodity revenue can drive up a country's exchange rate, making its other industries uncompetitive abroad — a syndrome known as 'Dutch disease.' Resource wealth, moreover, can be captured by a narrow elite, financing repression and corruption rather than schools and roads. Because the revenue flows in regardless of whether ordinary citizens are productive, governments feel little pressure to cultivate a diversified, tax-paying economy. None of this is inevitable: a handful of states have harnessed their windfalls to build lasting prosperity, usually by saving the proceeds and investing them abroad. The curse, such as it is, lies less in the resource than in the institutions that govern it.",
+      "group": "psy-rdg-g4",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nThe final sentence implies that whether a country suffers the 'resource curse' depends mainly on:",
+      "options": [
+        "the particular type of resource the country happens to possess",
+        "the sheer quantity of resources the country has available to export",
+        "the climate and geography of the country in question",
+        "the quality of the institutions that manage the resource wealth"
+      ],
+      "answer": 3,
+      "explanation": "המשפט האחרון: 'הקללה טמונה פחות במשאב ויותר במוסדות שמנהלים אותו', ומכאן שאיכות המוסדות היא המכריעה. מסיחים 1-2 ממקדים במשאב עצמו (סוג / כמות) - בדיוק מה שהקטע ממעיט בחשיבותו, ומסיח 3 (אקלים / גאוגרפיה) אינו נדון.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-013",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nOf the roughly seven thousand languages spoken today, linguists estimate that nearly half may vanish within a century. A language is considered moribund when children cease to learn it as their mother tongue; once the unbroken chain of transmission between generations is severed, the language's survival hangs on its remaining elderly speakers. The causes are rarely outright prohibition. More often a minority language simply loses prestige: speakers come to associate the dominant language with schooling, employment, and modernity, and quietly abandon their own. Each loss is more than sentimental. Languages encode distinctive ways of carving up experience — systems of kinship, color, spatial orientation, and botanical knowledge accumulated over millennia, much of it never written down. When the last fluent speaker dies, that knowledge is seldom recoverable. Revitalization efforts have had occasional successes, but they are costly and slow, and they succeed only where a community itself resolves that its language is worth the effort of saving.",
+      "group": "psy-rdg-g5",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nThe passage is primarily concerned with:",
+      "options": [
+        "the rapid disappearance of languages, its main cause, and the loss of knowledge that it entails",
+        "the specific government policies that forbid the use of minority languages",
+        "the techniques linguists use to write down languages that were never recorded",
+        "the reasons a few revitalization programs have succeeded while most of them fail"
+      ],
+      "answer": 0,
+      "explanation": "הקטע סוקר את קצב ההיעלמות, הסיבה המרכזית (אובדן יוקרה) ואובדן הידע. מסיח 1 ממקד באיסור ממשלתי שהקטע דווקא אומר שהוא נדיר, מסיח 2 בטכניקות תיעוד (לא הנושא), ומסיח 3 בהצלחות / כישלונות (פרט בסוף, לא הנושא הכולל).",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "main-idea"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-014",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nOf the roughly seven thousand languages spoken today, linguists estimate that nearly half may vanish within a century. A language is considered moribund when children cease to learn it as their mother tongue; once the unbroken chain of transmission between generations is severed, the language's survival hangs on its remaining elderly speakers. The causes are rarely outright prohibition. More often a minority language simply loses prestige: speakers come to associate the dominant language with schooling, employment, and modernity, and quietly abandon their own. Each loss is more than sentimental. Languages encode distinctive ways of carving up experience — systems of kinship, color, spatial orientation, and botanical knowledge accumulated over millennia, much of it never written down. When the last fluent speaker dies, that knowledge is seldom recoverable. Revitalization efforts have had occasional successes, but they are costly and slow, and they succeed only where a community itself resolves that its language is worth the effort of saving.",
+      "group": "psy-rdg-g5",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAccording to the passage, a language is considered 'moribund' when:",
+      "options": [
+        "it has fewer than seven thousand living speakers left",
+        "children stop learning it as their mother tongue",
+        "it has never been written down in any form at all",
+        "its grammar becomes too difficult for outsiders to learn"
+      ],
+      "answer": 1,
+      "explanation": "הקטע מגדיר מפורשות: שפה גוססת כאשר הילדים חדלים ללמוד אותה כשפת אם. המסיחים נוגעים לפרטים אחרים בקטע (מספר שפות, אי-תיעוד) או שאינם מופיעים כלל (קושי דקדוקי).",
+      "timeSec": 45,
+      "tags": [
+        "reading",
+        "detail"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-015",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nOf the roughly seven thousand languages spoken today, linguists estimate that nearly half may vanish within a century. A language is considered moribund when children cease to learn it as their mother tongue; once the unbroken chain of transmission between generations is severed, the language's survival hangs on its remaining elderly speakers. The causes are rarely outright prohibition. More often a minority language simply loses prestige: speakers come to associate the dominant language with schooling, employment, and modernity, and quietly abandon their own. Each loss is more than sentimental. Languages encode distinctive ways of carving up experience — systems of kinship, color, spatial orientation, and botanical knowledge accumulated over millennia, much of it never written down. When the last fluent speaker dies, that knowledge is seldom recoverable. Revitalization efforts have had occasional successes, but they are costly and slow, and they succeed only where a community itself resolves that its language is worth the effort of saving.",
+      "group": "psy-rdg-g5",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nAs used in the passage, the word 'severed' most nearly means:",
+      "options": [
+        "strengthened",
+        "written down",
+        "broken or cut",
+        "translated"
+      ],
+      "answer": 2,
+      "explanation": "'once the unbroken chain ... is severed' - ההקשר ('unbroken chain') מחייב ש-'severed' = נותק / נקטע. 'strengthened' הפוך, ו'written down' ו'translated' אינם המשמעות של המילה.",
+      "timeSec": 45,
+      "tags": [
+        "reading",
+        "vocab-in-context"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-rdg-016",
+      "sub": "psy-reading",
+      "subTitle": "הבנת הנקרא — Reading",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "קראו את הקטע וענו על השאלות שאחריו:\n\nOf the roughly seven thousand languages spoken today, linguists estimate that nearly half may vanish within a century. A language is considered moribund when children cease to learn it as their mother tongue; once the unbroken chain of transmission between generations is severed, the language's survival hangs on its remaining elderly speakers. The causes are rarely outright prohibition. More often a minority language simply loses prestige: speakers come to associate the dominant language with schooling, employment, and modernity, and quietly abandon their own. Each loss is more than sentimental. Languages encode distinctive ways of carving up experience — systems of kinship, color, spatial orientation, and botanical knowledge accumulated over millennia, much of it never written down. When the last fluent speaker dies, that knowledge is seldom recoverable. Revitalization efforts have had occasional successes, but they are costly and slow, and they succeed only where a community itself resolves that its language is worth the effort of saving.",
+      "group": "psy-rdg-g5",
+      "q": "על פי הקטע, בחרו את התשובה הנכונה:\n\nIt can be inferred that a revitalization program imposed from outside, without the community's own commitment, would most likely:",
+      "options": [
+        "succeed quickly and at very little cost",
+        "become unnecessary once the language is written down",
+        "spread the language rapidly to neighboring communities",
+        "fail to keep the language alive"
+      ],
+      "answer": 3,
+      "explanation": "הקטע אומר שההחייאה מצליחה 'רק היכן שהקהילה עצמה מחליטה שהשפה שווה את המאמץ'. מכאן שתוכנית ללא מחויבות הקהילה צפויה להיכשל. מסיח 1 סותר (הקטע מדגיש שההחייאה יקרה ואיטית), ומסיחים 2-3 אינם נתמכים בקטע.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-001",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nTENUOUS",
+      "options": [
+        "flimsy",
+        "robust",
+        "elaborate",
+        "tangible"
+      ],
+      "answer": 0,
+      "explanation": "'tenuous' = דק, קלוש, חסר ביסוס, ולכן 'flimsy' (רעוע). 'robust' (איתן) הוא ההפך, 'tangible' (מוחשי) אינו קשור, ו'elaborate' (מורכב / מפורט) הוא מלכודת - tenuous אינו עוסק במורכבות אלא בחולשה.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": false
+    },
+    {
+      "id": "psy-voc-002",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nOSTENSIBLE",
+      "options": [
+        "genuine",
+        "apparent",
+        "concealed",
+        "compulsory"
+      ],
+      "answer": 1,
+      "explanation": "'ostensible' = לכאורה, מה שמוצג כלפי חוץ (ולעיתים אינו האמת). 'apparent' = נראה-לעין / לכאורה. 'genuine' (אמיתי) הוא הניגוד הסמוי, 'concealed' (מוסתר) הפוך מ'מוצג כלפי חוץ', ו'compulsory' (מחייב) אינו קשור.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-003",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nAMELIORATE",
+      "options": [
+        "aggravate",
+        "postpone",
+        "improve",
+        "clarify"
+      ],
+      "answer": 2,
+      "explanation": "'ameliorate' = להיטיב, לשפר מצב. 'aggravate' (להחמיר) הוא ההפך, ו'postpone' (לדחות) ו'clarify' (להבהיר) אינם קשורים לשיפור מצב.",
+      "timeSec": 30,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-004",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nCOGENT",
+      "options": [
+        "rambling",
+        "tedious",
+        "tentative",
+        "persuasive"
+      ],
+      "answer": 3,
+      "explanation": "'cogent' מתאר טיעון משכנע וחד-הגיון. 'persuasive' = משכנע. 'rambling' (מפוזר), 'tedious' (משעמם) ו'tentative' (מהוסס) מתארים טיעון חלש, הפך cogent.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-005",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nSPURIOUS",
+      "options": [
+        "counterfeit",
+        "authentic",
+        "generous",
+        "abundant"
+      ],
+      "answer": 0,
+      "explanation": "'spurious' = מזויף, שאינו אמיתי או חסר בסיס. 'counterfeit' = מזויף. 'authentic' (מקורי) הוא ההפך, ו'generous' / 'abundant' אינם קשורים (מלכודת צליל ואסוציאציה).",
+      "timeSec": 30,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-006",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nENERVATE",
+      "options": [
+        "energize",
+        "weaken",
+        "provoke",
+        "stabilize"
+      ],
+      "answer": 1,
+      "explanation": "'enervate' = להתיש, לרוקן מכוח. 'weaken' = להחליש. המלכודת היא 'energize' (להמריץ) בגלל הדמיון הצלילי, אך המשמעות הפוכה; 'provoke' ו'stabilize' אינם קשורים.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-007",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nTRENCHANT",
+      "options": [
+        "vague",
+        "courteous",
+        "incisive",
+        "long-winded"
+      ],
+      "answer": 2,
+      "explanation": "'trenchant' מתאר ביקורת חדה, חותכת וקולעת. 'incisive' = חד / נוקב. 'vague' (מעורפל) ו'long-winded' (ארכני) הם ההפך, ו'courteous' (מנומס) אינו קשור לחדות.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-008",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nSALIENT",
+      "options": [
+        "trivial",
+        "saline",
+        "temporary",
+        "conspicuous"
+      ],
+      "answer": 3,
+      "explanation": "'salient' = בולט, מרכזי, מושך תשומת לב. 'conspicuous' = בולט לעין. 'trivial' (זניח) הוא ההפך, 'saline' (מלוח) מלכודת צליל, ו'temporary' (זמני) אינו קשור.",
+      "timeSec": 30,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-009",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nNEBULOUS",
+      "options": [
+        "vague",
+        "radiant",
+        "compact",
+        "hostile"
+      ],
+      "answer": 0,
+      "explanation": "'nebulous' = מעורפל, לא ברור (מהמילה nebula, ערפילית). 'vague' = מעורפל. 'radiant' (זוהר) ו'compact' (צפוף) הן מלכודות אסוציאטיביות לערפילית, ו'hostile' (עוין) אינו קשור.",
+      "timeSec": 30,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-010",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nMITIGATE",
+      "options": [
+        "intensify",
+        "alleviate",
+        "conceal",
+        "justify"
+      ],
+      "answer": 1,
+      "explanation": "'mitigate' = למתן, להקל על חומרה. 'alleviate' = להקל. 'intensify' (להחריף) הוא ההפך, ו'conceal' (להסתיר) ו'justify' (להצדיק) אינם קשורים.",
+      "timeSec": 30,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-011",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nCANDID",
+      "options": [
+        "secretive",
+        "hesitant",
+        "frank",
+        "evasive"
+      ],
+      "answer": 2,
+      "explanation": "'candid' = גלוי, כן, ישיר. 'frank' = גלוי-לב. 'secretive' (חשאי) ו'evasive' (חמקמק) הם ההפך, ו'hesitant' (מהסס) אינו המשמעות.",
+      "timeSec": 25,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-012",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nPROLIFIC",
+      "options": [
+        "barren",
+        "reluctant",
+        "mediocre",
+        "productive"
+      ],
+      "answer": 3,
+      "explanation": "'prolific' = פורה, שמפיק הרבה (למשל סופר פורה). 'productive' = פורה / יצרני. 'barren' (עקר) הוא ההפך, ו'reluctant' (נרתע) ו'mediocre' (בינוני) אינם קשורים לכמות התפוקה.",
+      "timeSec": 25,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-013",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nARBITRARY",
+      "options": [
+        "capricious",
+        "impartial",
+        "systematic",
+        "deliberate"
+      ],
+      "answer": 0,
+      "explanation": "'arbitrary' = שרירותי, נובע מגחמה ולא מכלל או היגיון. 'capricious' = הפכפך / גחמני. המלכודת היא 'impartial' (חסר פניות) שלעיתים מבלבלים עם 'שרירותי' אך אינו המשמעות; 'systematic' ו'deliberate' (שיטתי / מכוון) הם ההפך.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "psy-voc-014",
+      "sub": "psy-vocab",
+      "subTitle": "אוצר מילים אקדמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות:\n\nTACIT",
+      "options": [
+        "explicit",
+        "unspoken",
+        "unanimous",
+        "reluctant"
+      ],
+      "answer": 1,
+      "explanation": "'tacit' = משתמע, מובן מאליו בלי שנאמר במפורש (הסכמה שבשתיקה). 'unspoken' = לא-מדובר. 'explicit' (מפורש) הוא ההפך, 'unanimous' (פה-אחד) מלכודת צליל ומשמעות, ו'reluctant' אינו קשור.",
+      "timeSec": 35,
+      "tags": [
+        "vocabulary",
+        "synonym"
+      ],
+      "pro": true
+    }
+  ]
+}
