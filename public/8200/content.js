@@ -6,14 +6,14 @@ export const CATEGORIES = [
     id: "dapar", stage: 1, emoji: "🧩", color: "#c8431f",
     title: "פסיכוטכני — דפ״ר וצו ראשון", short: "פסיכוטכני",
     desc: "אנלוגיות מילוליות וצורניות, חשיבה צורנית, הוראות, סדרות וכמותי — מה שנבדק בדפ״ר בצו הראשון, ושוב במבחני כלל חמ״ן.",
-    packs: ["dapar-verbal", "dapar-quant"], generators: ["shapes", "series", "quick"],
+    packs: ["dapar-verbal", "dapar-quant"], generators: ["shapes", "gen-series", "gen-quick"],
     sim: { items: 30, minutes: 25 },
   },
   {
     id: "learning", stage: 2, emoji: "🧠", color: "#2b5fb3",
     title: "יכולת למידה — יום המא״ה וכנס המבחנים", short: "יכולת למידה",
     desc: "למידת חומר חדש (שפה מומצאת, 'מחשבון קרב'), עיבוד מידע, קשב מתמשך וזיכרון עבודה — הסגנון של יום המא״ה ושל מבחני הכנס.",
-    packs: ["learning"], generators: ["kerav", "attention", "memory"],
+    packs: ["learning"], generators: ["kerav", "gen-attention", "gen-memory"],
     sim: { items: 25, minutes: 20 },
   },
   {
@@ -113,8 +113,10 @@ export async function pickMixed({ catIds, progress, isPro, n = 20, seed = Date.n
 
 // ---------- markdown (tiny) ----------
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const MATH = /(\d[\d.,]*(?:\s*[+\u2212\u00d7\u00f7*\/=:^]\s*[\d.,?()^\u00b2\u00b3]+)+)/g;
+export const mathLtr = (escaped) => escaped.replace(MATH, '<bdi dir="ltr">$1</bdi>');
 function inline(s) {
-  return esc(s)
+  return mathLtr(esc(s))
     .replace(/`([^`]+)`/g, '<code dir="ltr">$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>")

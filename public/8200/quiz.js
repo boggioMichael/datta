@@ -1,11 +1,11 @@
 // quiz.js — מנוע התרגול: מציג שאלה אחת בכל פעם, שומר תשובות, מודד זמן, מציג הסבר וסיכום.
-import { md, esc } from "./content.js";
+import { md, esc, mathLtr } from "./content.js";
 
 const LIKERT = ["בכלל לא מסכים/ה", "לא מסכים/ה", "ניטרלי", "מסכים/ה", "מסכים/ה מאוד"];
 const HEB = /[\u0590-\u05FF]/;
 /** שורות בלי עברית (קודים, משפטים בשפה מלאכותית, אנגלית) מוצגות משמאל לימין */
 export function bidiLines(text) {
-  return String(text || "").split("\n").map((line) => { const t = line.trim(); if (!t) return ""; if (!HEB.test(t) && /[A-Za-z0-9]/.test(t)) { const codeLike = !/\s/.test(t) || /^[A-Z0-9\-\s·,]+$/.test(t); return `<bdi dir="ltr" class="ltr-line${codeLike ? " mono" : ""}">${esc(t)}</bdi>`; } return esc(line); }).join("<br>");
+  return String(text || "").split("\n").map((line) => { const t = line.trim(); if (!t) return ""; if (!HEB.test(t) && /[A-Za-z0-9]/.test(t)) { const codeLike = !/\s/.test(t) || /^[A-Z0-9\-\s·,]+$/.test(t); return `<bdi dir="ltr" class="ltr-line${codeLike ? " mono" : ""}">${esc(t)}</bdi>`; } return mathLtr(esc(line)); }).join("<br>");
 }
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -191,10 +191,11 @@ export function summaryHtml(result, { isPro } = {}) {
   const wrong = scored.filter((a) => !a.ok);
   const avgT = scored.length ? Math.round(scored.reduce((x, a) => x + a.t, 0) / scored.length) : 0;
   const grade = pct >= 85 ? "מצוין 🔥" : pct >= 70 ? "יפה מאוד 👏" : pct >= 50 ? "בכיוון הנכון 💪" : "זה רק ההתחלה 🌱";
+  const openOnly = scored.length && scored.every((a) => a.type === "open");
   const likertN = answers.filter((a) => a.type === "likert").length;
   return `<div class="summary">
     <div class="sum-hero"><div class="ring" style="--p:${pct}"><span>${scored.length ? pct + "%" : "✓"}</span></div>
-      <div><h2>${esc(result.title)}</h2><p class="muted">${scored.length ? `${result.score} מתוך ${scored.length} נכונות · ${grade}` : `${likertN} היגדים נענו`} · ${fmtTime(result.durSec)}${avgT ? ` · ${avgT} שנ׳ לשאלה` : ""}${result.timeout ? " · הזמן נגמר ⏱" : ""}</p></div></div>
+      <div><h2>${esc(result.title)}</h2><p class="muted">${scored.length ? `${result.score} מתוך ${scored.length} ${openOnly ? "דורגו 'בסדר' ומעלה" : "נכונות"} · ${grade}` : `${likertN} היגדים נענו`} · ${fmtTime(result.durSec)}${avgT ? ` · ${avgT} שנ׳ לשאלה` : ""}${result.timeout ? " · הזמן נגמר ⏱" : ""}</p></div></div>
     ${Object.keys(bySub).length > 1 ? `<div class="sum-subs">${Object.values(bySub).map((s) => `<div class="sum-sub"><span>${esc(s.title)}</span><div class="bar"><i style="width:${Math.round((s.ok / s.n) * 100)}%"></i></div><b>${s.ok}/${s.n}</b></div>`).join("")}</div>` : ""}
     ${wrong.length ? `<h3>מה כדאי לחזור עליו (${wrong.length})</h3><div class="sum-wrong">${wrong.map((a) => { const it = byId.get(a.id); if (!it) return ""; return `<details class="wrong-item"><summary><span class="x">✕</span> ${esc(it.q.split("\n")[0]).slice(0, 110)}${it.generated ? ` <span class="muted small">(${items.indexOf(it) + 1})</span>` : ""}</summary>${it.code ? `<pre class="code" dir="ltr"><code>${esc(it.code)}</code></pre>` : ""}${it.type === "mcq" ? (it.optionsSvg ? `<div class="mini-opts"><div class="mini right"><span>נכון</span>${it.optionsSvg[it.answer]}</div>${a.chosen != null && a.chosen !== it.answer ? `<div class="mini wrong"><span>בחרתם</span>${it.optionsSvg[a.chosen] || ""}</div>` : ""}</div>` : `<p><b>התשובה הנכונה:</b> ${esc(it.options[it.answer])}${a.chosen != null && a.chosen !== it.answer ? ` · <span class="muted">בחרתם: ${esc(it.options[a.chosen] ?? "—")}</span>` : ""}</p>`) : ""}<div class="fb-body">${md(it.explanation || it.model || "")}</div></details>`; }).join("")}</div>` : (scored.length ? `<p class="sum-perfect">בלי טעויות! 🏆</p>` : "")}
     ${!isPro && wrong.length ? `<p class="muted small">ב-PRO תקבלו גם תרגול חוזר אוטומטי של הטעויות ומאגר מלא.</p>` : ""}

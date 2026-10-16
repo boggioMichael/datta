@@ -32,7 +32,8 @@ function uniqueNums(r, correct, makers, count = 3) {
     const key = String(v);
     if (!set.has(key)) { set.add(key); out.push(v); }
   }
-  while (out.length < count) { const v = Number(correct) + (out.length + 1) * 7 + guard; if (!set.has(String(v))) { set.add(String(v)); out.push(v); } guard++; }
+  for (let k = 0; out.length < count && k < 40; k++) { const base = Number.isFinite(Number(correct)) ? Number(correct) : 0; const v = base + (out.length + 1) * 7 + k; if (!set.has(String(v))) { set.add(String(v)); out.push(v); } }
+  while (out.length < count) out.push(`${out.length + 1}`);
   return out;
 }
 const fmt = (n) => (Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100));
@@ -86,7 +87,9 @@ export function cellSvg(spec, { bare = false } = {}) {
   const svg = `<svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}${body}${inner}</svg>`;
   return bare ? svg : svg;
 }
-const specKey = (s) => `${s.shape}|${s.fill}|${s.size}|${s.rot}|${s.count}|${s.dot ? 1 : 0}`;
+const ROT_VISIBLE = ["triangle", "pentagon", "star", "hexagon"];
+function canon(s) { const c = { ...s }; if (c.shape === "circle") c.rot = 0; else if (c.shape === "square" || c.shape === "diamond") c.rot = (c.rot ?? 0) % 2; return c; }
+const specKey = (s) => { const c = canon(s); return `${c.shape}|${c.fill}|${c.size}|${c.rot}|${c.count}|${c.dot ? 1 : 0}`; };
 
 const ATTRS = {
   shape: { vals: SHAPES, he: (v) => SHAPE_HE[v], name: "הצורה" },
@@ -104,8 +107,9 @@ export function genMatrix(r, difficulty = 2) {
   const rules = {};
   const base = {};
   const desc = [];
+  const rotVaries = vary.includes("rot");
   for (const a of attrs) {
-    const pool = r.shuffle(ATTRS[a].vals).slice(0, 3);
+    const pool = r.shuffle(a === "shape" && rotVaries ? ROT_VISIBLE : ATTRS[a].vals).slice(0, 3);
     if (!vary.includes(a)) { base[a] = pool[0]; rules[a] = { type: "fixed", pool: [pool[0]] }; continue; }
     const type = a === "count" || a === "rot" ? r.pick(["row", "latin", "inc"]) : r.pick(["row", "col", "latin"]);
     rules[a] = { type, pool: a === "count" ? [1, 2, 3] : a === "rot" ? [0, 1, 2] : pool };
@@ -135,12 +139,12 @@ export function genMatrix(r, difficulty = 2) {
   while (distractors.length < 3 && guard++ < 50) {
     const d = { ...correct };
     const a = r.pick(vary.length ? vary : attrs);
-    const alt = ATTRS[a].vals.filter((v) => v !== correct[a]);
+    const alt = (a === "shape" && rotVaries ? ROT_VISIBLE : ATTRS[a].vals).filter((v) => v !== correct[a]);
     d[a] = r.pick(alt);
-    if (r.chance(0.3)) { const b = r.pick(attrs.filter((x) => x !== a)); d[b] = r.pick(ATTRS[b].vals.filter((v) => v !== correct[b])); }
-    if (!seen.has(specKey(d))) { seen.add(specKey(d)); distractors.push(d); }
+    if (r.chance(0.3)) { const b = r.pick(attrs.filter((x) => x !== a)); d[b] = r.pick((b === "shape" && rotVaries ? ROT_VISIBLE : ATTRS[b].vals).filter((v) => v !== correct[b])); }
+    if (!seen.has(specKey(d))) { seen.add(specKey(d)); distractors.push(canon(d)); }
   }
-  const { options, answer } = placeAnswer(r, correct, distractors);
+  const { options, answer } = placeAnswer(r, canon(correct), distractors);
   return {
     id: uid("gs-mat"), sub: "shapes", subTitle: "צורות", type: "mcq", difficulty, generated: true,
     q: "איזו צורה משלימה את המטריצה?",
@@ -159,10 +163,13 @@ export function genOddOne(r, difficulty = 1) {
   const base = { shape: r.pick(SHAPES), fill: r.pick(FILLS), size: 1, rot: 0, count: 1 };
   const varyFree = r.shuffle(attrs).slice(0, difficulty); // attributes that vary freely among all cells (noise)
   const key = r.pick(attrs.filter((a) => !varyFree.includes(a)));
+  if (key === "rot" && !ROT_VISIBLE.includes(base.shape)) base.shape = r.pick(ROT_VISIBLE);
+  if (varyFree.includes("shape") && key === "rot") varyFree.splice(varyFree.indexOf("shape"), 1);
   const cells = [];
   for (let i = 0; i < 5; i++) { const c = { ...base }; for (const a of varyFree) c[a] = r.pick(ATTRS[a].vals); cells.push(c); }
   const oddIdx = r.int(0, 4);
-  cells[oddIdx][key] = r.pick(ATTRS[key].vals.filter((v) => v !== base[key]));
+  cells[oddIdx][key] = r.pick(ATTRS[key].vals.filter((v) => v !== base[key] && (key !== "rot" || (v % 2 !== 0 || ROT_VISIBLE.includes(base.shape)))));
+  if (key === "rot" && specKey(cells[oddIdx]) === specKey({ ...cells[oddIdx], rot: base.rot })) cells[oddIdx].rot = 1;
   return {
     id: uid("gs-odd"), sub: "shapes", subTitle: "צורות", type: "mcq", difficulty, generated: true,
     q: "איזו צורה יוצאת דופן?",
@@ -176,7 +183,7 @@ export function genOddOne(r, difficulty = 1) {
 
 /** סדרת צורות — מה הבא בתור */
 export function genShapeSeq(r, difficulty = 2) {
-  const shape = r.pick(SHAPES.filter((s) => s !== "circle"));
+  const shape = r.pick(ROT_VISIBLE);
   const rotStep = r.pick([1, 2, 3]);
   const countRule = difficulty >= 2 ? r.pick(["same", "cycle"]) : "same";
   const fillRule = difficulty >= 3 ? "cycle" : "same";
@@ -241,7 +248,7 @@ export function genSeries(r, difficulty) {
   const distractors = uniqueNums(r, correct, [() => correct + (last - prev), () => correct - (last - prev), () => last * 2 - prev + 1, () => correct + r.int(1, 4), () => correct - r.int(1, 4), () => last + (last - prev) * 2]);
   const { options, answer } = placeAnswer(r, fmt(correct), distractors.map(fmt));
   return {
-    id: uid("gq-ser"), sub: "series", subTitle: "סדרות מספרים", type: "mcq", difficulty: d, generated: true,
+    id: uid("gq-ser"), sub: "gen-series", subTitle: "סדרות מספרים (מחולל)", type: "mcq", difficulty: d, generated: true,
     q: `מהו האיבר הבא בסדרה?\n${shown.join(", ")}, ?`, options, answer,
     explanation: `${rule}. לכן האיבר הבא הוא ${fmt(correct)}.`,
     timeSec: 30 + d * 10, tags: ["series"], pro: false,
@@ -266,12 +273,12 @@ export function genQuick(r, difficulty) {
     case "sq": { const a = r.int(11, 25); correct = a * a; q = `${a}² = ?`; distract = [correct + 2 * a, correct - a, correct + 1]; expl = `${a}² = (${a - 1})² + ${a - 1} + ${a} = ${correct}, או ישירות ${a} × ${a}.`; break; }
     case "pow": { const b = r.pick([2, 3, 4, 5]); const e = b === 2 ? r.int(5, 10) : b === 3 ? r.int(3, 5) : r.int(2, 4); correct = b ** e; q = `${b}^${e} = ?`; distract = [correct * 2, correct / 2, correct + b]; expl = `${b}^${e} = ${Array(e).fill(b).join(" × ")} = ${correct}.`; break; }
     case "frac": { const pairs = [[1, 8, 0.125], [3, 8, 0.375], [5, 8, 0.625], [7, 8, 0.875], [1, 4, 0.25], [3, 4, 0.75], [2, 5, 0.4], [3, 5, 0.6], [4, 5, 0.8], [1, 20, 0.05], [3, 20, 0.15], [7, 10, 0.7]]; const [n, m, v] = r.pick(pairs); correct = v; q = `${n}/${m} כשבר עשרוני = ?`; distract = [v + 0.1, v - 0.05, Math.round((n / m) * 10) / 10 === v ? v + 0.25 : Math.round((n / m) * 10) / 10]; expl = `${n} ÷ ${m} = ${v}. (זכרו: 1/8 = 0.125, 1/5 = 0.2, 1/4 = 0.25)`; break; }
-    case "cmp": { const a = r.int(20, 60); const left = (a - 1) * (a + 1), right = a * a; correct = `${a - 1} × ${a + 1}`; q = `מה גדול יותר?`; const opts = [`${a - 1} × ${a + 1}`, `${a}²`, "שווים", "אי אפשר לדעת"]; const ans = 1; return { id: uid("gq-qk"), sub: "quick", subTitle: "חישוב מהיר", type: "mcq", difficulty: d, generated: true, q: `מה גדול יותר: ${a - 1} × ${a + 1} או ${a}²?`, options: opts, answer: ans, explanation: `(a−1)(a+1) = a² − 1, לכן ${a - 1} × ${a + 1} = ${left} קטן ב-1 מ-${a}² = ${right}.`, timeSec: 15, tags: ["quick", "algebra"], pro: false }; }
+    case "cmp": { const a = r.int(20, 60); const left = (a - 1) * (a + 1), right = a * a; correct = `${a - 1} × ${a + 1}`; q = `מה גדול יותר?`; const opts = [`${a - 1} × ${a + 1}`, `${a}²`, "שווים", "אי אפשר לדעת"]; const ans = 1; return { id: uid("gq-qk"), sub: "gen-quick", subTitle: "חישוב מהיר (מחולל)", type: "mcq", difficulty: d, generated: true, q: `מה גדול יותר: ${a - 1} × ${a + 1} או ${a}²?`, options: opts, answer: ans, explanation: `(a−1)(a+1) = a² − 1, לכן ${a - 1} × ${a + 1} = ${left} קטן ב-1 מ-${a}² = ${right}.`, timeSec: 15, tags: ["quick", "algebra"], pro: false }; }
     case "rem": { const n = r.int(50, 300), m = r.pick([3, 4, 6, 7, 9]); correct = n % m; q = `מהי השארית של ${n} בחלוקה ב-${m}?`; distract = [(correct + 1) % m, (correct + 2) % m, (correct + m - 1) % m]; expl = `${m} × ${Math.floor(n / m)} = ${m * Math.floor(n / m)}, ו-${n} − ${m * Math.floor(n / m)} = ${correct}.`; break; }
   }
   const distractors = uniqueNums(r, correct, distract.map((v) => () => v).concat([() => Number(correct) + 1, () => Number(correct) - 1, () => Number(correct) + 3]));
   const { options, answer } = placeAnswer(r, fmt(correct), distractors.map(fmt));
-  return { id: uid("gq-qk"), sub: "quick", subTitle: "חישוב מהיר", type: "mcq", difficulty: d, generated: true, q, options, answer, explanation: expl, timeSec: d === 1 ? 12 : d === 2 ? 15 : 20, tags: ["quick"], pro: false };
+  return { id: uid("gq-qk"), sub: "gen-quick", subTitle: "חישוב מהיר (מחולל)", type: "mcq", difficulty: d, generated: true, q, options, answer, explanation: expl, timeSec: d === 1 ? 12 : d === 2 ? 15 : 20, tags: ["quick"], pro: false };
 }
 
 // ============================================================
@@ -294,7 +301,7 @@ export function genAttention(r, difficulty) {
     while (uniq.length < 4) uniq.push(`התו ה-${uniq.length + r.int(1, n)}`);
     const correct = same ? "המחרוזות זהות" : `התו ה-${pos + 1}`;
     const { options, answer } = placeAnswer(r, correct, uniq.filter((o) => o !== correct));
-    return { id: uid("ga-dif"), sub: "attention", subTitle: "קשב וריכוז", type: "mcq", difficulty: d, generated: true, q: `השוו בין שתי המחרוזות. היכן ההבדל?\n\n${a}\n${b}`, ltr: true, options, answer, explanation: same ? "אין הבדל — המחרוזות זהות תו-תו." : `התו במקום ${pos + 1}: "${a[pos]}" לעומת "${b[pos]}".`, timeSec: 15 + d * 5, tags: ["attention"], pro: false };
+    return { id: uid("ga-dif"), sub: "gen-attention", subTitle: "קשב וריכוז (מחולל)", type: "mcq", difficulty: d, generated: true, q: `השוו בין שתי המחרוזות. היכן ההבדל?\n\n${a}\n${b}`, ltr: true, options, answer, explanation: same ? "אין הבדל — המחרוזות זהות תו-תו." : `התו במקום ${pos + 1}: "${a[pos]}" לעומת "${b[pos]}".`, timeSec: 15 + d * 5, tags: ["attention"], pro: false };
   }
   if (kind === "count") {
     const n = 14 + d * 6;
@@ -303,14 +310,14 @@ export function genAttention(r, difficulty) {
     const c = [...s].filter((x) => x === ch).length;
     const distractors = uniqueNums(r, c, [() => c + 1, () => c - 1, () => c + 2, () => Math.max(0, c - 2)]).filter((v) => v >= 0);
     const { options, answer } = placeAnswer(r, String(c), distractors.map(String));
-    return { id: uid("ga-cnt"), sub: "attention", subTitle: "קשב וריכוז", type: "mcq", difficulty: d, generated: true, q: `כמה פעמים מופיע התו "${ch}" במחרוזת?\n\n${s}`, ltr: true, options, answer, explanation: `סרקו משמאל לימין וספרו: "${ch}" מופיע ${c} פעמים.`, timeSec: 15 + d * 5, tags: ["attention"], pro: false };
+    return { id: uid("ga-cnt"), sub: "gen-attention", subTitle: "קשב וריכוז (מחולל)", type: "mcq", difficulty: d, generated: true, q: `כמה פעמים מופיע התו "${ch}" במחרוזת?\n\n${s}`, ltr: true, options, answer, explanation: `סרקו משמאל לימין וספרו: "${ch}" מופיע ${c} פעמים.`, timeSec: 15 + d * 5, tags: ["attention"], pro: false };
   }
   const n = 6 + d * 2;
   const target = code(r, n);
   const variants = new Set();
   while (variants.size < 3) { const pos = r.int(0, n - 1); variants.add(target.slice(0, pos) + otherChar(r, target[pos]) + target.slice(pos + 1)); }
   const { options, answer } = placeAnswer(r, target, [...variants]);
-  return { id: uid("ga-mat"), sub: "attention", subTitle: "קשב וריכוז", type: "mcq", difficulty: d, generated: true, q: `איזו אפשרות זהה בדיוק לקוד?\n\n${target}`, ltr: true, optionsLtr: true, options, answer, explanation: `רק אפשרות ${answer + 1} זהה תו-תו. בשאר יש תו אחד שונה.`, timeSec: 12 + d * 4, tags: ["attention"], pro: false };
+  return { id: uid("ga-mat"), sub: "gen-attention", subTitle: "קשב וריכוז (מחולל)", type: "mcq", difficulty: d, generated: true, q: `איזו אפשרות זהה בדיוק לקוד?\n\n${target}`, ltr: true, optionsLtr: true, options, answer, explanation: `רק אפשרות ${answer + 1} זהה תו-תו. בשאר יש תו אחד שונה.`, timeSec: 12 + d * 4, tags: ["attention"], pro: false };
 }
 
 // ============================================================
@@ -327,17 +334,17 @@ export function genMemory(r, difficulty) {
   if (kind === "in") {
     const correct = r.pick(shown);
     const { options, answer } = placeAnswer(r, correct, notShown.slice(0, 3));
-    return { id: uid("gm-in"), sub: "memory", subTitle: "זיכרון עבודה", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: "איזו מילה הופיעה ברשימה?", options, answer, explanation: `הרשימה הייתה: ${shown.join(", ")}.`, timeSec: 15, tags: ["memory"], pro: false };
+    return { id: uid("gm-in"), sub: "gen-memory", subTitle: "זיכרון עבודה (מחולל)", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: "איזו מילה הופיעה ברשימה?", options, answer, explanation: `הרשימה הייתה: ${shown.join(", ")}.`, timeSec: 15, tags: ["memory"], pro: false };
   }
   if (kind === "notin") {
     const correct = notShown[0];
     const { options, answer } = placeAnswer(r, correct, r.shuffle(shown).slice(0, 3));
-    return { id: uid("gm-not"), sub: "memory", subTitle: "זיכרון עבודה", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: "איזו מילה לא הופיעה ברשימה?", options, answer, explanation: `הרשימה הייתה: ${shown.join(", ")} — "${correct}" לא הייתה בה.`, timeSec: 15, tags: ["memory"], pro: false };
+    return { id: uid("gm-not"), sub: "gen-memory", subTitle: "זיכרון עבודה (מחולל)", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: "איזו מילה לא הופיעה ברשימה?", options, answer, explanation: `הרשימה הייתה: ${shown.join(", ")} — "${correct}" לא הייתה בה.`, timeSec: 15, tags: ["memory"], pro: false };
   }
   const pos = r.int(1, n);
   const correct = shown[pos - 1];
   const { options, answer } = placeAnswer(r, correct, r.shuffle(shown.filter((w) => w !== correct)).slice(0, 3));
-  return { id: uid("gm-pos"), sub: "memory", subTitle: "זיכרון עבודה", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: `מה הייתה המילה ה-${pos} ברשימה?`, options, answer, explanation: `הרשימה לפי הסדר: ${shown.map((w, i) => `${i + 1}. ${w}`).join(", ")}.`, timeSec: 15, tags: ["memory"], pro: false };
+  return { id: uid("gm-pos"), sub: "gen-memory", subTitle: "זיכרון עבודה (מחולל)", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: `מה הייתה המילה ה-${pos} ברשימה?`, options, answer, explanation: `הרשימה לפי הסדר: ${shown.map((w, i) => `${i + 1}. ${w}`).join(", ")}.`, timeSec: 15, tags: ["memory"], pro: false };
 }
 
 
@@ -392,20 +399,22 @@ export function genKerav(r, difficulty) {
     if (d === 1) {
       const n = r.int(4, 6);
       lines.push(`TAK A ${r.int(2, 9)}`, `TAK B ${r.int(1, 9)}`);
-      while (lines.length < n) { const op = r.pick(["PLUS", "MINUS", "TIMES", "FLIP", "DROP"]); const a = r.pick(regs), b = r.pick(regs.filter((x) => x !== a).concat([String(r.int(1, 5))])); lines.push(op === "DROP" ? `DROP ${a}` : op === "FLIP" ? `FLIP ${a} ${b in {A:1,B:1,C:1} ? b : "C"}` : `${op} ${a} ${b}`); }
+      while (lines.length < n) { const op = r.pick(["PLUS", "MINUS", "TIMES", "FLIP", "DROP"]); const a = r.pick(regs), b = r.pick(regs.filter((x) => x !== a).concat([String(r.int(1, 5))])); const other = r.pick(regs.filter((x) => x !== a)); lines.push(op === "DROP" ? `DROP ${a}` : op === "FLIP" ? `FLIP ${a} ${other}` : `${op} ${a} ${b}`); }
       lines.push("STOP");
     } else {
       // loop: count down a register while accumulating
       const k = r.int(2, d === 2 ? 4 : 6);
       lines.push(`TAK A ${k}`, `TAK B ${r.int(1, 5)}`);
       const loopStart = lines.length + 1; // 1-based line number of HOPZ
-      lines.push(`HOPZ A ${loopStart + (d === 3 ? 4 : 3)}`);
+      lines.push(`HOPZ A 0`); // exit line filled in below
       lines.push(r.pick([`PLUS C B`, `PLUS C A`, `TIMES B 2`, `PLUS B ${r.int(1, 3)}`]));
       if (d === 3) lines.push(r.pick([`PLUS C ${r.int(1, 3)}`, `MINUS C 1`, `FLIP B C`]));
       lines.push(`DROP A`);
       lines.push(`HOP ${loopStart}`);
+      const exitLine = lines.length + 1;
       if (d === 3 && r.chance(0.5)) lines.push(`FLIP A C`);
       lines.push(`STOP`);
+      lines[loopStart - 1] = `HOPZ A ${exitLine}`;
     }
     const res = runKerav(lines);
     if (!res.ok) continue;
@@ -419,7 +428,8 @@ export function genKerav(r, difficulty) {
       distract = [correct + 1, correct - 1, correct + 2];
       expl = `הלולאה רצה כל עוד A אינו 0. A מתחיל ב-${lines[0].split(" ")[2]} ויורד ב-1 בכל סיבוב, לכן שורה ${li + 1} מתבצעת ${correct} פעמים.`;
     } else {
-      const reg = d === 1 ? r.pick(regs.filter((x) => res.R[x] !== 0 || r.chance(0.3))) : r.pick(["C", "B", "A"]);
+      const cands = d === 1 ? regs.filter((x) => res.R[x] !== 0) : ["C", "B", "A"];
+      const reg = r.pick(cands.length ? cands : regs);
       correct = res.R[reg];
       q = `מה הערך של התא ${reg} בסיום התוכנית?`;
       const others = regs.filter((x) => x !== reg).map((x) => res.R[x]);
@@ -435,10 +445,10 @@ export function genKerav(r, difficulty) {
 
 export const GENERATORS = {
   shapes: { title: "צורות", category: "dapar", gen: genShapes, desc: "מטריצות, יוצא דופן וסדרות צורות — מחולל אינסופי" },
-  series: { title: "סדרות מספרים (מחולל)", category: "dapar", gen: genSeries, desc: "סדרות חדשות בכל פעם" },
-  quick: { title: "חישוב מהיר (מחולל)", category: "dapar", gen: genQuick, desc: "חשבון בלחץ זמן" },
-  attention: { title: "קשב וריכוז (מחולל)", category: "learning", gen: genAttention, desc: "השוואת קודים וספירה" },
-  memory: { title: "זיכרון עבודה (מחולל)", category: "learning", gen: genMemory, desc: "רשימות לזכור" },
+  "gen-series": { title: "סדרות מספרים (מחולל)", category: "dapar", gen: genSeries, desc: "סדרות חדשות בכל פעם" },
+  "gen-quick": { title: "חישוב מהיר (מחולל)", category: "dapar", gen: genQuick, desc: "חשבון בלחץ זמן" },
+  "gen-attention": { title: "קשב וריכוז (מחולל)", category: "learning", gen: genAttention, desc: "השוואת קודים וספירה" },
+  "gen-memory": { title: "זיכרון עבודה (מחולל)", category: "learning", gen: genMemory, desc: "רשימות לזכור" },
   kerav: { title: "מחשבון קרב (שפה מומצאת)", category: "learning", gen: genKerav, desc: "לומדים שפת מכונה מומצאת ועוקבים אחרי תוכנית — כמו במבחני למידת חומר חדש" },
 };
 

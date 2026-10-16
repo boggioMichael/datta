@@ -14,7 +14,8 @@
 const CONFIG = window.PREP_CONFIG || {};
 const ADMINS = (CONFIG.adminEmails || []).map((e) => e.toLowerCase());
 export const isAdminEmail = (email) => !!email && ADMINS.includes(String(email).toLowerCase());
-export const today = () => new Date().toISOString().slice(0, 10);
+export const dateKey = (ts) => { const d = ts ? new Date(ts) : new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+export const today = () => dateKey();
 
 export function emptyProgress() {
   return { xp: 0, streak: 0, bestStreak: 0, lastDay: "", days: {}, dailyGoal: 15, subs: {}, items: {}, traits: {}, settings: { notifications: false, surprise: true, theme: "auto" }, onboarding: null, updatedAt: Date.now() };
@@ -53,6 +54,7 @@ function makeLocalStore() {
       const sid = LS.get(K.session, null);
       current = sid ? publicUser(users()[sid]) : null;
       if (current) { const all = users(); all[current.uid].lastActive = Date.now(); saveUsers(all); }
+      emit();
       return current;
     },
     auth: {
@@ -162,7 +164,7 @@ async function makeFirebaseStore(cfg) {
         } catch (e) { throw heError(e); }
       },
       async signIn(email, password) { try { const cred = await A.signInWithEmailAndPassword(auth, String(email).trim(), password); await loadCurrent(cred.user); return current; } catch (e) { throw heError(e); } },
-      async signInGoogle() { try { const cred = await A.signInWithPopup(auth, new A.GoogleAuthProvider()); await loadCurrent(cred.user); return current; } catch (e) { throw heError(e); } },
+      async signInGoogle() { try { const provider = new A.GoogleAuthProvider(); const standalone = window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone; if (standalone) { await A.signInWithRedirect(auth, provider); return current; } const cred = await A.signInWithPopup(auth, provider); await loadCurrent(cred.user); return current; } catch (e) { throw heError(e); } },
       async signOut() { await A.signOut(auth); current = null; emit(); },
       async resetPassword(email) { try { await A.sendPasswordResetEmail(auth, String(email).trim()); } catch (e) { throw heError(e); } },
     },
@@ -209,7 +211,7 @@ async function makeFirebaseStore(cfg) {
 
 export async function createStore() {
   if (CONFIG.firebase && CONFIG.firebase.apiKey) {
-    try { return await makeFirebaseStore(CONFIG); } catch (e) { console.error("Firebase init failed, falling back to local", e); }
+    try { return await makeFirebaseStore(CONFIG); } catch (e) { console.error("Firebase init failed", e); return { mode: "error", error: e, async init() { return null; }, auth: { onChange(cb) { cb(null); return () => {}; }, current: () => null } }; }
   }
   return makeLocalStore();
 }

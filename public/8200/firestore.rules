@@ -7,17 +7,36 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isAdmin() { return signedIn() && request.auth.token.email != null && request.auth.token.email.lower() in ['boggio.michael@gmail.com']; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function optStr(d, k, max) { return !(k in d) || d[k] == null || str(d[k], max); }
 
-    // פרופיל משתמש: המשתמש קורא/כותב את שלו, אבל לא יכול לשנות לעצמו את המנוי
+    // שדות שתלמיד/ה רשאי/ת לכתוב בפרופיל שלו/ה
+    function userKeysOk(d) {
+      return d.keys().hasOnly(['uid', 'email', 'name', 'phone', 'grade', 'targetDate', 'referrer', 'parentName', 'parentContact', 'parentConsent', 'termsAt',
+        'plan', 'planUntil', 'planSource', 'role', 'createdAt', 'lastActive', 'stats', 'tracks', 'dailyGoal', 'fcmTokens', 'pushEnabledAt', 'mentorMessage', 'adminNotes']);
+    }
+    function userTypesOk(d) {
+      return optStr(d, 'name', 80) && optStr(d, 'phone', 40) && optStr(d, 'grade', 10) && optStr(d, 'targetDate', 10) && optStr(d, 'referrer', 80)
+        && optStr(d, 'parentName', 80) && optStr(d, 'parentContact', 80) && optStr(d, 'email', 120)
+        && (!('tracks' in d) || (d.tracks is list && d.tracks.size() <= 6))
+        && (!('stats' in d) || d.stats is map)
+        && (!('fcmTokens' in d) || (d.fcmTokens is list && d.fcmTokens.size() <= 10));
+    }
+
+    // פרופיל משתמש: המשתמש קורא/כותב את שלו, אבל לא יכול לשנות לעצמו מנוי, תפקיד או הודעות של המלווה
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid) && !("plan" in request.resource.data && request.resource.data.plan != "free");
-      allow update: if isAdmin() || (isOwner(uid)
-        && request.resource.data.plan == resource.data.plan
-        && request.resource.data.get("planUntil", null) == resource.data.get("planUntil", null)
-        && request.resource.data.get("role", "student") == resource.data.get("role", "student")
-        && request.resource.data.get("mentorMessage", "") == resource.data.get("mentorMessage", "")
-        && request.resource.data.get("adminNotes", "") == resource.data.get("adminNotes", ""));
+      allow create: if isAdmin() || (isOwner(uid) && userKeysOk(request.resource.data) && userTypesOk(request.resource.data)
+        && (!('plan' in request.resource.data) || request.resource.data.plan == 'free')
+        && (!('role' in request.resource.data) || request.resource.data.role in ['student', 'admin'])
+        && !('mentorMessage' in request.resource.data) && !('adminNotes' in request.resource.data));
+      allow update: if isAdmin() || (isOwner(uid) && userKeysOk(request.resource.data) && userTypesOk(request.resource.data)
+        && request.resource.data.get('plan', 'free') == resource.data.get('plan', 'free')
+        && request.resource.data.get('planUntil', null) == resource.data.get('planUntil', null)
+        && request.resource.data.get('planSource', null) == resource.data.get('planSource', null)
+        && request.resource.data.get('role', 'student') == resource.data.get('role', 'student')
+        && request.resource.data.get('mentorMessage', '') == resource.data.get('mentorMessage', '')
+        && request.resource.data.get('adminNotes', '') == resource.data.get('adminNotes', ''));
       allow delete: if isAdmin();
     }
     match /progress/{uid} {
@@ -27,9 +46,13 @@ service cloud.firestore {
       allow read, create: if isOwner(uid) || isAdmin();
       allow update, delete: if isAdmin();
     }
-    // פניות: כל אחד יכול להשאיר פנייה; רק אדמין קורא ומעדכן
+    // פניות: כל אחד יכול להשאיר פנייה (שדות מוגדרים בלבד); רק אדמין קורא ומעדכן
     match /leads/{id} {
-      allow create: if true;
+      allow create: if request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'grade', 'msg', 'source', 'page', 'uid', 'createdAt', 'status'])
+        && str(request.resource.data.name, 80) && str(request.resource.data.phone, 40)
+        && optStr(request.resource.data, 'email', 120) && optStr(request.resource.data, 'grade', 10)
+        && optStr(request.resource.data, 'msg', 2000) && optStr(request.resource.data, 'source', 40) && optStr(request.resource.data, 'page', 200)
+        && request.resource.data.get('status', 'new') == 'new';
       allow read, update, delete: if isAdmin();
     }
     // המלצות: כולם קוראים, רק אדמין כותב

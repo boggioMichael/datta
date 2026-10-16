@@ -1,5 +1,5 @@
 // app.js — הניתוב, המסכים והלוגיקה של "מוכנים ל-8200".
-import { createStore, isAdminEmail, today, emptyProgress } from "./store.js";
+import { createStore, isAdminEmail, today, dateKey, emptyProgress } from "./store.js";
 import { CATEGORIES, catById, loadCategory, loadPack, allSubs, pickItems, pickMixed, subStats, masteryOf, md, esc } from "./content.js";
 import { Quiz, summaryHtml } from "./quiz.js";
 import { GENERATORS } from "./gen.js";
@@ -26,9 +26,10 @@ const isPro = () => { const u = S.user; if (!u) return false; if (u.role === "ad
 const isAdmin = () => !!S.user && (S.user.role === "admin" || isAdminEmail(S.user.email));
 const todayCount = () => S.progress.days?.[today()] || 0;
 const freeLeft = () => Math.max(0, (CONFIG.free?.dailyItems || 20) - todayCount());
-function requireUser() { if (!S.user) { go("#/login"); return false; } return true; }
+function requireUser() { if (!S.user) { S.afterLogin = location.hash && !/^#\/(login|register|reset)/.test(location.hash) ? location.hash : null; go("#/login"); return false; } return true; }
 function firstName() { return (S.user?.name || "").trim().split(/\s+/)[0] || "היי"; }
-function setView(html, cls = "") { const v = view(); v.className = `view ${cls}`; v.innerHTML = html; window.scrollTo({ top: 0 }); return v; }
+function setView(html, cls = "") { document.querySelectorAll(".modal-wrap").forEach((m) => m.remove()); const v = view(); v.className = `view ${cls}`; v.innerHTML = html; window.scrollTo({ top: 0 }); return v; }
+const bidi = (text) => esc(text).replace(/([A-Za-z][A-Za-z0-9+#./ ,-]*[A-Za-z0-9+#])/g, '<bdi dir="ltr">$1</bdi>');
 function nav(active) {
   const tabs = [["#/home", "🏠", "בית"], ["#/train", "🎯", "תרגול"], ["#/progress", "📈", "התקדמות"], ["#/more", "☰", "עוד"]];
   $("#tabbar").innerHTML = S.user ? tabs.map(([h, i, t]) => `<a href="${h}" class="${active === h ? "active" : ""}"><span class="ti">${i}</span><span>${t}</span></a>`).join("") : "";
@@ -51,9 +52,12 @@ async function recordResult(result, { cat, sub } = {}) {
     if (!a.generated) { const h = (p.items[a.id] ||= { n: 0, ok: 0, last: 0 }); h.n++; h.ok = !!a.ok; h.last = Date.now(); }
     p.xp += a.ok ? 10 : 2;
   }
-  p.days[d] = (p.days[d] || 0) + result.answers.length;
-  const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
-  if (p.lastDay !== d) { p.streak = p.lastDay === y ? (p.streak || 0) + 1 : 1; p.lastDay = d; p.bestStreak = Math.max(p.bestStreak || 0, p.streak); }
+  const counted = result.answers.filter((a) => a.type !== "likert").length;
+  if (counted) {
+    p.days[d] = (p.days[d] || 0) + counted;
+    const y = dateKey(Date.now() - 864e5);
+    if (p.lastDay !== d) { p.streak = p.lastDay === y ? (p.streak || 0) + 1 : 1; p.lastDay = d; p.bestStreak = Math.max(p.bestStreak || 0, p.streak); }
+  }
   await S.store.progress.save(S.user.uid, p);
   const attempt = { mode: result.mode, title: result.title, cat: cat || null, sub: sub || null, score: result.score, scoredTotal: result.scoredTotal, total: result.total, durSec: result.durSec, startedAt: result.startedAt, timeout: result.timeout, aborted: result.aborted };
   if (result.answers.length) await S.store.attempts.add(S.user.uid, attempt);
@@ -71,7 +75,7 @@ function landing() {
     <section class="hero">
       <p class="eyebrow">הכנה למיוני 8200 · בעברית · מהטלפון</p>
       <h1>${esc(CONFIG.appName || "מוכנים ל-8200")}</h1>
-      <p class="lead">${esc(CONFIG.tagline || "")}. תרגול לפי שלבי המיון, בוחני פתע, מעקב התקדמות — ומלווה אמיתי שרואה איפה את/ה עומד/ת.</p>
+      <p class="hero-lead">${esc(CONFIG.tagline || "")}. תרגול לפי שלבי המיון, בוחני פתע, מעקב התקדמות — ומלווה אמיתי שרואה איפה את/ה עומד/ת.</p>
       <div class="cta-row"><a class="btn primary big" href="#/register">מתחילים בחינם</a><a class="btn big" href="#/login">כבר רשומים? כניסה</a></div>
       <p class="muted small">מתאים לתלמידי י״א–י״ב לפני המיונים. אפשר להתקין כאפליקציה על הטלפון.</p>
     </section>
@@ -90,7 +94,7 @@ function landing() {
       <div class="feat"><span>🧩</span><strong>מחולל שאלות</strong><p class="muted">צורות, סדרות וחישוב מהיר — שאלות חדשות בכל פעם, בלי לשנן.</p></div>
     </section>
     <section class="section mentor" id="mentor">
-      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המלווה</p><h3>${esc(m.name || "")}</h3><p>${esc(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#/contact">לדבר איתי</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהאתר של ההכנה ל-8200")}">וואטסאפ</a>` : ""}</div></div></div>
+      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המלווה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#/contact">לדבר איתי</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהאתר של ההכנה ל-8200")}">וואטסאפ</a>` : ""}</div></div></div>
     </section>
     <section class="section" id="testimonials"></section>
     <section class="section pricing-teaser">
@@ -167,11 +171,11 @@ function authView(kind) {
     try {
       if (isReg) { await S.store.auth.signUp({ email: fd.email, password: fd.password, name: fd.name.trim(), phone: fd.phone || "", grade: fd.grade || "", targetDate: fd.targetDate || "", referrer: fd.referrer || "", parentName: fd.parentName || "", parentContact: fd.parentContact || "", parentConsent: true, termsAt: Date.now() }); toast(`ברוך/ה הבא/ה, ${fd.name.trim().split(" ")[0]}! 🎉`, "ok"); go("#/onboarding"); }
       else if (kind === "reset") { await S.store.auth.resetPassword(fd.email); msg.classList.remove("err"); msg.textContent = "שלחנו קישור לאיפוס לאימייל."; }
-      else { await S.store.auth.signIn(fd.email, fd.password); go("#/home"); }
+      else { await S.store.auth.signIn(fd.email, fd.password); const next = S.afterLogin; S.afterLogin = null; go(next || "#/home"); }
     } catch (err) { msg.classList.add("err"); msg.textContent = err.message || "משהו השתבש"; }
     btn.disabled = false;
   };
-  $("#googleBtn")?.addEventListener("click", async () => { try { await S.store.auth.signInGoogle(); go("#/home"); } catch (err) { f.querySelector(".form-msg").textContent = err.message; } });
+  $("#googleBtn")?.addEventListener("click", async () => { try { await S.store.auth.signInGoogle(); const next = S.afterLogin; S.afterLogin = null; go(next || "#/home"); } catch (err) { f.querySelector(".form-msg").textContent = err.message; } });
 }
 
 function onboarding() {
@@ -219,7 +223,7 @@ async function home() {
     <section class="daily-card" style="--p:${pct}">
       <div class="ring"><span>${done}/${goal}</span></div>
       <div><h2>${done >= goal ? "היעד היומי הושלם! 🏆" : "האימון של היום"}</h2><p class="muted">${done >= goal ? "אפשר להמשיך — כל שאלה נוספת נספרת." : `${goal - done} שאלות ליעד. מעורב מכל הנושאים, עם דגש על מה שפחות חזק.`}</p>
-      <div class="cta-row"><a class="btn primary" href="#/daily">${done ? "ממשיכים" : "מתחילים"} (${Math.min(goal - done || goal, 15) || 15} שאלות)</a><a class="btn" href="#/surprise">⚡ בוחן פתע</a></div></div>
+      <div class="cta-row"><a class="btn primary" href="#/daily">${done ? "ממשיכים" : "מתחילים"} (${Math.max(5, Math.min(15, goal - done))} שאלות)</a><a class="btn" href="#/surprise">⚡ בוחן פתע</a></div></div>
     </section>
     ${!isPro() ? `<p class="muted small center">נשארו היום ${freeLeft()} שאלות במסלול החינמי · <a href="#/pricing">PRO ללא הגבלה</a></p>` : ""}
     <section class="section"><div class="sec-head"><h2>מסלול ההכנה</h2><a href="#/train" class="muted small">כל הנושאים</a></div>
@@ -314,11 +318,13 @@ async function sim(catId) {
   let items, title, minutes;
   if (catId === "all") { items = await pickMixed({ catIds: ["dapar", "learning", "english"], progress: S.progress, isPro: true, n: 40 }); title = "סימולציה מלאה"; minutes = 35; }
   else { const c = catById(catId); if (!c?.sim) return go("#/train"); items = await pickMixed({ catIds: [catId], progress: S.progress, isPro: true, n: c.sim.items }); title = `סימולציה · ${c.short}`; minutes = c.sim.minutes; }
-  const start = modal(`<h2>${esc(title)}</h2><p>${items.length} שאלות · ${minutes} דקות · בלי הסברים באמצע. מוכנים?</p><div class="cta-row"><button class="btn primary" id="simGo">התחלה</button><a class="btn" href="#/train">לא עכשיו</a></div>`);
+  const start = modal(`<h2>${esc(title)}</h2><p>${items.length} שאלות · ${minutes} דקות · בלי הסברים באמצע. מוכנים?</p><div class="cta-row"><button class="btn primary" id="simGo">התחלה</button><button class="btn" id="simNo">לא עכשיו</button></div>`);
+  $("#simNo").onclick = () => { start.close(); go("#/train"); };
   $("#simGo").onclick = () => { start.close(); runQuiz({ items, title, mode: "sim", immediate: false, timeLimitSec: minutes * 60, cat: catId === "all" ? null : catId, back: "#/train", again: `#/sim/${catId}` }); };
 }
 function runQuiz({ items, title, mode, immediate, timeLimitSec, cat, sub, back, again }) {
   nav();
+  $("#tabbar").hidden = true;
   const v = setView("", "quiz-view");
   S.quiz?.destroy();
   S.quiz = new Quiz({ el: v, items, title, mode, immediate, timeLimitSec, onFinish: async (result) => {
@@ -328,7 +334,7 @@ function runQuiz({ items, title, mode, immediate, timeLimitSec, cat, sub, back, 
     nav();
     setView(`${summaryHtml(result, { isPro: isPro() })}
       ${done >= goal && done - result.answers.length < goal ? `<p class="celebrate">🏆 היעד היומי הושלם! רצף: ${S.progress.streak} ימים</p>` : ""}
-      <div class="cta-row">${mode === "personality" ? `<a class="btn primary" href="#/profile">לפרופיל האישיות</a>` : `<a class="btn primary" href="${again}">עוד סבב</a>`}<a class="btn" href="${back}">חזרה</a>${result.answers.some((a) => a.type !== "likert" && !a.ok) && mode !== "sim" ? `<button class="btn" id="retryWrong">תרגול הטעויות</button>` : ""}</div>`);
+      <div class="cta-row">${mode === "personality" ? `<a class="btn primary" href="#/profile">לפרופיל האישיות</a>` : `<button class="btn primary" data-go="${esc(again)}">עוד סבב</button>`}<a class="btn" href="${back}">חזרה</a>${result.answers.some((a) => a.type !== "likert" && !a.ok) && mode !== "sim" ? `<button class="btn" id="retryWrong">תרגול הטעויות</button>` : ""}</div>`);
     $("#retryWrong")?.addEventListener("click", () => { const wrongIds = new Set(result.answers.filter((a) => !a.ok).map((a) => a.id)); const wi = result.items.filter((it) => wrongIds.has(it.id)); runQuiz({ items: wi, title: "תרגול הטעויות", mode: "practice", immediate: true, cat, sub, back, again }); });
   } });
   S.quiz.mount();
@@ -344,7 +350,7 @@ async function progressView() {
   nav("#/progress");
   const p = S.progress; const subsAll = await allSubs();
   const attempts = await S.store.attempts.list(S.user.uid, 15);
-  const days = []; for (let i = 27; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10); days.push([d, p.days[d] || 0]); }
+  const days = []; for (let i = 27; i >= 0; i--) { const d = dateKey(Date.now() - i * 864e5); days.push([d, p.days[d] || 0]); }
   const weak = subsAll.map((s) => ({ s, st: subStats(p, s.id) })).filter((x) => x.st.n >= 5).sort((a, b) => a.st.acc - b.st.acc).slice(0, 3);
   const totalN = Object.values(p.subs).reduce((x, s) => x + s.n, 0); const totalOk = Object.values(p.subs).reduce((x, s) => x + s.ok, 0);
   setView(`<section><h1>ההתקדמות שלי</h1>
@@ -416,7 +422,7 @@ async function settings() {
       <button class="btn primary" type="submit">שמירה</button>
     </form>
     <div class="section"><h3>התראות בטלפון</h3><p class="muted small">${S.store.mode === "firebase" ? "בוחני פתע ותזכורות גם כשהאפליקציה סגורה." : "במצב הדגמה ההתראות עובדות רק כשהאפליקציה פתוחה."} באייפון: קודם 'הוסף למסך הבית' (שיתוף ← הוסף למסך הבית) ואז לאשר כאן.</p>
-      <button class="btn" id="notifBtn">${Notification?.permission === "granted" ? "ההתראות פעילות ✓" : "הפעלת התראות"}</button></div>
+      <button class="btn" id="notifBtn">${window.Notification?.permission === "granted" ? "ההתראות פעילות ✓" : "הפעלת התראות"}</button></div>
     <div class="section"><h3>החשבון</h3><p class="muted small">${esc(S.user.email)} · ${isPro() ? `PRO${S.user.planUntil ? ` עד ${fmtDate(S.user.planUntil)}` : ""}` : "חינם"} · ${S.store.mode === "firebase" ? "מצב חי" : "מצב הדגמה"}</p><div class="cta-row"><button class="btn" id="logoutBtn">יציאה</button>${S.store.mode === "local" ? `<button class="btn danger" id="deleteBtn">מחיקת החשבון</button>` : ""}</div></div>
   </section>`);
   $("#setForm").onsubmit = async (e) => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target).entries()); p.dailyGoal = +fd.dailyGoal; p.settings = { ...st, surprise: !!fd.surprise, theme: fd.theme }; applyTheme(); await S.store.progress.save(S.user.uid, p); await S.store.users.update(S.user.uid, { name: fd.name.trim(), phone: fd.phone, grade: fd.grade, targetDate: fd.targetDate, dailyGoal: p.dailyGoal }); toast("נשמר ✓", "ok"); scheduleSurprise(); };
@@ -512,7 +518,7 @@ async function admin(sub, id) {
     <div class="cta-row"><a class="btn" href="#/admin/leads">פניות (${leads.length})</a><a class="btn" href="#/admin/testimonials">המלצות</a><button class="btn" id="csvBtn">ייצוא CSV</button>${S.store.mode === "local" ? `<button class="btn" id="seedBtn">${users.some((u) => u.demo) ? "מחיקת נתוני הדגמה" : "יצירת תלמידי הדגמה"}</button>` : ""}</div>
     <input class="search" id="q" placeholder="חיפוש לפי שם / אימייל / טלפון">
     <div class="tbl"><table id="stuTable"><thead><tr><th>תלמיד/ה</th><th>כיתה</th><th>מיונים</th><th>מסלול</th><th>שאלות</th><th>דיוק</th><th>רצף</th><th>פעיל/ה</th></tr></thead><tbody>
-      ${users.map((u) => `<tr data-uid="${u.uid}" data-s="${esc((u.name || "") + " " + u.email + " " + (u.phone || ""))}"><td><a href="#/admin/student/${u.uid}">${esc(u.name || "—")}</a>${u.demo ? ' <span class="pill">דמו</span>' : ""}<br><span class="muted small" dir="ltr">${esc(u.email)}</span></td><td>${GRADES[u.grade] || u.grade || "—"}</td><td>${esc(u.targetDate || "—")}</td><td>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO</span>` : "חינם"}</td><td>${u.stats?.items ?? 0}</td><td>${u.stats?.items ? Math.round((u.stats.ok / u.stats.items) * 100) + "%" : "—"}</td><td>${u.stats?.streak ?? 0}</td><td>${u.lastActive ? (daysAgo(u.lastActive) === 0 ? "היום" : `לפני ${daysAgo(u.lastActive)} ימים`) : "—"}</td></tr>`).join("") || `<tr><td colspan="8" class="muted">עדיין אין תלמידים. כשמישהו נרשם הוא יופיע כאן.</td></tr>`}
+      ${users.map((u) => `<tr data-uid="${u.uid}" data-s="${esc((u.name || "") + " " + u.email + " " + (u.phone || ""))}"><td><a href="#/admin/student/${u.uid}">${esc(u.name || "—")}</a>${u.demo ? ' <span class="pill">דמו</span>' : ""}<br><span class="muted small" dir="ltr">${esc(u.email)}</span></td><td>${esc(GRADES[u.grade] || u.grade || "—")}</td><td>${esc(u.targetDate || "—")}</td><td>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO</span>` : "חינם"}</td><td>${Number(u.stats?.items) || 0}</td><td>${Number(u.stats?.items) ? Math.round((Number(u.stats.ok) / Number(u.stats.items)) * 100) + "%" : "—"}</td><td>${Number(u.stats?.streak) || 0}</td><td>${u.lastActive ? (daysAgo(u.lastActive) === 0 ? "היום" : `לפני ${daysAgo(u.lastActive)} ימים`) : "—"}</td></tr>`).join("") || `<tr><td colspan="8" class="muted">עדיין אין תלמידים. כשמישהו נרשם הוא יופיע כאן.</td></tr>`}
     </tbody></table></div></section>`);
   $("#q").oninput = (e) => { const q = e.target.value.trim().toLowerCase(); document.querySelectorAll("#stuTable tbody tr").forEach((tr) => { tr.hidden = q && !(tr.dataset.s || "").toLowerCase().includes(q); }); };
   $("#csvBtn").onclick = () => { const rows = [["name", "email", "phone", "grade", "targetDate", "plan", "planUntil", "items", "accuracy", "streak", "lastActive", "createdAt", "referrer"], ...users.map((u) => [u.name, u.email, u.phone, u.grade, u.targetDate, u.plan, u.planUntil ? new Date(u.planUntil).toISOString().slice(0, 10) : "", u.stats?.items ?? 0, u.stats?.items ? Math.round((u.stats.ok / u.stats.items) * 100) : "", u.stats?.streak ?? 0, u.lastActive ? new Date(u.lastActive).toISOString() : "", u.createdAt ? new Date(u.createdAt).toISOString() : "", u.referrer])]; const csv = "﻿" + rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n"); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `students-${today()}.csv`; a.click(); };
@@ -543,9 +549,9 @@ async function adminStudent(uid) {
   const t = p.traits || {};
   setView(`<section class="admin"><a class="back" href="#/admin">‹ לוח ניהול</a>
     <div class="sec-head"><h1>${esc(u.name || "—")}</h1>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO${u.planUntil ? ` עד ${fmtDate(u.planUntil)}` : ""}</span>` : `<span class="pill">חינם</span>`}</div>
-    <p class="muted small" dir="auto">${esc(u.email)} · ${esc(u.phone || "ללא טלפון")} · ${GRADES[u.grade] || "—"} · מיונים: ${esc(u.targetDate || "—")} · נרשם/ה ${fmtDate(u.createdAt)} · פעיל/ה ${fmtDateTime(u.lastActive)}${u.referrer ? ` · הפניה: ${esc(u.referrer)}` : ""}${u.tracks?.length ? ` · מסלולים: ${u.tracks.join(", ")}` : ""}</p>
+    <p class="muted small" dir="auto">${esc(u.email)} · ${esc(u.phone || "ללא טלפון")} · ${esc(GRADES[u.grade] || "—")} · מיונים: ${esc(u.targetDate || "—")} · נרשם/ה ${fmtDate(u.createdAt)} · פעיל/ה ${fmtDateTime(u.lastActive)}${u.referrer ? ` · הפניה: ${esc(u.referrer)}` : ""}${Array.isArray(u.tracks) && u.tracks.length ? ` · מסלולים: ${esc(u.tracks.join(", "))}` : ""}${u.parentName ? ` · הורה: ${esc(u.parentName)} <span dir="ltr">${esc(u.parentContact || "")}</span>` : ""}</p>
     <div class="cta-row">${u.phone ? `<a class="btn small" target="_blank" rel="noopener" href="https://wa.me/${esc(String(u.phone).replace(/\D/g, "").replace(/^0/, "972"))}">וואטסאפ</a>` : ""}<a class="btn small" href="mailto:${esc(u.email)}">אימייל</a></div>
-    <div class="kpis"><div class="kpi"><b>${u.stats?.items ?? 0}</b><span>שאלות</span></div><div class="kpi"><b>${u.stats?.items ? Math.round((u.stats.ok / u.stats.items) * 100) : 0}%</b><span>דיוק</span></div><div class="kpi"><b>${p.streak || 0}</b><span>רצף</span></div><div class="kpi"><b>${Object.keys(p.days || {}).length}</b><span>ימי אימון</span></div></div>
+    <div class="kpis"><div class="kpi"><b>${Number(u.stats?.items) || 0}</b><span>שאלות</span></div><div class="kpi"><b>${Number(u.stats?.items) ? Math.round((Number(u.stats.ok) / Number(u.stats.items)) * 100) : 0}%</b><span>דיוק</span></div><div class="kpi"><b>${p.streak || 0}</b><span>רצף</span></div><div class="kpi"><b>${Object.keys(p.days || {}).length}</b><span>ימי אימון</span></div></div>
     <h2>שליטה לפי שלב</h2><div class="cat-list">${CATEGORIES.map((c) => { const m = masteryOf(p, subsAll.filter((s) => s.cat.id === c.id).map((s) => s.id)); return `<div class="cat-row" style="--c:${c.color}"><span class="cat-emoji">${c.emoji}</span><span class="cat-main"><strong>${esc(c.short)}</strong><span class="bar"><i style="width:${Math.round(m * 100)}%"></i></span></span><span class="cat-pct">${Math.round(m * 100)}%</span></div>`; }).join("")}</div>
     <h2>לפי נושא</h2><div class="tbl"><table><thead><tr><th>נושא</th><th>שאלות</th><th>דיוק</th><th>זמן ממוצע</th></tr></thead><tbody>${subsAll.map((s) => { const st = subStats(p, s.id); if (!st.n) return ""; return `<tr><td>${esc(s.title)}</td><td>${st.n}</td><td class="${st.acc < 0.6 ? "low" : ""}">${Math.round(st.acc * 100)}%</td><td>${Math.round(st.t / st.n)} שנ׳</td></tr>`; }).join("") || `<tr><td colspan="4" class="muted">עוד לא תרגל/ה</td></tr>`}</tbody></table></div>
     ${Object.keys(t).length ? `<h2>פרופיל אישיות</h2><div class="traits compact">${Object.entries(TRAITS).map(([k, [name]]) => { const v = t[k]; const pct = v?.n ? Math.round((v.sum / v.n / 4) * 100) : 0; return `<div class="trait"><div class="trait-h"><span>${name}</span><b>${pct}%</b></div><span class="bar"><i style="width:${pct}%"></i></span></div>`; }).join("")}</div>` : ""}
@@ -563,8 +569,8 @@ async function adminLeads() {
   const leads = await S.store.leads.list();
   const STATUS = { new: "חדש", contacted: "יצרתי קשר", registered: "נרשם/ה", paid: "שילם/ה", no: "לא רלוונטי" };
   setView(`<section class="admin"><a class="back" href="#/admin">‹ לוח ניהול</a><h1>פניות (${leads.length})</h1>
-    ${leads.length ? `<div class="leads">${leads.map((l) => `<div class="lead-card ${l.status}"><div class="lead-h"><strong>${esc(l.name)}</strong><select data-id="${l.id}">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}</select></div><p class="muted small">${fmtDateTime(l.createdAt)} · ${GRADES[l.grade] || (l.grade === "parent" ? "הורה" : "—")} · <span dir="ltr">${esc(l.phone || "")}</span> ${l.email ? `· <span dir="ltr">${esc(l.email)}</span>` : ""} ${l.source ? `· ${esc(l.source)}` : ""}</p>${l.msg ? `<p>${esc(l.msg)}</p>` : ""}<div class="cta-row">${l.phone ? `<a class="btn small" target="_blank" rel="noopener" href="https://wa.me/${esc(String(l.phone).replace(/\D/g, "").replace(/^0/, "972"))}">וואטסאפ</a><a class="btn small" href="tel:${esc(l.phone)}">חיוג</a>` : ""}${l.email ? `<a class="btn small" href="mailto:${esc(l.email)}">אימייל</a>` : ""}</div></div>`).join("")}</div>` : `<p class="muted">עדיין אין פניות. הטופס בעמוד הבית ובעמוד "יצירת קשר" שולח לכאן (וגם לאימייל שלך).</p>`}</section>`);
-  document.querySelectorAll(".lead-card select").forEach((s) => { s.onchange = async () => { await S.store.leads.update(s.dataset.id, { status: s.value }); s.closest(".lead-card").className = `lead-card ${s.value}`; toast("עודכן"); }; });
+    ${leads.length ? `<div class="leads">${leads.map((l) => `<div class="lead-card ${STATUS[l.status] ? esc(l.status) : "new"}"><div class="lead-h"><strong>${esc(l.name)}</strong><select data-id="${l.id}">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}</select></div><p class="muted small">${fmtDateTime(l.createdAt)} · ${GRADES[l.grade] || (l.grade === "parent" ? "הורה" : "—")} · <span dir="ltr">${esc(l.phone || "")}</span> ${l.email ? `· <span dir="ltr">${esc(l.email)}</span>` : ""} ${l.source ? `· ${esc(l.source)}` : ""}</p>${l.msg ? `<p>${esc(l.msg)}</p>` : ""}<div class="cta-row">${l.phone ? `<a class="btn small" target="_blank" rel="noopener" href="https://wa.me/${esc(String(l.phone).replace(/\D/g, "").replace(/^0/, "972"))}">וואטסאפ</a><a class="btn small" href="tel:${esc(l.phone)}">חיוג</a>` : ""}${l.email ? `<a class="btn small" href="mailto:${esc(l.email)}">אימייל</a>` : ""}</div></div>`).join("")}</div>` : `<p class="muted">עדיין אין פניות. הטופס בעמוד הבית ובעמוד "יצירת קשר" שולח לכאן (וגם לאימייל שלך).</p>`}</section>`);
+  document.querySelectorAll(".lead-card select").forEach((s) => { s.onchange = async () => { if (!STATUS[s.value]) return; await S.store.leads.update(s.dataset.id, { status: s.value }); s.closest(".lead-card").className = `lead-card ${s.value}`; toast("עודכן"); }; });
 }
 async function adminTestimonials() {
   const items = await S.store.public.getTestimonials();
@@ -601,7 +607,7 @@ function scheduleSurprise() {
   const delay = (15 + Math.random() * 30) * 60 * 1000;
   S.surpriseTimer = setTimeout(() => {
     if (!S.user || S.quiz) return scheduleSurprise();
-    if (Notification?.permission === "granted" && document.hidden) { navigator.serviceWorker?.getRegistration().then((reg) => reg?.showNotification?.("⚡ בוחן פתע!", { body: "5 שאלות, 2 דקות. יאללה?", icon: "./icons/icon-192.png", tag: "surprise", data: { url: "#/surprise" } })); }
+    if (window.Notification?.permission === "granted" && document.hidden) { navigator.serviceWorker?.getRegistration().then((reg) => reg?.showNotification?.("⚡ בוחן פתע!", { body: "5 שאלות, 2 דקות. יאללה?", icon: "./icons/icon-192.png", tag: "surprise", data: { url: "#/surprise" } })); }
     const bar = document.createElement("div"); bar.className = "surprise-bar"; bar.innerHTML = `<span>⚡ בוחן פתע! 5 שאלות ב-2 דקות</span><a class="btn small primary" href="#/surprise">יאללה</a><button class="btn-icon" aria-label="סגירה">✕</button>`;
     bar.querySelector("button").onclick = () => bar.remove(); bar.querySelector("a").onclick = () => bar.remove();
     document.body.appendChild(bar); setTimeout(() => bar.remove(), 60000);
@@ -622,26 +628,26 @@ async function route() {
   const r = seg[0] || "";
   try {
     switch (r) {
-      case "": return S.user ? home() : landing();
+      case "": return await (S.user ? home() : landing());
       case "login": case "register": case "reset": return S.user && r !== "reset" ? go("#/home") : authView(r);
-      case "onboarding": return onboarding();
-      case "home": return home();
-      case "train": return train();
-      case "cat": return category(seg[1]);
-      case "lesson": return lesson(seg[1], seg[2]);
-      case "practice": return practice(seg[1], seg[2], params);
-      case "daily": return daily();
-      case "surprise": return surprise();
-      case "sim": return sim(seg[1] || "all");
-      case "progress": return progressView();
-      case "profile": return profile();
+      case "onboarding": return await onboarding();
+      case "home": return await home();
+      case "train": return await train();
+      case "cat": return await category(seg[1]);
+      case "lesson": return await lesson(seg[1], seg[2]);
+      case "practice": return await practice(seg[1], seg[2], params);
+      case "daily": return await daily();
+      case "surprise": return await surprise();
+      case "sim": return await sim(seg[1] || "all");
+      case "progress": return await progressView();
+      case "profile": return await profile();
       case "pricing": return pricing();
       case "contact": return contact(params);
-      case "settings": return settings();
+      case "settings": return await settings();
       case "more": return more();
       case "terms": return terms();
       case "map": return stageMap();
-      case "admin": return admin(seg[1], seg[2]);
+      case "admin": return await admin(seg[1], seg[2]);
       default: return go("#/");
     }
   } catch (e) { console.error(e); setView(`<section class="auth"><h1>משהו השתבש</h1><p class="muted">${esc(e.message || e)}</p><a class="btn" href="#/">לעמוד הבית</a></section>`); }
@@ -650,15 +656,23 @@ async function route() {
 async function boot() {
   $("#appName").textContent = CONFIG.appName || "מוכנים ל-8200";
   S.store = await createStore();
+  if (S.store.mode === "error") { setView(`<section class="auth"><h1>השירות לא זמין כרגע</h1><p class="muted">לא הצלחנו להתחבר לשרת. נסו לרענן בעוד כמה דקות.</p></section>`); return; }
   if (S.store.mode === "local") $("#demoBanner").hidden = false;
-  S.store.auth.onChange(async (u) => {
+  S.ready = false;
+  S.store.auth.onChange((u) => {
     const changed = (u?.uid || null) !== (S.user?.uid || null);
     S.user = u;
-    if (u) { S.progress = await S.store.progress.get(u.uid); applyTheme(); scheduleSurprise(); } else { S.progress = emptyProgress(); clearTimeout(S.surpriseTimer); }
-    if (changed) route();
+    S.userReady = (async () => {
+      if (u) { if (changed || !S.progress?.updatedAt) S.progress = await S.store.progress.get(u.uid); applyTheme(); if (changed) scheduleSurprise(); }
+      else { S.progress = emptyProgress(); clearTimeout(S.surpriseTimer); }
+    })();
+    if (S.ready && changed) S.userReady.then(route);
   });
   await S.store.init();
+  await S.userReady;
+  S.ready = true;
   window.addEventListener("hashchange", route);
+  document.addEventListener("click", (e) => { const b = e.target.closest?.("[data-go]"); if (b) { e.preventDefault(); go(b.dataset.go); } });
   if (!S.user && !location.hash) location.hash = "#/";
   route();
   if ("serviceWorker" in navigator) { navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("sw", e)); navigator.serviceWorker.addEventListener("message", (e) => { if (e.data?.url) go(e.data.url); }); }

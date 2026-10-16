@@ -41,6 +41,9 @@ Firebase Console → Engage → Messaging → New campaign → Notification: כ�
 - לבדוק קובץ אחרי עריכה: `python3 -I tools/validate-8200-pack.py public/8200/data/coding.json`.
 - המחוללים (צורות, סדרות, חישוב, קשב, זיכרון) ב-`gen.js` — אינסופיים, לא צריך תוכן.
 
+## אחרי כל שינוי בקבצי האפליקציה
+להעלות את המספר ב-`const VERSION = "8200-vN"` בתחילת `public/8200/sw.js` — אחרת דפדפנים של תלמידים ימשיכו להציג את הגרסה הקודמת מהמטמון עוד רענון-שניים.
+
 ## בדיקה מקומית
 ```sh
 cd public && python3 -m http.server 4400
