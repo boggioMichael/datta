@@ -6,7 +6,7 @@ export const CATEGORIES = [
     id: "dapar", stage: 1, emoji: "🧩", color: "#c8431f",
     title: "פסיכוטכני — דפ״ר וצו ראשון", short: "פסיכוטכני",
     desc: "אנלוגיות מילוליות וצורניות, חשיבה צורנית, הוראות, סדרות וכמותי — מה שנבדק בדפ״ר בצו הראשון, ושוב במבחני כלל חמ״ן.",
-    packs: ["dapar-verbal", "dapar-quant"], generators: ["shapes", "gen-series", "gen-quick"],
+    packs: ["dapar-verbal", "dapar-quant", "psychometric-he"], generators: ["shapes", "gen-series", "gen-quick"],
     sim: { items: 30, minutes: 25 },
   },
   {
@@ -22,6 +22,13 @@ export const CATEGORIES = [
     desc: "Python מאפס: משתנים, תנאים, לולאות, פונקציות וחשיבה אלגוריתמית — הבסיס למבחן הידע, לסדנה ולראיון המקצועי במסלולים הטכנולוגיים.",
     packs: ["coding"], generators: [],
     sim: { items: 20, minutes: 30 },
+  },
+  {
+    id: "ctf", badge: "מסלול מתקדם", emoji: "🚩", color: "#4b2e83",
+    title: "CTF — מערכת, בינארי ומיגונים", short: "CTF",
+    desc: "printf והתנהגות בלתי מוגדרת, מבנה ELF והטוען הדינמי, מרחב הקרנל ומודולים, ומנגנוני ההגנה — הבנה לעומק של המערכת מהחומרה ועד הקרנל. קשה בכוונה.",
+    packs: ["ctf"], generators: [],
+    sim: { items: 25, minutes: 35 },
   },
   {
     id: "personality", stage: 4, emoji: "🪞", color: "#7a4fb3",
@@ -41,7 +48,7 @@ export const CATEGORIES = [
     id: "english", stage: 6, emoji: "🔤", color: "#1f7a8c",
     title: "אנגלית", short: "אנגלית",
     desc: "אוצר מילים, הבנת הנקרא ודקדוק ברמה שצריך כדי לקרוא חומר טכני.",
-    packs: ["english"], generators: [],
+    packs: ["english", "psychometric-en"], generators: [],
     sim: { items: 20, minutes: 15 },
   },
 ];

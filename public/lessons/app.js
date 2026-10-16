@@ -266,7 +266,7 @@ async function category(id) {
   const m = masteryOf(p, subs.map((s) => s.id));
   setView(`<section class="cat-page" style="--c:${c.color}">
     <a class="back" href="#/train">‹ כל הנושאים</a>
-    <div class="cat-head"><span class="cat-emoji big">${c.emoji}</span><div><p class="eyebrow">שלב ${c.stage}</p><h1>${esc(c.title)}</h1><p class="muted">${esc(c.desc)}</p></div></div>
+    <div class="cat-head"><span class="cat-emoji big">${c.emoji}</span><div><p class="eyebrow">${c.stage ? "שלב " + c.stage : (c.badge || "")}</p><h1>${esc(c.title)}</h1><p class="muted">${esc(c.desc)}</p></div></div>
     <div class="cat-stat"><span class="bar"><i style="width:${Math.round(m * 100)}%"></i></span><b>${Math.round(m * 100)}% שליטה</b></div>
     ${lessons.length ? `<h2>שיעורים קצרים</h2><div class="lessons">${lessons.map((l) => `<a class="lesson-row" href="#/lesson/${c.id}/${l.id}"><span>📖</span><span><strong>${esc(l.title)}</strong><span class="muted small"> · ${l.minutes} דק׳</span></span></a>`).join("")}</div>` : ""}
     <h2>תרגול</h2>
@@ -392,7 +392,7 @@ const P = (n) => Number(n || 0).toLocaleString("en-US");
 function pricing() {
   nav();
   const pr = CONFIG.prices || {}; const pl = CONFIG.payLinks || {};
-  const btn = (key, label, cls = "") => pl[key] ? `<a class="btn ${cls}" target="_blank" rel="noopener" href="${esc(pl[key])}">${label}</a>` : (S.store.mode === "local" && S.user && ["monthly", "season"].includes(key) ? `<button class="btn ${cls}" data-demo-pro="${key}">${label} (הדגמה)</button>` : `<a class="btn ${cls}" href="#/contact?plan=${key}">${label}</a>`);
+  const btn = (key, label, cls = "") => pl[key] ? `<a class="btn ${cls}" target="_blank" rel="noopener" href="${esc(pl[key])}">${label}</a>` : (S.store.mode === "local" && S.user && ["monthly", "season"].includes(key) ? `<button class="btn ${cls}" data-demo-pro="${key}">${label} (הדגמה)</button>` : `<a class="btn ${cls}" href="#/pay?plan=${key}">${label}</a>`);
   setView(`<section class="pricing"><h1>מחירים</h1><p class="muted">המחירים כוללים הכול (עוסק פטור — ללא מע״מ). תשלום לפני השיעור הראשון.</p>
     <h2>שיעורים פרטיים</h2>
     <div class="plans">
@@ -405,6 +405,7 @@ function pricing() {
       <div class="plan"><h3>חבילת הכנה למיונים</h3><div class="price">₪${P(pr.mentoring)}</div><ul><li>4 שיעורים אישיים לפי שלבי המיון</li><li>סימולציית ראיון אישי + משוב</li><li>PRO לעונה באפליקציית התרגול</li><li>תוכנית לפי תאריך המיונים שלך</li></ul>${btn("mentoring", "לתאם שיחה")}</div>
       <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>620 שאלות עם הסברים + מחוללים ללא הגבלה</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
     </div>
+    <p class="muted">התשלום בביט, פייבוקס או העברה בנקאית — הגישה מופעלת ידנית אחרי אישור התשלום (אין סליקת אשראי).</p>
     <p class="muted small">ביטול תוך 14 יום לפי חוק הגנת הצרכן; מנוי חודשי ניתן לביטול בכל עת; שיעור ניתן להזזה עד 2 ימי עבודה לפני. <a href="#/terms">לתקנון</a>.</p>
   </section>`);
   document.querySelectorAll("[data-demo-pro]").forEach((b) => { b.onclick = async () => { const until = Date.now() + (b.dataset.demoPro === "season" ? 183 : 31) * 864e5; await S.store.users.update(S.user.uid, { plan: "pro", planUntil: until, planSource: "demo" }); toast("PRO הופעל (הדגמה) ✨", "ok"); go("#/home"); }; });
@@ -452,6 +453,55 @@ function more() {
   setView(`<section><h1>עוד</h1><div class="menu">
     <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 שיעורים ומחירים</a><a href="#/contact">💬 לדבר עם המורה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a><a href="#/contact?cancel=1">✂️ ביטול מנוי / עסקה</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
   </div>${footerHtml()}</section>`);
+}
+function payMethodsHtml() {
+  const pm = CONFIG.payManual || {};
+  const rows = [];
+  if (pm.bit) rows.push(`<div class="pay-method"><span class="pm-ico">📲</span><div><b>ביט</b><div class="muted small">שלחו את הסכום למספר <a dir="ltr" href="tel:${esc(String(pm.bit).replace(/[^\d+]/g, ""))}">${esc(pm.bit)}</a> באפליקציית bit</div></div></div>`);
+  if (pm.paybox) { const link = /^https?:/.test(pm.paybox); rows.push(`<div class="pay-method"><span class="pm-ico">💳</span><div><b>PayBox</b><div class="muted small">${link ? `<a target="_blank" rel="noopener" href="${esc(pm.paybox)}">קישור לתשלום ב-PayBox</a>` : `שלחו את הסכום למספר <span dir="ltr">${esc(pm.paybox)}</span> ב-PayBox`}</div></div></div>`); }
+  if (pm.bankAccount) rows.push(`<div class="pay-method"><span class="pm-ico">🏦</span><div><b>העברה בנקאית</b><div class="muted small">${esc(pm.bankHolder || "")} · בנק ${esc(pm.bankName || "")}${pm.bankBranch ? " · סניף " + esc(pm.bankBranch) : ""} · חשבון <span dir="ltr">${esc(pm.bankAccount)}</span></div></div></div>`);
+  return rows.join("");
+}
+function pay(params) {
+  if (!requireUser()) return;
+  const plan = params?.get("plan") || "monthly";
+  const label = PLAN_LABELS[plan] || plan;
+  const amount = CONFIG.prices?.[plan];
+  const pm = CONFIG.payManual || {};
+  const methods = payMethodsHtml();
+  nav();
+  setView(`<section class="auth"><a class="back" href="#/pricing">‹ מחירים</a><h1>תשלום — ${esc(label)}</h1>
+    ${amount ? `<div class="price">₪${P(amount)}</div>` : ""}
+    <p class="muted">שלמו באחת הדרכים, ואז לחצו "שילמתי" כדי שאקבל התראה ואפעיל לכם את הגישה. ${esc(pm.note || "")}</p>
+    ${methods ? `<div class="pay-methods">${methods}</div>` : `<p class="muted">פרטי התשלום יימסרו בפנייה — <a href="#/contact?plan=${plan}">צרו קשר</a>.</p>`}
+    <form class="form" id="payForm">
+      <div class="row2"><label>שם <input name="name" required value="${esc(S.user?.name || "")}"></label><label>טלפון <input name="phone" dir="ltr" required value="${esc(S.user?.phone || "")}"></label></div>
+      <label>איך שילמת? <select name="method"><option value="bit">ביט</option><option value="paybox">PayBox</option>${pm.bankAccount ? `<option value="bank">העברה בנקאית</option>` : ""}</select></label>
+      <button class="btn primary" type="submit">שילמתי — הפעילו לי גישה</button>
+      <p class="form-msg" aria-live="polite"></p>
+    </form>
+    <p class="muted small">התשלום נבדק ידנית ותקבלו אישור. ביטול תוך 14 יום לפי <a href="#/terms">התקנון</a>.</p></section>`);
+  $("#payForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    const methodHe = { bit: "ביט", paybox: "PayBox", bank: "העברה בנקאית" }[fd.method] || fd.method;
+    const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+    const lead = { name: fd.name, phone: fd.phone, email: S.user?.email || "", grade: S.user?.grade || "", msg: `דיווח תשלום: ${label}${amount ? ` (₪${amount})` : ""} · שולם ב${methodHe} · ממתין להפעלת PRO`, source: "payment", page: location.hash, uid: S.user?.uid || null };
+    try { await S.store.leads.add(lead); } catch (err) { console.warn(err); }
+    if (CONFIG.leadsEndpoint) { try { await fetch(CONFIG.leadsEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: `דיווח תשלום: ${fd.name} — ${label}`, ...lead }) }); } catch (err) { console.warn(err); } }
+    const wa = CONFIG.mentor?.whatsapp;
+    if (wa) window.open(`https://wa.me/${esc(wa)}?text=${encodeURIComponent(`שילמתי על ${label}${amount ? ` (₪${amount})` : ""} ב${methodHe}. שם: ${fd.name}. אפשר להפעיל לי גישה?`)}`, "_blank");
+    e.target.querySelector(".form-msg").textContent = "תודה! קיבלתי את הדיווח ואפעיל את הגישה בהקדם.";
+    toast("הדיווח נשלח 🙌", "ok");
+  };
+}
+function paid() {
+  nav();
+  const m = CONFIG.mentor || {};
+  setView(`<section class="auth"><h1>תודה! התשלום התקבל ✅</h1>
+    <p>קיבלנו את התשלום. אני מפעיל לך את הגישה (PRO) ידנית — בדרך כלל תוך כמה שעות, ותקבל/י הודעה.${S.user ? "" : " אם עדיין לא נרשמת לאפליקציה, כדאי להירשם עכשיו עם אותו אימייל."}</p>
+    <p class="muted small">אם משהו לא נפתח תוך 24 שעות, כתבו לי ואבדוק: ${m.phone ? `<span dir="ltr">${esc(m.phone)}</span> · ` : ""}<span dir="ltr">${esc(m.email || "")}</span>.</p>
+    <div class="cta-row">${S.user ? `<a class="btn primary" href="#/home">למסך הבית</a>` : `<a class="btn primary" href="#/register">הרשמה</a>`}<a class="btn" href="#/contact">יצירת קשר</a></div></section>`);
 }
 function terms() {
   nav();
@@ -668,6 +718,8 @@ async function route() {
       case "settings": return await settings();
       case "more": return more();
       case "terms": return terms();
+      case "paid": return paid();
+      case "pay": return pay(params);
       case "map": return stageMap();
       case "admin": return await admin(seg[1], seg[2]);
       default: return go("#/");
