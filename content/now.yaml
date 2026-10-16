@@ -1,11 +1,11 @@
 # "Currently building" — shown on the home page (first 5) and on /now. Edit this file, rebuild, done.
 asOf: 2026-10-16
 items:
-  - project: projects/8200-prep
-    title: { en: "Ready for 8200", he: "מוכנים ל‑8200" }
+  - project: projects/computer-lessons
+    title: { en: "Private computer lessons", he: "שיעורים פרטיים במחשבים" }
     text:
-      en: "Wiring the live backend and the payment page for the 8200 prep app; first students onboarding on the free tier."
-      he: "מחברים את השרת החי ואת דף התשלום לאפליקציית ההכנה ל-8200; תלמידים ראשונים נכנסים למסלול החינמי."
+      en: "Wiring the live backend and the payment page for the lessons page and practice app; first students booking trial lessons."
+      he: "מחברים את השרת החי ואת דף התשלום לדף השיעורים ולאפליקציית התרגול; תלמידים ראשונים קובעים שיעורי ניסיון."
   - project: projects/rasa
     title: { en: "Rasa", he: "ראסא" }
     text:

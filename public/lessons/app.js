@@ -1,4 +1,4 @@
-// app.js — הניתוב, המסכים והלוגיקה של "מוכנים ל-8200".
+// app.js — הניתוב, המסכים והלוגיקה של דף השיעורים הפרטיים ואפליקציית התרגול.
 import { createStore, isAdminEmail, today, dateKey, emptyProgress } from "./store.js";
 import { CATEGORIES, catById, loadCategory, loadPack, allSubs, pickItems, pickMixed, subStats, masteryOf, md, esc } from "./content.js";
 import { Quiz, summaryHtml } from "./quiz.js";
@@ -70,45 +70,49 @@ async function recordResult(result, { cat, sub } = {}) {
 function landing() {
   nav();
   const m = CONFIG.mentor || {};
-  const steps = [["1", "נרשמים בחינם", "דקה אחת, בלי כרטיס אשראי. מספרים לנו מתי המיונים ואיזה מסלול מעניין."], ["2", "מתאמנים כל יום", "15 שאלות ביום לפי החולשות שלך, בוחני פתע בטלפון, הסברים לכל שאלה."], ["3", "מישהו עוקב", "המלווה רואה את ההתקדמות שלך ומכוון איפה להשקיע — ובליווי אישי גם עוברים יחד על ראיונות."]];
+  const topics = CONFIG.topics || [];
+  const steps = [["1", "שיעור ניסיון בחינם", "30 דקות בזום: מספרים איפה אתם, מה המטרה (בגרות, מיונים, פרויקט, סקרנות), ובודקים שהכימיה עובדת."], ["2", "תוכנית אישית", "מסלול קצר עם יעדים ברורים, ושיעורים אחד על אחד בקצב שלכם — פעם או פעמיים בשבוע."], ["3", "תרגול בין השיעורים", "אפליקציית תרגול חינמית עם בוחני פתע ומעקב התקדמות, כך שאני רואה מה עובד ומה צריך עוד עבודה."]];
   setView(`
     <section class="hero">
-      <p class="eyebrow">הכנה למיוני 8200 · בעברית · מהטלפון</p>
-      <h1>${esc(CONFIG.appName || "מוכנים ל-8200")}</h1>
-      <p class="hero-lead">${esc(CONFIG.tagline || "")}. תרגול לפי שלבי המיון, בוחני פתע, מעקב התקדמות — ומלווה אמיתי שרואה איפה את/ה עומד/ת.</p>
-      <div class="cta-row"><a class="btn primary big" href="#/register">מתחילים בחינם</a><a class="btn big" href="#/login">כבר רשומים? כניסה</a></div>
-      <p class="muted small">מתאים לתלמידי י״א–י״ב לפני המיונים. אפשר להתקין כאפליקציה על הטלפון.</p>
+      <p class="eyebrow">אחד על אחד · בזום או פרונטלי · ${esc(m.name || "")}</p>
+      <h1>${esc(CONFIG.appName || "שיעורים פרטיים במחשבים")}</h1>
+      <p class="hero-lead">${bidi(CONFIG.tagline || "")}.</p>
+      <div class="cta-row"><a class="btn primary big" href="#lead">שיעור ניסיון בחינם</a><a class="btn big" href="#/register">לאפליקציית התרגול</a></div>
+      <p class="muted small">${esc((CONFIG.audiences || []).join(" · "))}</p>
     </section>
     <section class="section">
-      <div class="sec-head"><h2>המסלול, שלב אחרי שלב</h2><a href="#/map" class="small">מפת המיונים המלאה ›</a></div>
-      <div class="cat-grid">${CATEGORIES.map((c) => `<a class="cat-card" href="#/register" style="--c:${c.color}"><span class="cat-emoji">${c.emoji}</span><span class="cat-stage">שלב ${c.stage}</span><strong>${esc(c.title)}</strong><span class="muted small">${esc(c.desc)}</span></a>`).join("")}</div>
+      <h2>מה לומדים</h2>
+      <div class="cat-grid">${topics.map((t) => `<div class="cat-card" style="--c:var(--accent)"><span class="cat-emoji">${t.emoji || "💻"}</span><strong>${bidi(t.title)}</strong><span class="muted small">${bidi(t.desc)}</span></div>`).join("")}</div>
     </section>
     <section class="section">
       <h2>איך זה עובד</h2>
       <div class="steps">${steps.map(([n, t, d]) => `<div class="step"><span class="step-n">${n}</span><strong>${t}</strong><p class="muted">${d}</p></div>`).join("")}</div>
     </section>
-    <section class="section features">
-      <div class="feat"><span>⚡</span><strong>בוחני פתע</strong><p class="muted">התראה בטלפון, 5 שאלות, 2 דקות. ככה נבנית מהירות.</p></div>
-      <div class="feat"><span>📈</span><strong>מעקב התקדמות</strong><p class="muted">רמת שליטה בכל נושא, רצף ימים, זמן ממוצע לשאלה, ומה לחזור עליו.</p></div>
-      <div class="feat"><span>🧑‍🏫</span><strong>מלווה אמיתי</strong><p class="muted">לא רק אפליקציה: אדם שרואה את הנתונים שלך ומכוון.</p></div>
-      <div class="feat"><span>🧩</span><strong>מחולל שאלות</strong><p class="muted">צורות, סדרות וחישוב מהיר — שאלות חדשות בכל פעם, בלי לשנן.</p></div>
-    </section>
     <section class="section mentor" id="mentor">
-      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המלווה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#/contact">לדבר איתי</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהאתר של ההכנה ל-8200")}">וואטסאפ</a>` : ""}</div></div></div>
+      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור ניסיון</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}</div></div></div>
     </section>
     <section class="section" id="testimonials"></section>
+    <section class="section app-teaser">
+      <div class="sec-head"><h2>אפליקציית התרגול — חינם לתלמידים</h2><a href="#/register" class="small">הרשמה ›</a></div>
+      <p class="muted">מתרגלים מהטלפון בין השיעורים, ואני רואה את ההתקדמות בלוח שלי. יש בה גם הכנה מלאה למיונים הטכנולוגיים (8200, ממר״ם, עתודה) לפי שלבי המיון: ${CATEGORIES.map((c) => esc(c.short)).join(", ")}.</p>
+      <div class="features">
+        <div class="feat"><span>⚡</span><strong>בוחני פתע</strong><p class="muted">התראה בטלפון, 5 שאלות, 2 דקות.</p></div>
+        <div class="feat"><span>📈</span><strong>מעקב התקדמות</strong><p class="muted">שליטה בכל נושא, רצף ימים, מה לחזור עליו.</p></div>
+        <div class="feat"><span>🧩</span><strong>620 שאלות + מחוללים</strong><p class="muted">הסבר לכל שאלה; צורות וסדרות בלי סוף.</p></div>
+        <div class="feat"><span>🗺</span><strong>מפת המיונים</strong><p class="muted">מה בודקים בכל שלב, ובדיקת תנאי סף. <a href="#/map">לצפייה</a></p></div>
+      </div>
+    </section>
     <section class="section pricing-teaser">
       <h2>כמה זה עולה?</h2>
-      <p>מתחילים בחינם (עד ${CONFIG.free?.dailyItems || 20} שאלות ביום). PRO פותח את כל המאגר, סימולציות ותרגול חוזר של טעויות החל מ-₪${CONFIG.prices?.monthly} לחודש. ליווי אישי — לפי בקשה.</p>
-      <a class="btn" href="#/pricing">לכל האפשרויות</a>
+      <p>שיעור ניסיון — חינם. שיעור של 50 דקות — ₪${P(CONFIG.prices?.lesson)}; חבילת 10 שיעורים — ₪${P(CONFIG.prices?.pack10)} (כולל אפליקציית התרגול המלאה). <a href="#/pricing">לכל המחירים</a>.</p>
     </section>
-    <section class="section lead" id="lead"><h2>רוצים לדבר לפני שמתחילים?</h2><p class="muted">השאירו פרטים ואחזור אליכם (גם להורים).</p>${leadFormHtml()}</section>
+    <section class="section lead" id="lead"><h2>שיעור ניסיון בחינם</h2><p class="muted">השאירו פרטים ואחזור אליכם לתיאום (גם להורים). בלי התחייבות.</p>${leadFormHtml()}</section>
     ${footerHtml()}
   `, "landing");
   wireLeadForm();
   S.store.public.getTestimonials().then((items) => { const el = $("#testimonials"); if (!el) return; if (!items?.length) { el.hidden = true; return; } el.innerHTML = `<h2>מה אומרים</h2><div class="testi">${items.map((t) => `<blockquote><p>${esc(t.text)}</p><footer>${esc(t.name)}${t.role ? ` · ${esc(t.role)}` : ""}</footer></blockquote>`).join("")}</div>`; });
 }
-function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")}. האתר אינו קשור לצה״ל או ליחידה 8200; כל התכנים מקוריים ונועדו לתרגול.</span></footer>`; }
+function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")} · שיעורים פרטיים במחשבים. הדף אינו קשור לצה״ל או לאף יחידה; תכני ההכנה למיונים מקוריים ונועדו לתרגול.</span></footer>`; }
 
 function leadFormHtml(prefill = {}) {
   return `<form class="form lead-form" id="leadForm">
@@ -128,7 +132,7 @@ function wireLeadForm() {
     const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
     const lead = { name: fd.name, phone: fd.phone, email: fd.email || "", grade: fd.grade || "", msg: fd.msg || "", source: "site", page: location.hash, uid: S.user?.uid || null };
     try { await S.store.leads.add(lead); } catch (err) { console.warn(err); }
-    if (CONFIG.leadsEndpoint) { try { await fetch(CONFIG.leadsEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: `פנייה חדשה מהאתר 8200: ${fd.name}`, ...lead }) }); } catch (err) { console.warn("lead email", err); } }
+    if (CONFIG.leadsEndpoint) { try { await fetch(CONFIG.leadsEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: `פנייה חדשה — שיעורים פרטיים במחשבים: ${fd.name}`, ...lead }) }); } catch (err) { console.warn("lead email", err); } }
     f.querySelector(".form-msg").textContent = "תודה! הפנייה נשמרה ואחזור אליכם בהקדם.";
     f.reset(); btn.disabled = false;
     toast("הפנייה נשלחה 🙌", "ok");
@@ -139,7 +143,7 @@ function wireLeadForm() {
 function authView(kind) {
   nav();
   const isReg = kind === "register";
-  setView(`<section class="auth"><h1>${isReg ? "הרשמה חינם" : kind === "reset" ? "איפוס סיסמה" : "כניסה"}</h1>
+  setView(`<section class="auth"><h1>${isReg ? "הרשמה לאפליקציית התרגול" : kind === "reset" ? "איפוס סיסמה" : "כניסה"}</h1>${isReg ? `<p class="muted">חינם. תרגול מהטלפון, בוחני פתע ומעקב התקדמות — ואני רואה איפה כדאי לעזור.</p>` : ""}
     ${S.store.mode === "local" ? `<p class="demo-note">מצב הדגמה: החשבון נשמר בדפדפן הזה בלבד.</p>` : ""}
     <form class="form" id="authForm">
       ${isReg ? `<label>שם מלא <input name="name" required autocomplete="name"></label>` : ""}
@@ -231,9 +235,9 @@ async function home() {
       ${next ? `<p class="muted small">המלצה להיום: <a href="#/cat/${next.id}">${esc(next.short)}</a> — הנושא הכי פחות מתורגל.</p>` : ""}
       <p class="small"><a href="#/map">🗺 מפת המיונים — איפה כל נושא נכנס בתהליך</a></p>
     </section>
-    <section class="section mentor-msg"><div class="mentor-card small"><div class="avatar">${esc((CONFIG.mentor?.name || "מ")[0])}</div><div><p class="eyebrow">${esc(CONFIG.mentor?.name || "המלווה")}</p>
-      <p>${u.mentorMessage ? esc(u.mentorMessage) : "אני רואה את ההתקדמות שלך כאן ואשמח לכוון. יש שאלה? רוצה שנעבור יחד על ראיון?"}</p><a class="btn small" href="#/contact">לכתוב למלווה</a></div></div></section>
-    ${!isPro() ? `<section class="section upgrade"><h3>PRO — כל המאגר, סימולציות ותרגול חוזר של טעויות</h3><p class="muted">מ-₪${CONFIG.prices?.monthly} לחודש, או ₪${CONFIG.prices?.season} עד המיונים.</p><a class="btn primary" href="#/pricing">לפרטים</a></section>` : ""}
+    <section class="section mentor-msg"><div class="mentor-card small"><div class="avatar">${esc((CONFIG.mentor?.name || "מ")[0])}</div><div><p class="eyebrow">${esc(CONFIG.mentor?.name || "המורה")}</p>
+      <p>${u.mentorMessage ? esc(u.mentorMessage) : "אני רואה את ההתקדמות שלך כאן ואשמח לכוון. רוצה שיעור על משהו שתקוע? כתוב/כתבי לי."}</p><a class="btn small" href="#/contact">לכתוב למורה</a></div></div></section>
+    ${!isPro() ? `<section class="section upgrade"><h3>רוצים שיעור על מה שתקוע?</h3><p class="muted">שיעור ניסיון בחינם, ו-PRO לאפליקציה (כל המאגר, סימולציות, תרגול חוזר) מ-₪${CONFIG.prices?.monthly} לחודש — כלול בחבילות השיעורים.</p><a class="btn primary" href="#/pricing">לשיעורים ולמחירים</a></section>` : ""}
     ${S.deferredInstall ? `<section class="section install"><p>📲 אפשר להתקין את האפליקציה על הטלפון ולקבל בוחני פתע.</p><button class="btn" id="installBtn">התקנה</button></section>` : ""}
     <p class="muted small center" style="margin-top:2rem"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a></p>
   `);
@@ -341,7 +345,7 @@ function runQuiz({ items, title, mode, immediate, timeLimitSec, cat, sub, back, 
 }
 function upgradePrompt(title, text) {
   nav();
-  setView(`<section class="auth"><h1>${esc(title)}</h1><p>${esc(text)}</p><div class="cta-row"><a class="btn primary" href="#/pricing">לראות את PRO</a><a class="btn" href="#/home">חזרה</a></div></section>`);
+  setView(`<section class="auth"><h1>${esc(title)}</h1><p>${esc(text)}</p><div class="cta-row"><a class="btn primary" href="#/pricing">לשיעורים ול-PRO</a><a class="btn" href="#/home">חזרה</a></div></section>`);
 }
 
 // ---------- progress ----------
@@ -380,30 +384,37 @@ async function profile() {
 }
 
 // ---------- pricing / contact / settings / terms / more ----------
+const P = (n) => Number(n || 0).toLocaleString("en-US");
 function pricing() {
   nav();
   const pr = CONFIG.prices || {}; const pl = CONFIG.payLinks || {};
-  const btn = (key, label, cls = "") => pl[key] ? `<a class="btn ${cls}" target="_blank" rel="noopener" href="${esc(pl[key])}">${label}</a>` : (S.store.mode === "local" && S.user && key !== "mentoring" ? `<button class="btn ${cls}" data-demo-pro="${key}">${label} (הדגמה)</button>` : `<a class="btn ${cls}" href="#/contact?plan=${key}">${label}</a>`);
-  setView(`<section class="pricing"><h1>מסלולים</h1><p class="muted">מתחילים בחינם. משדרגים כשמרגישים שזה עובד.</p>
+  const btn = (key, label, cls = "") => pl[key] ? `<a class="btn ${cls}" target="_blank" rel="noopener" href="${esc(pl[key])}">${label}</a>` : (S.store.mode === "local" && S.user && ["monthly", "season"].includes(key) ? `<button class="btn ${cls}" data-demo-pro="${key}">${label} (הדגמה)</button>` : `<a class="btn ${cls}" href="#/contact?plan=${key}">${label}</a>`);
+  setView(`<section class="pricing"><h1>מחירים</h1><p class="muted">מתחילים בשיעור ניסיון חינם. המחירים כוללים הכול (עוסק פטור — ללא מע״מ).</p>
+    <h2>שיעורים פרטיים</h2>
     <div class="plans">
-      <div class="plan"><h3>חינם</h3><div class="price">₪0</div><ul><li>עד ${CONFIG.free?.dailyItems || 20} שאלות ביום</li><li>כל הנושאים, חלק מהמאגר</li><li>מחוללי צורות, סדרות וחישוב</li><li>מעקב התקדמות בסיסי</li></ul>${S.user ? `<a class="btn" href="#/home">ממשיכים בחינם</a>` : `<a class="btn" href="#/register">הרשמה</a>`}</div>
-      <div class="plan hi"><span class="tag">הכי פופולרי</span><h3>PRO</h3><div class="price">₪${pr.monthly}<small>/חודש</small></div><p class="muted small">או ₪${pr.season} לעונה (6 חודשים) — חוסך ${Math.round((1 - pr.season / (pr.monthly * 6)) * 100)}%</p><ul><li>ללא הגבלת שאלות</li><li>כל המאגר (מאות שאלות + מחוללים)</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר אוטומטי של טעויות</li><li>פרופיל אישיות מלא</li><li>המלווה עוקב אחרי ההתקדמות</li></ul><div class="cta-col">${btn("monthly", "חודשי", "primary")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
-      <div class="plan"><h3>ליווי אישי</h3><div class="price">₪${pr.mentoring}</div><ul><li>כל מה שב-PRO לעונה</li><li>4 מפגשים אישיים (וידאו/פרונטלי)</li><li>סימולציית ראיון אישי + משוב</li><li>תוכנית אישית לפי תאריך המיונים</li><li>וואטסאפ פתוח לשאלות</li></ul>${btn("mentoring", "לתאם שיחה")}</div>
+      <div class="plan"><h3>שיעור ניסיון</h3><div class="price">₪0</div><ul><li>30 דקות בזום</li><li>מבינים איפה אתם ומה המטרה</li><li>בלי התחייבות</li></ul><a class="btn primary" href="#/contact?plan=trial">לתאם</a></div>
+      <div class="plan"><h3>שיעור בודד</h3><div class="price">₪${P(pr.lesson)}<small>/50 דק׳</small></div><ul><li>אחד על אחד, בזום או פרונטלי</li><li>חומר וסיכום אחרי כל שיעור</li><li>גישה לאפליקציית התרגול (חינם)</li></ul>${btn("lesson", "לתאם שיעור")}</div>
+      <div class="plan hi"><span class="tag">הכי משתלם</span><h3>חבילת 10 שיעורים</h3><div class="price">₪${P(pr.pack10)}<small> · ₪${P(Math.round(pr.pack10 / 10))} לשיעור</small></div><p class="muted small">או 5 שיעורים — ₪${P(pr.pack5)}</p><ul><li>תוכנית אישית עם יעדים</li><li>וואטסאפ פתוח לשאלות בין השיעורים</li><li>PRO לעונה באפליקציית התרגול — כלול</li><li>תוקף 6 חודשים</li></ul><div class="cta-col">${btn("pack10", "חבילת 10", "primary")}${btn("pack5", "חבילת 5 — ₪" + pr.pack5)}</div></div>
     </div>
-    <p class="muted small">המחירים כוללים הכול (עוסק פטור — ללא מע״מ). ביטול תוך 14 יום מההצטרפות לפי חוק הגנת הצרכן. <a href="#/terms">לתקנון</a>.</p>
-    ${!S.user ? `<p><a class="btn primary" href="#/register">מתחילים בחינם</a></p>` : ""}
+    <h2>הכנה למיונים טכנולוגיים</h2>
+    <div class="plans">
+      <div class="plan"><h3>חבילת הכנה למיונים</h3><div class="price">₪${P(pr.mentoring)}</div><ul><li>4 שיעורים אישיים לפי שלבי המיון</li><li>סימולציית ראיון אישי + משוב</li><li>PRO לעונה באפליקציית התרגול</li><li>תוכנית לפי תאריך המיונים שלך</li></ul>${btn("mentoring", "לתאם שיחה")}</div>
+      <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>ללא הגבלת שאלות (חינם: ${CONFIG.free?.dailyItems || 20} ביום)</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
+    </div>
+    <p class="muted small">ביטול תוך 14 יום לפי חוק הגנת הצרכן; מנוי חודשי ניתן לביטול בכל עת; שיעור ניתן להזזה עד 2 ימי עבודה לפני. <a href="#/terms">לתקנון</a>.</p>
   </section>`);
   document.querySelectorAll("[data-demo-pro]").forEach((b) => { b.onclick = async () => { const until = Date.now() + (b.dataset.demoPro === "season" ? 183 : 31) * 864e5; await S.store.users.update(S.user.uid, { plan: "pro", planUntil: until, planSource: "demo" }); toast("PRO הופעל (הדגמה) ✨", "ok"); go("#/home"); }; });
 }
+const PLAN_LABELS = { trial: "שיעור ניסיון", lesson: "שיעור בודד", pack5: "חבילת 5 שיעורים", pack10: "חבילת 10 שיעורים", mentoring: "חבילת הכנה למיונים", monthly: "PRO חודשי באפליקציה", season: "PRO לעונה באפליקציה" };
 function contact(params) {
   nav();
   const plan = params?.get("plan"); const cancel = params?.get("cancel");
-  setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המלווה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך מסלול <b>${plan === "mentoring" ? "ליווי אישי" : "PRO"}</b> — השאירו פרטים ואחזור עם כל הפרטים והתשלום.` : "שאלות, ליווי אישי, או סתם להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
-    ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהאפליקציה של ההכנה ל-8200")}">💬 וואטסאפ</a>` : ""}
-    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("הכנה ל-8200")}">✉️ אימייל</a>` : ""}
+  setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המורה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך <b>${PLAN_LABELS[plan] || plan}</b> — השאירו פרטים ואחזור לתיאום.` : "שיעור ניסיון, שאלות, או סתם להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
+    ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">💬 וואטסאפ</a>` : ""}
+    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("שיעורים פרטיים במחשבים")}">✉️ אימייל</a>` : ""}
     ${leadFormHtml({ name: S.user?.name, phone: S.user?.phone, email: S.user?.email })}
   </section>`);
-  if (plan) { const ta = $("#leadForm textarea"); if (ta) ta.value = `מעניין אותי המסלול: ${plan === "mentoring" ? "ליווי אישי" : plan === "season" ? "PRO לעונה" : "PRO חודשי"}`; }
+  if (plan) { const ta = $("#leadForm textarea"); if (ta) ta.value = `מעניין אותי: ${PLAN_LABELS[plan] || plan}`; }
   if (cancel) { const ta = $("#leadForm textarea"); if (ta) ta.value = `בקשת ביטול: ${S.user ? `החשבון ${S.user.email}` : "(כתבו את האימייל של החשבון)"} — `; }
   wireLeadForm();
 }
@@ -434,14 +445,14 @@ function more() {
   if (!requireUser()) return;
   nav("#/more");
   setView(`<section><h1>עוד</h1><div class="menu">
-    <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 מסלולים ו-PRO</a><a href="#/contact">💬 לדבר עם המלווה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a><a href="#/contact?cancel=1">✂️ ביטול מנוי / עסקה</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
+    <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 שיעורים ומחירים</a><a href="#/contact">💬 לדבר עם המורה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a><a href="#/contact?cancel=1">✂️ ביטול מנוי / עסקה</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
   </div>${footerHtml()}</section>`);
 }
 function terms() {
   nav();
   setView(`<article class="lesson"><h1>תקנון ומדיניות פרטיות</h1><div class="prose">${md(`
 ## מי אנחנו
-"${CONFIG.appName || "מוכנים ל-8200"}" הוא שירות הכנה פרטי לתרגול לקראת מיונים טכנולוגיים בצה״ל, שמפעיל ${CONFIG.mentor?.name || ""} (עוסק פטור, ישראל). השירות **אינו קשור** לצה״ל, ליחידה 8200 או לכל גוף רשמי, ואינו מתיימר לשחזר מבחנים אמיתיים. כל התכנים מקוריים ונועדו לתרגול בלבד.
+"${CONFIG.appName || "שיעורים פרטיים במחשבים"}" הוא שירות שיעורים פרטיים במחשבים ותכנות, יחד עם אפליקציית תרגול (כולל הכנה למיונים טכנולוגיים), שמפעיל ${CONFIG.mentor?.name || ""} (עוסק פטור, ישראל). השירות **אינו קשור** לצה״ל, לאף יחידה או לכל גוף רשמי, ואינו מתיימר לשחזר מבחנים אמיתיים. כל תכני התרגול מקוריים.
 
 ## הרשמה וקטינים
 השירות מיועד לבני 16 ומעלה. משתמש/ת מתחת לגיל 18 נרשם/ת באישור הורה או אפוטרופוס, והתשלום (אם יש) מתבצע על ידם. בהרשמה נשמרים: שם, אימייל, טלפון (לא חובה), כיתה ותאריך משוער של המיונים.
@@ -459,7 +470,7 @@ function terms() {
 - **ביטול תוך 14 יום** מיום ההצטרפות (מכר מרחוק): החזר מלא בניכוי דמי ביטול של עד 5% מהמחיר או 100 ₪, הנמוך מביניהם. ההחזר מבוצע תוך 14 יום.
 - **מנוי חודשי מתחדש** הוא עסקה מתמשכת: אפשר לבטל **בכל עת** — בטופס "ביטול מנוי" שבעמוד הבית, במייל או בוואטסאפ. החיוב נפסק תוך 3 ימי עסקים ממועד הבקשה, ומשלמים רק על התקופה שנוצלה.
 - **חבילת עונה (6 חודשים)** היא עסקה לתקופה קצובה: היא מסתיימת בסופה ואינה מתחדשת אוטומטית.
-- **מפגש ליווי** ניתן לביטול או להזזה עד 2 ימי עבודה לפני מועדו; מפגש שלא בוטל בזמן נחשב כמנוצל.
+- **שיעור** ניתן לביטול או להזזה עד 2 ימי עבודה לפני מועדו; שיעור שלא בוטל בזמן נחשב כמנוצל. חבילת שיעורים תקפה 6 חודשים; ביטול חבילה אחרי 14 יום — החזר יחסי על השיעורים שלא נוצלו בניכוי שיעורים שנוצלו לפי מחיר שיעור בודד.
 
 ביטול = הודעה למלווה בכל אחת מהדרכים; תתקבל הודעת אישור במייל.
 
@@ -593,7 +604,7 @@ async function enableNotifications() {
   const token = await S.store.push.enable(S.user.uid);
   toast(token ? "התראות הופעלו — גם כשהאפליקציה סגורה ✓" : "התראות הופעלו (כשהאפליקציה פתוחה) ✓", "ok");
   const reg = await navigator.serviceWorker?.getRegistration();
-  reg?.showNotification?.("מוכנים ל-8200", { body: "מעולה! מכאן יגיעו בוחני הפתע ⚡", icon: "./icons/icon-192.png", tag: "welcome" });
+  reg?.showNotification?.(CONFIG.appName || "אפליקציית התרגול", { body: "מעולה! מכאן יגיעו בוחני הפתע ⚡", icon: "./icons/icon-192.png", tag: "welcome" });
   if (location.hash.startsWith("#/settings")) settings();
 }
 function offerNotifications() {
@@ -620,6 +631,12 @@ function applyTheme() { const t = S.progress.settings?.theme || "auto"; if (t ==
 //  Router
 // ============================================================
 async function route() {
+  if (location.hash && !location.hash.startsWith("#/")) { // in-page anchor on the landing page (e.g. #lead)
+    const id = location.hash.slice(1);
+    if (!document.getElementById(id)) { if (S.quiz) { S.quiz.destroy(); S.quiz = null; } landing(); }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
   const raw = location.hash.replace(/^#\/?/, "");
   const [path, qs] = raw.split("?"); const params = new URLSearchParams(qs || "");
   const seg = path.split("/").filter(Boolean);
@@ -654,7 +671,7 @@ async function route() {
 }
 
 async function boot() {
-  $("#appName").textContent = CONFIG.appName || "מוכנים ל-8200";
+  $("#appName").textContent = CONFIG.appName || "שיעורים פרטיים במחשבים";
   S.store = await createStore();
   if (S.store.mode === "error") { setView(`<section class="auth"><h1>השירות לא זמין כרגע</h1><p class="muted">לא הצלחנו להתחבר לשרת. נסו לרענן בעוד כמה דקות.</p></section>`); return; }
   if (S.store.mode === "local") $("#demoBanner").hidden = false;

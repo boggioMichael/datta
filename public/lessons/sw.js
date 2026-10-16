@@ -1,5 +1,5 @@
 /* service worker — מטמון לאפליקציה (עובדת גם בלי רשת) + התראות push */
-const VERSION = "8200-v4";
+const VERSION = "lessons-v1";
 const SHELL = ["./", "./index.html", "./app.css", "./app.js", "./config.js", "./store.js", "./content.js", "./quiz.js", "./gen.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "../fonts/assistant.woff2", "../fonts/frankruhllibre.woff2", "../fonts/plexmono-regular.woff2", "../fonts/plexmono-medium.woff2"];
 
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL).catch(() => {})).then(() => self.skipWaiting())); });
@@ -11,7 +11,7 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Firebase/CDN: network only
   // data packs: network first, fallback cache
-  if (url.pathname.includes("/8200/data/")) {
+  if (url.pathname.includes("/lessons/data/")) {
     e.respondWith(fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res; }).catch(() => caches.match(req)));
     return;
   }
@@ -25,7 +25,7 @@ self.addEventListener("fetch", (e) => {
 // Web Push (FCM שולח payload עם notification או data)
 self.addEventListener("push", (e) => {
   let data = {};
-  try { data = e.data ? e.data.json() : {}; } catch { data = { notification: { title: "מוכנים ל-8200", body: e.data?.text() } }; }
+  try { data = e.data ? e.data.json() : {}; } catch { data = { notification: { title: "שיעורים פרטיים במחשבים", body: e.data?.text() } }; }
   const n = data.notification || {};
   const d = data.data || {};
   const title = n.title || d.title || "⚡ בוחן פתע!";
@@ -37,7 +37,7 @@ self.addEventListener("notificationclick", (e) => {
   e.notification.close();
   const target = e.notification.data?.url || "#/surprise";
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-    for (const c of list) { if (c.url.includes("/8200/")) { c.focus(); c.postMessage({ url: target }); return; } }
+    for (const c of list) { if (c.url.includes("/lessons/")) { c.focus(); c.postMessage({ url: target }); return; } }
     return self.clients.openWindow(new URL(target.startsWith("#") ? "./" + target : target, self.registration.scope).href);
   }));
 });

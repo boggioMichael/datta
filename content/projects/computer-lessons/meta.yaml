@@ -1,0 +1,44 @@
+title: { en: "Private computer lessons", he: "שיעורים פרטיים במחשבים" }
+subtitle: { en: "One-to-one lessons in programming and systems, with a free practice app that includes full prep for the IDF technological screenings.", he: "שיעורים אחד על אחד בתכנות ובמערכות, עם אפליקציית תרגול חינמית שכוללת הכנה מלאה למיונים הטכנולוגיים." }
+summary:
+  en: "Michael's tutoring practice: Python and intro to programming, C/C++, Linux, Android, high-school computer science, and preparation for the technological unit screenings (8200, Mamram) — over Zoom or in person, with a mobile practice app and a progress dashboard."
+  he: "השיעורים הפרטיים של מיכאל: Python ומבוא לתכנות, C/C++, Linux, Android, מדעי המחשב לתיכון והכנה למיוני היחידות הטכנולוגיות (8200, ממר״ם) — בזום או פרונטלי, עם אפליקציית תרגול לטלפון ולוח מעקב."
+category: { en: "Education · teaching", he: "חינוך · הוראה" }
+status: live
+started: "2026-10"
+updated: "2026-10-16"
+featured: true
+weight: 2
+order: 2
+accent: "#C8431F"
+milestone:
+  en: "Page and practice app live at /lessons — free trial lesson; payments being wired"
+  he: "הדף ואפליקציית התרגול באוויר ב-/lessons — שיעור ניסיון חינם; הסליקה בחיבור"
+website: https://boggiomichael.github.io/datta/lessons/
+languages: ["Hebrew", "Python", "C", "C++", "JavaScript"]
+builtLevels:
+  built:
+    en:
+      - "Lesson page: topics, how it works, pricing, trial-lesson form"
+      - "Practice app: six categories mapped to the screening stages, ~620 original questions with explanations, unlimited generated drills, surprise quizzes, timed simulations, progress per topic"
+      - "Teacher dashboard: every student's accuracy per topic, notes, plan activation, leads"
+      - "Installable on the phone (PWA)"
+    he:
+      - "דף השיעורים: נושאים, איך זה עובד, מחירים, טופס שיעור ניסיון"
+      - "אפליקציית תרגול: שש קטגוריות לפי שלבי המיון, כ-620 שאלות מקוריות עם הסברים, מחוללים ללא הגבלה, בוחני פתע, סימולציות עם שעון, התקדמות לפי נושא"
+      - "לוח מורה: הדיוק של כל תלמיד/ה לפי נושא, הערות, הפעלת מנוי, פניות"
+      - "ניתנת להתקנה על הטלפון (PWA)"
+  prototyped:
+    en:
+      - "Live mode on Firebase (auth, database, push notifications) — one config file away"
+      - "Checkout for lesson packages and the app subscription through an Israeli payment page"
+    he:
+      - "מצב חי על Firebase (הזדהות, מסד נתונים, התראות) — קובץ הגדרות אחד מההפעלה"
+      - "רכישת חבילות שיעורים ומנוי לאפליקציה דרך דף תשלום ישראלי"
+  vision:
+    en:
+      - "Push-driven micro-drills that adapt to each student's weak spots"
+      - "Small group workshops before screening season"
+    he:
+      - "מיקרו-אימונים בהתראות שמתאימים את עצמם לחולשות של כל תלמיד/ה"
+      - "סדנאות קטנות לפני עונת המיונים"
