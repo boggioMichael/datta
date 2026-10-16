@@ -76,7 +76,7 @@ function landing() {
       <p class="muted small">מתאים לתלמידי י״א–י״ב לפני המיונים. אפשר להתקין כאפליקציה על הטלפון.</p>
     </section>
     <section class="section">
-      <h2>המסלול, שלב אחרי שלב</h2>
+      <div class="sec-head"><h2>המסלול, שלב אחרי שלב</h2><a href="#/map" class="small">מפת המיונים המלאה ›</a></div>
       <div class="cat-grid">${CATEGORIES.map((c) => `<a class="cat-card" href="#/register" style="--c:${c.color}"><span class="cat-emoji">${c.emoji}</span><span class="cat-stage">שלב ${c.stage}</span><strong>${esc(c.title)}</strong><span class="muted small">${esc(c.desc)}</span></a>`).join("")}</div>
     </section>
     <section class="section">
@@ -221,6 +221,7 @@ async function home() {
     <section class="section"><div class="sec-head"><h2>מסלול ההכנה</h2><a href="#/train" class="muted small">כל הנושאים</a></div>
       <div class="cat-list">${catMastery.map(({ c, m }) => `<a class="cat-row" href="#/cat/${c.id}" style="--c:${c.color}"><span class="cat-emoji">${c.emoji}</span><span class="cat-main"><strong>${esc(c.title)}</strong><span class="bar"><i style="width:${Math.round(m * 100)}%"></i></span></span><span class="cat-pct">${Math.round(m * 100)}%</span></a>`).join("")}</div>
       ${next ? `<p class="muted small">המלצה להיום: <a href="#/cat/${next.id}">${esc(next.short)}</a> — הנושא הכי פחות מתורגל.</p>` : ""}
+      <p class="small"><a href="#/map">🗺 מפת המיונים — איפה כל נושא נכנס בתהליך</a></p>
     </section>
     <section class="section mentor-msg"><div class="mentor-card small"><div class="avatar">${esc((CONFIG.mentor?.name || "מ")[0])}</div><div><p class="eyebrow">${esc(CONFIG.mentor?.name || "המלווה")}</p>
       <p>${u.mentorMessage ? esc(u.mentorMessage) : "אני רואה את ההתקדמות שלך כאן ואשמח לכוון. יש שאלה? רוצה שנעבור יחד על ראיון?"}</p><a class="btn small" href="#/contact">לכתוב למלווה</a></div></div></section>
@@ -421,7 +422,7 @@ function more() {
   if (!requireUser()) return;
   nav("#/more");
   setView(`<section><h1>עוד</h1><div class="menu">
-    <a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 מסלולים ו-PRO</a><a href="#/contact">💬 לדבר עם המלווה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
+    <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 מסלולים ו-PRO</a><a href="#/contact">💬 לדבר עם המלווה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
   </div>${footerHtml()}</section>`);
 }
 function terms() {
@@ -449,6 +450,29 @@ function terms() {
 ${CONFIG.mentor?.email || ""}
 
 _עודכן: אוקטובר 2026._`)}</div></article>`);
+}
+
+
+// ---------- מפת המיונים ----------
+const STAGES = [
+  { n: "0", t: "צו ראשון", when: "כיתה י״א (מגיל 16.5)", what: "בדיקה רפואית (פרופיל), דפ״ר — מבחן פסיכוטכני ממוחשב (אנלוגיות מילוליות וצורניות, חשיבה צורנית, הוראות, כמותי; קשב מתמשך נמדד בנפרד) וראיון אישי (קב״א).", cat: "dapar", tip: "הציון כאן פותח או סוגר דלתות לכל ההמשך — זה השלב שהכי שווה להתאמן אליו מוקדם." },
+  { n: "0.5", t: "יום המא״ה", when: "אחרי צו ראשון", what: "יום מיון מהבית בזום (5–7 שעות, קבוצות קטנות): מבחנים ממוחשבים של עיבוד מידע, קשב מתמשך, תפיסה מרחבית וניהול וארגון; דינמיקה קבוצתית; תרגיל הדרכה קצר; סימולציות והצגה עצמית.", cat: "learning", tip: "קשב, מהירות ועבודה בקבוצה — מתרגלים אצלנו ב'יכולת למידה' וב'דינמיקה קבוצתית'." },
+  { n: "1", t: "שאלון מקוון (גאמ״א סייבר / מסלולים טכנולוגיים)", when: "סוף י״א – תחילת י״ב (זימונים יולי–אוקטובר)", what: "שאלון באזור האישי: רקע אישי, פרויקטים, תחביבים, שפות, ורשימת מושגים טכנולוגיים שמכירים. ממנו נגזר מה ייבחן בהמשך. תנאי סף מדווחים: דפ״ר 60+, פרופיל 25+, 5 יח״ל מחשבים (או רקע שקול).", cat: null, tip: "לענות בכנות — מה שמסמנים נבדק אחר כך. GitHub עם פרויקטים אמיתיים עוזר." },
+  { n: "2", t: "כנס המבחנים", when: "3–4 שבועות אחרי השאלון", what: "יום מבחנים במתקן: (א) מבחני למידת חומר חדש — 'מחשבון קרב' (שפת מכונה מומצאת) ו'רשתות מומצאת' (פרוטוקול מומצא); (ב) מבחן ידע מקצועי רב-פרקי (רשתות, Linux, Python, C ועוד); (ג) שאלון 300 — שאלון אישיות ואמינות.", cat: "learning", tip: "'מחשבון קרב' יושב אצלנו כמחולל אינסופי ב'יכולת למידה'; שאלון 300 מתורגל ב'אישיות'." },
+  { n: "3", t: "הסדנה המעשית", when: "2–8 שבועות אחרי הכנס", what: "7–8 שעות במתקן: פיתוח תוכנה מונחה עצמים ותרגיל BlackBox בסגנון CTF בשלבים עולים.", cat: "coding", tip: "יסודות התכנות וחשיבה אלגוריתמית — 'מבוא לתכנות'. מי שמכוון לכאן צריך גם תרגול קוד אמיתי מעבר לאפליקציה; זה מה שעושים בליווי." },
+  { n: "4", t: "ראיונות", when: "3–8 שבועות אחרי הסדנה", what: "ראיון מקצועי (משימות קוד וחידות לוגיקה) וראיון אישי/אישיותי (שיחה, שאלונים, לעיתים עם פסיכולוג).", cat: "interview", tip: "STAR, הסיפור שלך ב-60 שניות, ושאלות המצב — הכול ב'ראיונות'." },
+  { n: "5", t: "תחקיר וסיווג ביטחוני", when: "בסוף", what: "שאלון מפורט וראיון אימות; פנייה לאנשי קשר.", cat: "interview", tip: "כנות ועקביות. אין מה 'להתכונן' חוץ מלהיות מסודרים ואמיתיים." },
+];
+function stageMap() {
+  nav(S.user ? "#/train" : undefined);
+  setView(`<section class="lesson"><a class="back" href="${S.user ? "#/home" : "#/"}">‹ חזרה</a><p class="eyebrow">מפת המיונים</p><h1>איך נראה התהליך — שלב אחרי שלב</h1>
+    <p class="muted">מבוסס על מידע פומבי של חברות הכנה, בוגרים וכתבות (אוקטובר 2026). צה״ל לא מפרסם את תוכן המיונים, והפרטים משתנים בין מסלולים ומחזורים — זו מפה, לא מפת דרכים רשמית.</p>
+    <div class="stages">${STAGES.map((st) => `<div class="stage"><div class="stage-n">${st.n}</div><div><h3>${esc(st.t)}</h3><p class="muted small">${esc(st.when)}</p><p>${esc(st.what)}</p><p class="stage-tip">💡 ${esc(st.tip)}</p>${st.cat && S.user ? `<a class="btn small" href="#/cat/${st.cat}">לתרגול: ${esc(catById(st.cat).short)}</a>` : ""}</div></div>`).join("")}</div>
+    <div class="section"><h2>מסלולים אחרים שנפתחים מאותה נקודה</h2><ul class="prose"><li><b>כלל חמ״ן</b> (מודיעין: מחקר, פענוח, שפות): דפ״ר 70+ מדווח; יום מבחנים ממוחשב (הוראות, אנלוגיות, הבנת הנקרא, כמותי, רצפים, ראייה מרחבית) + שאלון 300 → ראיון → סיווג.</li><li><b>מקצועות המחשב</b> (ממר״ם, מצו״ב, לוטם): מבחן ארוך מהבית (לוגיקה, מתמטיקה, אנגלית, שפת קוד מומצאת) → יום מיון (תכנות, לוגיקה, דינמיקה) → ראיון; בדרך כלל דצמבר–ינואר של י״ב.</li><li><b>שחקים / חבצלות</b> (עתודה אקדמית): דפ״ר גבוה מאוד, 5 יח״ל מתמטיקה; יום מבחנים (שפה ומתמטיקה מומצאות, הבנת קוד), סדנה, דינמיקה, ראיונות.</li></ul></div>
+    <div class="section"><h2>בדיקת תנאי סף (לפי מידע פומבי)</h2><form class="form" id="eligForm"><div class="row2"><label>דפ״ר <select name="dapar">${[0,10,20,30,40,50,60,70,80,90].map((v)=>`<option value="${v}" ${v===60?"selected":""}>${v||"עוד לא קיבלתי"}</option>`).join("")}</select></label><label>פרופיל רפואי <select name="profile">${[0,21,24,25,45,64,72,82,97].map((v)=>`<option value="${v}" ${v===82?"selected":""}>${v||"עוד לא"}</option>`).join("")}</select></label></div><div class="row2"><label>יח״ל מחשבים <select name="cs">${[0,1,3,5].map((v)=>`<option value="${v}">${v}</option>`).join("")}</select></label><label>יח״ל מתמטיקה <select name="math">${[3,4,5].map((v)=>`<option value="${v}" ${v===4?"selected":""}>${v}</option>`).join("")}</select></label></div><button class="btn primary" type="submit">בדיקה</button><div id="eligOut"></div></form></div>
+    <p class="muted small">מספרי הסף מדווחים על ידי חברות הכנה ובוגרים ואינם רשמיים; הצבא מזמן גם לפי צרכים, ומי שעומד בסף ולא זומן יכול לפנות למוקד המתגייסים.</p>
+  </section>`);
+  $("#eligForm").onsubmit = (e) => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target).entries()); const d = +fd.dapar, p = +fd.profile, cs = +fd.cs, m = +fd.math; const rows = [["גאמ״א סייבר (8200 טכנולוגי)", d >= 60 && p >= 25 && (cs >= 5), "דפ״ר 60+, פרופיל 25+, 5 יח״ל מחשבים (או רקע שקול — אפשר להראות פרויקטים)"], ["כלל חמ״ן (מודיעין)", d >= 70 && m >= 4, "דפ״ר 70+, 4 יח״ל מתמטיקה"], ["מקצועות המחשב", d >= 50 && p >= 45, "פרופיל ודפ״ר מספיקים; ללא דרישת ידע מוקדם"], ["שחקים / חבצלות", d >= 80 && m >= 5, "דפ״ר 80+ (מדווח גם 90), 5 יח״ל מתמטיקה"]]; $("#eligOut").innerHTML = `<div class="tbl"><table><thead><tr><th>מסלול</th><th>עומד/ת?</th><th>סף מדווח</th></tr></thead><tbody>${rows.map(([t, ok, c]) => `<tr><td>${t}</td><td>${ok ? "✅ כן" : "➖ עדיין לא / לא ידוע"}</td><td class="small muted">${c}</td></tr>`).join("")}</tbody></table></div>`; };
 }
 
 // ============================================================
@@ -599,6 +623,7 @@ async function route() {
       case "settings": return settings();
       case "more": return more();
       case "terms": return terms();
+      case "map": return stageMap();
       case "admin": return admin(seg[1], seg[2]);
       default: return go("#/");
     }

@@ -340,12 +340,106 @@ export function genMemory(r, difficulty) {
   return { id: uid("gm-pos"), sub: "memory", subTitle: "זיכרון עבודה", type: "mcq", difficulty: d, generated: true, memorize: shown.join(" · "), memorizeSec: 6 + n, q: `מה הייתה המילה ה-${pos} ברשימה?`, options, answer, explanation: `הרשימה לפי הסדר: ${shown.map((w, i) => `${i + 1}. ${w}`).join(", ")}.`, timeSec: 15, tags: ["memory"], pro: false };
 }
 
+
+// ============================================================
+//  6. "מחשבון קרב" — שפת מכונה מומצאת (למידת חומר חדש)
+// ============================================================
+export const KERAV_SPEC = `**מחשבון קרב** הוא מחשב קטן עם שלושה תאים: **A**, **B**, **C**. בתחילת כל תוכנית כל התאים מכילים 0. התוכנית רצה שורה אחרי שורה מלמעלה למטה, אלא אם פקודה אומרת אחרת.
+
+| פקודה | מה היא עושה |
+|---|---|
+| \`TAK A 5\` | שמים את המספר 5 בתא A (הערך הקודם נמחק) |
+| \`PLUS A B\` | מוסיפים לתא A את הערך של B (או מספר): A = A + B |
+| \`MINUS A B\` | מחסירים מתא A את הערך של B (או מספר): A = A − B |
+| \`TIMES A B\` | כופלים את תא A בערך של B (או מספר): A = A × B |
+| \`FLIP A B\` | מחליפים את התוכן של A ו-B |
+| \`DROP A\` | מורידים 1 מתא A |
+| \`HOP 2\` | קופצים לשורה 2 וממשיכים משם |
+| \`HOPZ A 6\` | אם A שווה 0 — קופצים לשורה 6; אחרת ממשיכים לשורה הבאה |
+| \`STOP\` | סוף התוכנית |
+
+השורות ממוספרות מ-1. פקודה שמקבלת שני תאים פועלת תמיד על התא הראשון.`;
+
+function runKerav(lines, cap = 200) {
+  const R = { A: 0, B: 0, C: 0 };
+  const counts = new Array(lines.length).fill(0);
+  let pc = 0, steps = 0;
+  const val = (x) => (x in R ? R[x] : parseInt(x, 10));
+  while (pc < lines.length && steps++ < cap) {
+    counts[pc]++;
+    const [op, a, b] = lines[pc].split(" ");
+    let next = pc + 1;
+    switch (op) {
+      case "TAK": R[a] = parseInt(b, 10); break;
+      case "PLUS": R[a] += val(b); break;
+      case "MINUS": R[a] -= val(b); break;
+      case "TIMES": R[a] *= val(b); break;
+      case "FLIP": { const t = R[a]; R[a] = R[b]; R[b] = t; break; }
+      case "DROP": R[a] -= 1; break;
+      case "HOP": next = parseInt(a, 10) - 1; break;
+      case "HOPZ": if (R[a] === 0) next = parseInt(b, 10) - 1; break;
+      case "STOP": return { R, counts, steps, ok: true };
+    }
+    pc = next;
+  }
+  return { R, counts, steps, ok: steps < cap };
+}
+export function genKerav(r, difficulty) {
+  const d = difficulty || r.int(1, 3);
+  const regs = ["A", "B", "C"];
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const lines = [];
+    if (d === 1) {
+      const n = r.int(4, 6);
+      lines.push(`TAK A ${r.int(2, 9)}`, `TAK B ${r.int(1, 9)}`);
+      while (lines.length < n) { const op = r.pick(["PLUS", "MINUS", "TIMES", "FLIP", "DROP"]); const a = r.pick(regs), b = r.pick(regs.filter((x) => x !== a).concat([String(r.int(1, 5))])); lines.push(op === "DROP" ? `DROP ${a}` : op === "FLIP" ? `FLIP ${a} ${b in {A:1,B:1,C:1} ? b : "C"}` : `${op} ${a} ${b}`); }
+      lines.push("STOP");
+    } else {
+      // loop: count down a register while accumulating
+      const k = r.int(2, d === 2 ? 4 : 6);
+      lines.push(`TAK A ${k}`, `TAK B ${r.int(1, 5)}`);
+      const loopStart = lines.length + 1; // 1-based line number of HOPZ
+      lines.push(`HOPZ A ${loopStart + (d === 3 ? 4 : 3)}`);
+      lines.push(r.pick([`PLUS C B`, `PLUS C A`, `TIMES B 2`, `PLUS B ${r.int(1, 3)}`]));
+      if (d === 3) lines.push(r.pick([`PLUS C ${r.int(1, 3)}`, `MINUS C 1`, `FLIP B C`]));
+      lines.push(`DROP A`);
+      lines.push(`HOP ${loopStart}`);
+      if (d === 3 && r.chance(0.5)) lines.push(`FLIP A C`);
+      lines.push(`STOP`);
+    }
+    const res = runKerav(lines);
+    if (!res.ok) continue;
+    const program = lines.map((l, i) => `${i + 1}. ${l}`).join("\n");
+    const askCount = d >= 2 && r.chance(0.35);
+    let q, correct, distract, expl;
+    if (askCount) {
+      const li = lines.findIndex((l) => l.startsWith("DROP"));
+      correct = res.counts[li];
+      q = `כמה פעמים מתבצעת שורה ${li + 1}?`;
+      distract = [correct + 1, correct - 1, correct + 2];
+      expl = `הלולאה רצה כל עוד A אינו 0. A מתחיל ב-${lines[0].split(" ")[2]} ויורד ב-1 בכל סיבוב, לכן שורה ${li + 1} מתבצעת ${correct} פעמים.`;
+    } else {
+      const reg = d === 1 ? r.pick(regs.filter((x) => res.R[x] !== 0 || r.chance(0.3))) : r.pick(["C", "B", "A"]);
+      correct = res.R[reg];
+      q = `מה הערך של התא ${reg} בסיום התוכנית?`;
+      const others = regs.filter((x) => x !== reg).map((x) => res.R[x]);
+      distract = [...others, correct + 1, correct - 1, correct * 2];
+      expl = d === 1 ? `עוקבים שורה-שורה. בסיום: A=${res.R.A}, B=${res.R.B}, C=${res.R.C}.` : `זו לולאה: שורה ${lines.findIndex((l) => l.startsWith("HOPZ")) + 1} בודקת אם A הוא 0, וכל סיבוב מוריד 1 מ-A. ${res.counts[lines.findIndex((l) => l.startsWith("DROP"))]} סיבובים. בסיום: A=${res.R.A}, B=${res.R.B}, C=${res.R.C}.`;
+    }
+    const distractors = uniqueNums(r, correct, distract.map((v) => () => v).concat([() => correct + 3, () => correct - 2]));
+    const { options, answer } = placeAnswer(r, fmt(correct), distractors.map(fmt));
+    return { id: uid("gk-kr"), sub: "kerav", subTitle: "מחשבון קרב (שפה מומצאת)", type: "mcq", difficulty: d, generated: true, group: "kerav", context: KERAV_SPEC, q: `${q}\n${program}`, options, answer, explanation: expl, timeSec: 45 + d * 30, tags: ["kerav", "learning"], pro: false };
+  }
+  return genKerav(r, 1);
+}
+
 export const GENERATORS = {
   shapes: { title: "צורות", category: "dapar", gen: genShapes, desc: "מטריצות, יוצא דופן וסדרות צורות — מחולל אינסופי" },
   series: { title: "סדרות מספרים (מחולל)", category: "dapar", gen: genSeries, desc: "סדרות חדשות בכל פעם" },
   quick: { title: "חישוב מהיר (מחולל)", category: "dapar", gen: genQuick, desc: "חשבון בלחץ זמן" },
   attention: { title: "קשב וריכוז (מחולל)", category: "learning", gen: genAttention, desc: "השוואת קודים וספירה" },
   memory: { title: "זיכרון עבודה (מחולל)", category: "learning", gen: genMemory, desc: "רשימות לזכור" },
+  kerav: { title: "מחשבון קרב (שפה מומצאת)", category: "learning", gen: genKerav, desc: "לומדים שפת מכונה מומצאת ועוקבים אחרי תוכנית — כמו במבחני למידת חומר חדש" },
 };
 
 export function generate(kind, n = 10, difficulty = 0, seed = Date.now()) {

@@ -205,3 +205,10 @@ main#view { max-width: var(--max); margin: 0 auto; padding: 1.2rem var(--gutter)
 .mini-opts { display: flex; gap: 1rem; margin: .5rem 0; } .mini { width: 76px; text-align: center; font-size: .75rem; color: var(--muted); } .mini svg { width: 64px; height: 64px; border: 2px solid var(--rule-strong); border-radius: 8px; padding: 4px; color: var(--ink); } .mini.right svg { border-color: var(--ok); } .mini.wrong svg { border-color: var(--bad); }
 @media (max-width: 420px) { .brand { font-size: 1rem; } .brand .by { display: none; } }
 .brand { white-space: nowrap; }
+
+/* ---- stage map ---- */
+.stages { display: flex; flex-direction: column; gap: .8rem; margin: 1rem 0; }
+.stage { display: flex; gap: .9rem; background: var(--bg-elev); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem; }
+.stage-n { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 600; font-size: .85rem; }
+.stage h3 { margin-bottom: .1rem; } .stage p { margin-bottom: .4rem; } .stage-tip { background: var(--bg-soft); border-radius: var(--radius-s); padding: .4rem .7rem; font-size: .95rem; }
+.tbl code { white-space: nowrap; }
