@@ -1,6 +1,6 @@
 ## What it is
 
-Private, one-to-one lessons in computers and programming: Python and an introduction to programming, C and C++, Linux and the command line, Android and embedded systems, high-school computer science, and preparation for the screenings of the IDF technological units. Over Zoom or in person, for high-schoolers, pre-draft candidates, first-year students and adults who want to learn to code.
+Private, one-to-one lessons in computers and programming: Python and an introduction to programming, C and C++, Linux and the command line, Android and embedded systems, high-school computer science, a small-group CTF (capture-the-flag) course on legal practice ranges, and preparation for the screenings of the IDF technological units. Over Zoom or in person, for high-schoolers, pre-draft candidates, first-year students and adults who want to learn to code.
 
 The teacher is an engineer with six years of Android and Linux work in C/C++ and a technological-unit background, so the lessons go from "how do I print a list" to how a phone really works.
 

@@ -91,7 +91,7 @@ function landing() {
       <div class="steps">${steps.map(([n, t, d]) => `<div class="step"><span class="step-n">${n}</span><strong>${t}</strong><p class="muted">${d}</p></div>`).join("")}</div>
     </section>
     <section class="section mentor" id="mentor">
-      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}</div></div></div>
+      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}${m.phone ? `<a class="btn" href="tel:${esc(String(m.phone).replace(/[^\d+]/g, ""))}">📞 <span dir="ltr">${esc(m.phone)}</span></a>` : ""}</div><p class="muted small" dir="ltr" style="text-align:start">${esc(m.email || "")}</p></div></div>
     </section>
     <section class="section" id="testimonials"></section>
     <section class="section app-teaser">
@@ -106,7 +106,7 @@ function landing() {
     </section>
     <section class="section pricing-teaser">
       <h2>כמה זה עולה?</h2>
-      <p>שיעור של 50 דקות — ₪${P(CONFIG.prices?.lesson)}; חבילת 10 שיעורים — ₪${P(CONFIG.prices?.pack10)} (כולל אפליקציית התרגול); אפליקציית התרגול לבד — ₪${P(CONFIG.prices?.monthly)} לחודש. <a href="#/pricing">לכל המחירים</a>.</p>
+      <p>שיעור של 50 דקות — ₪${P(CONFIG.prices?.lesson)}; חבילת 10 שיעורים — ₪${P(CONFIG.prices?.pack10)} (כולל אפליקציית התרגול); קורס CTF — ₪${P(CONFIG.prices?.ctf)}; אפליקציית התרגול לבד — ₪${P(CONFIG.prices?.monthly)} לחודש. <a href="#/pricing">לכל המחירים</a>.</p>
     </section>
     <section class="section lead" id="lead"><h2>לתאם שיעור</h2><p class="muted">השאירו פרטים ואחזור אליכם לתיאום השיעור הראשון (גם להורים).</p>${leadFormHtml()}</section>
     ${footerHtml()}
@@ -114,7 +114,7 @@ function landing() {
   wireLeadForm();
   S.store.public.getTestimonials().then((items) => { const el = $("#testimonials"); if (!el) return; if (!items?.length) { el.hidden = true; return; } el.innerHTML = `<h2>מה אומרים</h2><div class="testi">${items.map((t) => `<blockquote><p>${esc(t.text)}</p><footer>${esc(t.name)}${t.role ? ` · ${esc(t.role)}` : ""}</footer></blockquote>`).join("")}</div>`; });
 }
-function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")} · שיעורים פרטיים במחשבים. הדף אינו קשור לצה״ל או לאף יחידה; תכני ההכנה למיונים מקוריים ונועדו לתרגול.</span></footer>`; }
+function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")} · שיעורים פרטיים במחשבים · <span dir="ltr">${esc(CONFIG.mentor?.phone || "")}</span> · <span dir="ltr">${esc(CONFIG.mentor?.email || "")}</span>. הדף אינו קשור לצה״ל או לאף יחידה; תכני ההכנה למיונים מקוריים ונועדו לתרגול.</span></footer>`; }
 
 function leadFormHtml(prefill = {}) {
   return `<form class="form lead-form" id="leadForm">
@@ -397,6 +397,7 @@ function pricing() {
     <h2>שיעורים פרטיים</h2>
     <div class="plans">
       <div class="plan"><h3>שיעור בודד</h3><div class="price">₪${P(pr.lesson)}<small>/50 דק׳</small></div><ul><li>אחד על אחד, בזום או פרונטלי</li><li>חומר וסיכום אחרי כל שיעור</li><li>שיעור ראשון = היכרות ותוכנית עבודה</li></ul>${btn("lesson", "לתאם שיעור")}</div>
+      <div class="plan"><h3>קורס CTF — אתגרי סייבר</h3><div class="price">₪${P(pr.ctf)}</div><ul><li>6 מפגשים של 75 דק׳, אחד על אחד או עד 3 משתתפים</li><li>Linux, רשתות, Web, Reverse Engineering, קריפטו בסיסית</li><li>אתגרים בסביבות תרגול חוקיות + כתיבת write-ups</li><li>PRO לעונה באפליקציית התרגול — כלול</li></ul>${btn("ctf", "להצטרף לקורס")}</div>
       <div class="plan hi"><span class="tag">הכי משתלם</span><h3>חבילת 10 שיעורים</h3><div class="price">₪${P(pr.pack10)}<small> · ₪${P(Math.round(pr.pack10 / 10))} לשיעור</small></div><p class="muted small">או 5 שיעורים — ₪${P(pr.pack5)}</p><ul><li>תוכנית אישית עם יעדים</li><li>וואטסאפ פתוח לשאלות בין השיעורים</li><li>PRO לעונה באפליקציית התרגול — כלול</li><li>תוקף 6 חודשים</li></ul><div class="cta-col">${btn("pack10", "חבילת 10", "primary")}${btn("pack5", "חבילת 5 — ₪" + pr.pack5)}</div></div>
     </div>
     <h2>הכנה למיונים טכנולוגיים</h2>
@@ -408,13 +409,14 @@ function pricing() {
   </section>`);
   document.querySelectorAll("[data-demo-pro]").forEach((b) => { b.onclick = async () => { const until = Date.now() + (b.dataset.demoPro === "season" ? 183 : 31) * 864e5; await S.store.users.update(S.user.uid, { plan: "pro", planUntil: until, planSource: "demo" }); toast("PRO הופעל (הדגמה) ✨", "ok"); go("#/home"); }; });
 }
-const PLAN_LABELS = { lesson: "שיעור בודד", pack5: "חבילת 5 שיעורים", pack10: "חבילת 10 שיעורים", mentoring: "חבילת הכנה למיונים", monthly: "PRO חודשי באפליקציה", season: "PRO לעונה באפליקציה" };
+const PLAN_LABELS = { ctf: "קורס CTF", lesson: "שיעור בודד", pack5: "חבילת 5 שיעורים", pack10: "חבילת 10 שיעורים", mentoring: "חבילת הכנה למיונים", monthly: "PRO חודשי באפליקציה", season: "PRO לעונה באפליקציה" };
 function contact(params) {
   nav();
   const plan = params?.get("plan"); const cancel = params?.get("cancel");
   setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המורה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך <b>${PLAN_LABELS[plan] || plan}</b> — השאירו פרטים ואחזור לתיאום.` : "לתאם שיעור, לשאול, או להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
     ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">💬 וואטסאפ</a>` : ""}
-    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("שיעורים פרטיים במחשבים")}">✉️ אימייל</a>` : ""}
+    ${CONFIG.mentor?.phone ? `<a class="btn" href="tel:${esc(String(CONFIG.mentor.phone).replace(/[^\d+]/g, ""))}">📞 <span dir="ltr">${esc(CONFIG.mentor.phone)}</span></a>` : ""}
+    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("שיעורים פרטיים במחשבים")}">✉️ <span dir="ltr">${esc(CONFIG.mentor.email)}</span></a>` : ""}
     ${leadFormHtml({ name: S.user?.name, phone: S.user?.phone, email: S.user?.email })}
   </section>`);
   if (plan) { const ta = $("#leadForm textarea"); if (ta) ta.value = `מעניין אותי: ${PLAN_LABELS[plan] || plan}`; }
@@ -484,7 +486,7 @@ function terms() {
 אנחנו עושים כל מאמץ שהתכנים יהיו מדויקים ומועילים, אבל לא מתחייבים לתוצאה במיונים — ההצלחה תלויה בך. השירות ניתן כמות שהוא (AS IS).
 
 ## יצירת קשר
-${CONFIG.mentor?.email || ""}
+${CONFIG.mentor?.name || ""} · ${CONFIG.mentor?.phone || ""} · ${CONFIG.mentor?.email || ""}
 
 _עודכן: אוקטובר 2026._`)}</div></article>`);
 }
