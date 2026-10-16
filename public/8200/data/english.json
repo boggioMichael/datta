@@ -1,0 +1,1529 @@
+{
+  "pack": "english",
+  "category": "english",
+  "title": "אנגלית",
+  "lessons": [
+    {
+      "id": "english-lesson-1",
+      "title": "איך קוראים טקסט באנגלית מהר: סקירה, מילות מפתח, ניחוש מהקשר — עם דוגמה",
+      "minutes": 5,
+      "md": "## למה לא קוראים הכל מילה במילה\nבבחינה יש זמן מוגבל, וכמעט בכל קטע באנגלית יש כמה מילים שלא תכירו. קריאה איטית ותרגום של כל משפט לעברית יבזבזו את הזמן ולא יעזרו לענות על השאלות. הגישה היעילה היא שלוש שכבות: **סקירה**, **מילות מפתח** ו**ניחוש מהקשר**.\n\n## שלב 1: סקירה (skimming) — 20 שניות\n- קראו את הכותרת, את המשפט הראשון של כל פסקה ואת המשפט האחרון של הקטע.\n- שאלו את עצמכם: **על מה הקטע? מה הכותב רוצה שאבין?**\n- אל תעצרו על מילים לא מוכרות בשלב הזה.\n\nאחרי 20 שניות תוכלו בדרך כלל לענות על שאלת הרעיון המרכזי (main idea) ועל שאלת מטרת הכותב (purpose).\n\n## שלב 2: מילות מפתח (scanning)\nקראו את השאלה **לפני** שחוזרים לקטע. סמנו בשאלה מילה או מספר שקל למצוא: שם, מספר, מונח טכני. חפשו אותם בקטע כמו ב\"חיפוש\" במסמך, וקראו היטב רק את המשפט שלפני ואת המשפט שאחרי. שאלות פרט (detail) נענות כמעט תמיד ממשפט אחד.\n\nשימו לב למילות קישור:\n- **but / yet / however** — שינוי כיוון. מה שבא אחריהן הוא בדרך כלל הרעיון החשוב.\n- **because / which is why / therefore** — סיבה ותוצאה.\n- **for example / such as** — פרט שמשרת רעיון גדול יותר.\n\n## שלב 3: ניחוש מהקשר\nכשמילה לא מוכרת, אל תיבהלו. שאלו ארבע שאלות:\n1. **איזה חלק דיבור זה?** שם עצם, פועל, תואר? מבנה המשפט מגלה.\n2. **מה הגיוני כאן?** חיובי או שלילי? גדול או קטן?\n3. **יש רמז בחלקי המילה?** קידומות כמו un-, dis-, re-, ושורשים מוכרים (verify קשור ל-very ול'אמת').\n4. **הכותב מסביר את המילה בעצמו?** לעיתים קרובות אחרי נקודתיים או אחרי which means.\n\n## דוגמה\nקראו:\n\n> The new filter was supposed to remove all spam, but the results were **underwhelming**: it caught fewer than half of the junk messages, and users kept complaining.\n\nנניח שאינכם מכירים את underwhelming.\n- **חלק דיבור:** אחרי were — זה תואר שמתאר את results.\n- **הגיון:** המשפט מתחיל ב-was supposed to (היה אמור), ואז מגיע **but** — משהו השתבש. אחרי הנקודתיים: תפס פחות מחצי, המשתמשים התלוננו. כלומר, התואר שלילי.\n- **חלקי המילה:** under- (מתחת) + whelm, כמו ב-overwhelming (מרשים, מציף). אז underwhelming = מאכזב, פחות מהמצופה.\n\nגם בלי לדעת את המילה במדויק, כבר אפשר לענות על שאלה כמו \"The word underwhelming is closest in meaning to...\" — disappointing.\n\n## סדר עבודה מומלץ בבחינה\n1. סקירה של 20 שניות.\n2. קריאת כל השאלות.\n3. לכל שאלה: מילת מפתח, חיפוש בקטע, קריאת משפט אחד סביבה.\n4. בשאלות הסקה (inference): התשובה הנכונה נתמכת בטקסט אבל לא כתובה בו מילה במילה. פסלו אפשרויות שמוסיפות מידע שלא הופיע, ואפשרויות עם מילים מוחלטות כמו always, never ו-only — הן לרוב מלכודת.\n"
+    }
+  ],
+  "items": [
+    {
+      "id": "en-voc-001",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe technician managed to RETRIEVE the deleted files from the backup.",
+      "options": [
+        "delete",
+        "create",
+        "recover",
+        "hide"
+      ],
+      "answer": 2,
+      "explanation": "retrieve פירושו לאחזר, להחזיר משהו למקום שבו היה. הרמז בהקשר הוא \"deleted files from the backup\" — מחזירים קבצים שנמחקו, ולכן recover (לשחזר). שימו לב שהקידומת re- מרמזת לעיתים קרובות על 'שוב' או 'בחזרה'.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-002",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe sensor reported an ANOMALY in the temperature readings last night.",
+      "options": [
+        "חריגה מהצפוי",
+        "שיפור הדרגתי",
+        "עלייה קבועה",
+        "הפסקה קצרה"
+      ],
+      "answer": 0,
+      "explanation": "anomaly היא סטייה מהרגיל, משהו שלא מתאים לדפוס הצפוי. הדרך המהירה: המילה דומה ל-normal עם a- שלילית בתחילתה, כלומר 'לא נורמלי'. בטקסטים טכניים זו מילה נפוצה לתיאור קריאה חריגה בנתונים.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "meaning",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-003",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe main CONSTRAINT on the project was the limited budget.",
+      "options": [
+        "advantage",
+        "purpose",
+        "result",
+        "limitation"
+      ],
+      "answer": 3,
+      "explanation": "constraint = מגבלה, אילוץ. ההקשר \"the limited budget\" (תקציב מוגבל) מצביע על משהו שמגביל את הפרויקט, ולכן limitation. שימו לב לשורש המשותף עם strict ו-strain — להדק, לכווץ.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-004",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nThe manager decided to ____ more memory to the database server.",
+      "options": [
+        "delay",
+        "allocate",
+        "ignore",
+        "describe"
+      ],
+      "answer": 1,
+      "explanation": "allocate = להקצות, לחלק משאב למטרה מסוימת. 'להקצות זיכרון לשרת' הוא ביטוי שגור בעולם המחשבים (memory allocation). שאר האפשרויות לא מתחברות למבנה \"more memory to\".",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "fill",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-005",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe delay caused by the update was NEGLIGIBLE, so nobody noticed it.",
+      "options": [
+        "tiny",
+        "serious",
+        "unexpected",
+        "permanent"
+      ],
+      "answer": 0,
+      "explanation": "negligible = זניח, קטן כל כך שאפשר להתעלם ממנו (מאותו שורש של neglect — להזניח). ההקשר \"nobody noticed it\" מאשר שמדובר בעיכוב זעיר, ולכן tiny.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-006",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nFrom the pattern of the messages, the analysts were able to INFER where the meeting would take place.",
+      "options": [
+        "to announce publicly",
+        "to deny firmly",
+        "to conclude from evidence",
+        "to record in writing"
+      ],
+      "answer": 2,
+      "explanation": "infer = להסיק מסקנה מתוך ראיות או רמזים, לא ממידע ישיר. ההקשר \"from the pattern of the messages\" מראה שהאנליסטים הגיעו למסקנה מתוך דפוס. זכרו את ההבדל: הדובר implies (מרמז), השומע infers (מסיק).",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-007",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nWe need a ____ source of information, not rumors from social media.",
+      "options": [
+        "random",
+        "sudden",
+        "broken",
+        "reliable"
+      ],
+      "answer": 3,
+      "explanation": "reliable = אמין, שאפשר לסמוך עליו (מהפועל rely on — להסתמך על). המשפט מנגיד בין המקור הרצוי לבין rumors (שמועות), ולכן המילה החסרה היא ההפך משמועה — מקור אמין.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "fill"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-008",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe security team was able to INTERCEPT the message before it reached its destination.",
+      "options": [
+        "translate",
+        "catch",
+        "send",
+        "ignore"
+      ],
+      "answer": 1,
+      "explanation": "intercept = ליירט, לתפוס משהו בדרכו לפני שהגיע ליעד. ההקשר \"before it reached its destination\" הוא הרמז המכריע, ולכן catch. translate ו-send מתארים פעולות אחרות לגמרי.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-009",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nBefore publishing the report, the editor asked to VERIFY every number in it.",
+      "options": [
+        "change",
+        "delete",
+        "confirm",
+        "estimate"
+      ],
+      "answer": 2,
+      "explanation": "verify = לאמת, לוודא שמשהו נכון (מהשורש הלטיני ver — אמת, כמו ב-very). עורך שבודק כל מספר לפני פרסום מאמת אותו, ולכן confirm. estimate (להעריך) הוא ההפך — ניחוש במקום בדיקה.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-010",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe instructions were AMBIGUOUS, so half of the team understood them one way and half another way.",
+      "options": [
+        "having more than one possible meaning",
+        "written in a foreign language",
+        "very long and detailed",
+        "extremely strict"
+      ],
+      "answer": 0,
+      "explanation": "ambiguous = דו-משמעי, ניתן להבנה ביותר מדרך אחת. המשפט מסביר את עצמו: חצי מהצוות הבין כך וחצי אחרת. כשמופיעה מילה קשה, חפשו את ההסבר שלה בהמשך המשפט — לעיתים קרובות הכותב מפרש אותה בעצמו.",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-011",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nYou must OBTAIN permission before entering the lab.",
+      "options": [
+        "lose",
+        "get",
+        "refuse",
+        "forget"
+      ],
+      "answer": 1,
+      "explanation": "obtain = להשיג, לקבל (מילה רשמית יותר מ-get). \"You must obtain permission\" = עליכם לקבל אישור. בטקסטים רשמיים וטכניים obtain מחליפה לעיתים קרובות את get.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "synonym"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-012",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nThe first test failed, but all ____ tests passed without problems.",
+      "options": [
+        "previous",
+        "rare",
+        "initial",
+        "subsequent"
+      ],
+      "answer": 3,
+      "explanation": "subsequent = שלאחר מכן, הבא בתור. המשפט מנגיד בין המבחן הראשון (first) שנכשל לבין כל המבחנים שבאו אחריו ועברו. previous ו-initial מתארים את ההפך — מה שקדם.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "fill",
+        "academic"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-voc-013",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe new software can DETECT unusual activity on the network within seconds.",
+      "options": [
+        "notice",
+        "cause",
+        "prevent",
+        "repeat"
+      ],
+      "answer": 0,
+      "explanation": "detect = לגלות, לזהות משהו שקשה להבחין בו (ומכאן detective — בלש). תוכנה שמזהה פעילות חריגה ברשת 'מבחינה' בה, ולכן notice. prevent (למנוע) הוא שלב אחר — שבא רק אחרי הגילוי.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "synonym",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-014",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nBuilding the bridge in six months is not FEASIBLE with our current team.",
+      "options": [
+        "expensive",
+        "necessary",
+        "possible to do",
+        "popular"
+      ],
+      "answer": 2,
+      "explanation": "feasible = בר-ביצוע, אפשרי מבחינה מעשית. ההקשר \"with our current team\" מדבר על יכולת לבצע, לא על מחיר או פופולריות. טיפ: feasibility study = בדיקת היתכנות.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-015",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nTo keep the data private, the app will ____ every message before sending it.",
+      "options": [
+        "shorten",
+        "encrypt",
+        "display",
+        "print"
+      ],
+      "answer": 1,
+      "explanation": "encrypt = להצפין, להפוך מידע לקוד שרק מי שמחזיק במפתח יכול לקרוא. הרמז \"to keep the data private\" מכוון להגנה על המידע. השורש crypt קשור ל'סודי', כמו ב-cryptography.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "fill",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-016",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nRegular backups help to MITIGATE the damage caused by a system crash.",
+      "options": [
+        "measure",
+        "explain",
+        "increase",
+        "reduce"
+      ],
+      "answer": 3,
+      "explanation": "mitigate = למתן, להפחית את חומרתו של נזק או סיכון. גיבויים לא מונעים קריסה, אבל מקטינים את הנזק שלה — ולכן reduce. זו מילה נפוצה מאוד בטקסטים על אבטחה וניהול סיכונים (risk mitigation).",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "synonym",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-017",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nDoctors MONITOR the patient's heart rate during the operation.",
+      "options": [
+        "ignore",
+        "slow down",
+        "watch closely",
+        "improve"
+      ],
+      "answer": 2,
+      "explanation": "monitor כפועל = לנטר, לעקוב מקרוב ובאופן רציף. במהלך ניתוח עוקבים אחרי הדופק כל הזמן, ולכן watch closely. שימו לב שאותה מילה כשם עצם היא מסך — אבל כאן היא פועל.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-018",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nHer results were CONSISTENT: every time she ran the test, she got the same answer.",
+      "options": [
+        "עקבי ויציב",
+        "מפתיע",
+        "שגוי",
+        "מהיר במיוחד"
+      ],
+      "answer": 0,
+      "explanation": "consistent = עקבי, חוזר על עצמו ללא סתירות. המשפט מסביר אחרי הנקודתיים: בכל פעם התקבלה אותה תשובה. בטקסטים מדעיים consistent results הן תוצאות שחוזרות על עצמן — סימן לאמינות.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-019",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nA sudden rise in traffic can TRIGGER an automatic alert.",
+      "options": [
+        "stop",
+        "delay",
+        "hide",
+        "cause"
+      ],
+      "answer": 3,
+      "explanation": "trigger כפועל = לגרום, להפעיל (במקור: הדק של כלי ירייה). עלייה פתאומית בתעבורה 'מפעילה' התראה אוטומטית, ולכן cause. בטקסטים טכניים trigger הוא האירוע שמתניע תגובה.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-020",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe accountant noticed a DISCREPANCY between the two reports: one listed 40 items, the other 44.",
+      "options": [
+        "a signature",
+        "a difference that should not exist",
+        "a short summary",
+        "a repeated line"
+      ],
+      "answer": 1,
+      "explanation": "discrepancy = אי-התאמה, פער בין שני דברים שאמורים להיות זהים. המשפט נותן דוגמה אחרי הנקודתיים: 40 פריטים לעומת 44. כשיש הבדל בין שני דוחות שאמורים להתאים — זו discrepancy.",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-021",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nEngineers were sent to ____ the damage after the storm.",
+      "options": [
+        "assess",
+        "cause",
+        "forget",
+        "extend"
+      ],
+      "answer": 0,
+      "explanation": "assess = להעריך, לבחון את המצב או את ההיקף של משהו. מהנדסים שנשלחים אחרי סערה בודקים כמה נזק נגרם. בטקסטים מקצועיים תמצאו גם את שם העצם assessment — הערכה.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "fill",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-022",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe company plans to DEPLOY the new version to all users next week.",
+      "options": [
+        "test",
+        "cancel",
+        "release",
+        "describe"
+      ],
+      "answer": 2,
+      "explanation": "deploy = לפרוס, להעביר לשימוש בפועל (במקור מונח צבאי לפריסת כוחות). במחשבים, deploy a new version פירושו לשחרר גרסה חדשה למשתמשים — ולכן release. test (לבדוק) קורה לפני הפריסה.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-023",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe second power supply is REDUNDANT: it is only used if the first one fails.",
+      "options": [
+        "broken",
+        "extra, kept as a backup",
+        "the most important",
+        "cheaper"
+      ],
+      "answer": 1,
+      "explanation": "redundant בהקשר טכני = יתיר, רכיב כפול שנשמר כגיבוי. המשפט מסביר: הספק השני מופעל רק אם הראשון נכשל. בשפה יומיומית redundant יכול להיות גם 'מיותר' — ההקשר קובע.",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-024",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nCandidates with ____ experience in programming will have an advantage.",
+      "options": [
+        "future",
+        "sudden",
+        "final",
+        "prior"
+      ],
+      "answer": 3,
+      "explanation": "prior = קודם, שלפני. \"prior experience\" הוא ביטוי קבוע בהצעות עבודה: ניסיון קודם. future ו-final מתארים זמנים אחרים, ו-sudden (פתאומי) אינו מתאר ניסיון.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "fill",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-025",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nThe bank decided to SUSPEND the account until the owner confirms his identity.",
+      "options": [
+        "freeze",
+        "close",
+        "open",
+        "sell"
+      ],
+      "answer": 0,
+      "explanation": "suspend = להשעות, לעצור באופן זמני. הרמז \"until the owner confirms\" מראה שהעצירה זמנית — ולכן freeze. close (לסגור) הוא צעד קבוע, ולכן אינו מדויק.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-026",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe network COMPRISES twelve servers and about two hundred workstations.",
+      "options": [
+        "connects",
+        "replaces",
+        "consists of",
+        "protects"
+      ],
+      "answer": 2,
+      "explanation": "comprise = מורכב מ-, כולל. \"The network comprises twelve servers\" = הרשת מורכבת משנים-עשר שרתים. בטקסטים אקדמיים וטכניים זו מילה שימושית לתיאור החלקים של שלם.",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-027",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nTiming is CRUCIAL in this operation; one minute late and the plan fails.",
+      "options": [
+        "unimportant",
+        "essential",
+        "difficult",
+        "optional"
+      ],
+      "answer": 1,
+      "explanation": "crucial = מכריע, חיוני. המשפט מסביר בעצמו: דקה אחת של איחור והתוכנית נכשלת, כלומר התזמון קריטי. essential (חיוני) היא המילה הקרובה ביותר; difficult מתאר קושי ולא חשיבות.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-028",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט במילה המתאימה ביותר:\nWe cannot count every visitor, so we will ____ the number based on ticket sales.",
+      "options": [
+        "forbid",
+        "double",
+        "cancel",
+        "estimate"
+      ],
+      "answer": 3,
+      "explanation": "estimate = להעריך, לאמוד בקירוב. ההקשר \"we cannot count every visitor\" אומר שאין ספירה מדויקת, ולכן חייבים להעריך על בסיס מכירות הכרטיסים. estimate חשובה גם בטקסטים מדעיים — הערכה מקורבת.",
+      "timeSec": 35,
+      "tags": [
+        "vocab",
+        "fill",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-029",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מהי המשמעות של המילה המודגשת במשפט?\nThe report did not say so directly, but it IMPLIED that the error was caused by a human mistake.",
+      "options": [
+        "suggested without stating it openly",
+        "proved beyond doubt",
+        "denied completely",
+        "repeated several times"
+      ],
+      "answer": 0,
+      "explanation": "imply = לרמוז, להביע משהו בעקיפין בלי לומר אותו במפורש. ההקשר \"did not say so directly\" הוא הרמז. זכרו את הזוג: הכותב implies (מרמז), הקורא infers (מסיק).",
+      "timeSec": 40,
+      "tags": [
+        "vocab",
+        "meaning",
+        "academic"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-voc-030",
+      "sub": "vocab",
+      "subTitle": "אוצר מילים",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "בחרו את המילה הקרובה ביותר במשמעות למילה המודגשת:\nAfter three failed attempts, the team decided to ABANDON the original plan.",
+      "options": [
+        "improve",
+        "give up",
+        "continue",
+        "explain"
+      ],
+      "answer": 1,
+      "explanation": "abandon = לנטוש, לזנוח. אחרי שלושה ניסיונות כושלים הצוות ויתר על התוכנית — give up. continue הוא ההפך המדויק, ולכן זו מלכודת נפוצה.",
+      "timeSec": 30,
+      "tags": [
+        "vocab",
+        "synonym"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-001",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**Two Steps to Log In**\n\nMany online services now ask users to turn on two-factor authentication. The idea is simple: a password alone is something you know, and it can be guessed or stolen. A second factor is something you have, such as your phone. After you type your password, the service sends a short code to your phone or asks you to approve a notification. Only when both steps succeed are you allowed in. Even if criminals obtain your password through a fake website, they still cannot log in without your device. Security experts admit that the extra step is slightly annoying, but they argue that it blocks the vast majority of account takeovers.",
+      "group": "en-rdg-g1",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat is the main idea of the passage?",
+      "options": [
+        "Passwords are no longer used by most online services.",
+        "Two-factor authentication adds a second step that makes accounts much harder to break into.",
+        "Criminals usually steal phones rather than passwords.",
+        "Approving a notification is safer than typing a code."
+      ],
+      "answer": 1,
+      "explanation": "הרעיון המרכזי מופיע בדרך כלל בפתיחה ובסיום: הקטע מסביר מהו אימות דו-שלבי ומסיים בכך שהוא חוסם את רוב פריצות החשבון. האפשרויות האחרות מתייחסות לפרטים או מוסיפות טענות שלא נאמרו — הקטע לא טוען שסיסמאות יצאו משימוש.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "main-idea",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-002",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**Two Steps to Log In**\n\nMany online services now ask users to turn on two-factor authentication. The idea is simple: a password alone is something you know, and it can be guessed or stolen. A second factor is something you have, such as your phone. After you type your password, the service sends a short code to your phone or asks you to approve a notification. Only when both steps succeed are you allowed in. Even if criminals obtain your password through a fake website, they still cannot log in without your device. Security experts admit that the extra step is slightly annoying, but they argue that it blocks the vast majority of account takeovers.",
+      "group": "en-rdg-g1",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, what is the \"second factor\"?",
+      "options": [
+        "a longer and more complex password",
+        "a security question about your past",
+        "a code printed on a plastic card",
+        "something you have, such as your phone"
+      ],
+      "answer": 3,
+      "explanation": "שאלת פרט: חפשו את המילים second factor בקטע וקראו את המשפט שסביבן. כתוב במפורש: \"A second factor is something you have, such as your phone\". אל תסתמכו על ידע כללי — התשובה חייבת להופיע בטקסט.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "detail",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-003",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Two Steps to Log In**\n\nMany online services now ask users to turn on two-factor authentication. The idea is simple: a password alone is something you know, and it can be guessed or stolen. A second factor is something you have, such as your phone. After you type your password, the service sends a short code to your phone or asks you to approve a notification. Only when both steps succeed are you allowed in. Even if criminals obtain your password through a fake website, they still cannot log in without your device. Security experts admit that the extra step is slightly annoying, but they argue that it blocks the vast majority of account takeovers.",
+      "group": "en-rdg-g1",
+      "q": "לפי ההקשר בקטע, בחרו את המשמעות הקרובה ביותר:\nThe phrase \"account takeovers\" (last sentence) most likely refers to...",
+      "options": [
+        "companies buying other companies",
+        "users forgetting their passwords",
+        "criminals gaining control of other people's accounts",
+        "services closing old or unused accounts"
+      ],
+      "answer": 2,
+      "explanation": "take over = להשתלט. הקטע כולו עוסק בפושעים שמנסים להיכנס לחשבונות של אחרים, ולכן account takeovers הן השתלטויות על חשבונות. כשנתקלים בביטוי לא מוכר, פרקו אותו למילים (take + over) ובדקו מה מתאים לנושא הקטע.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context",
+        "tech"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-004",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**Seeing with Sound**\n\nBats are not blind, but many of them hunt at night, when eyes are of little use. Instead, they rely on echolocation. A bat produces short, high-pitched sounds, far above the range of human hearing, and listens for the echoes that bounce back from objects around it. The time it takes for an echo to return tells the bat how far away an object is, while small differences between the two ears reveal its direction. In this way a bat can locate a moth the size of a fingernail in complete darkness. Engineers have borrowed the same principle for sonar, which ships use to measure the depth of the sea.",
+      "group": "en-rdg-g2",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, how does a bat know how far away an object is?",
+      "options": [
+        "by the time it takes the echo to return",
+        "by the loudness of its own call",
+        "by the color and shape of the object",
+        "by the temperature of the air around it"
+      ],
+      "answer": 0,
+      "explanation": "שאלת פרט: המשפט \"The time it takes for an echo to return tells the bat how far away an object is\" עונה ישירות. שימו לב שהכיוון (direction) נקבע לפי ההבדל בין שתי האוזניים — זה פרט אחר, ואל תערבבו ביניהם.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "detail",
+        "science"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-005",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Seeing with Sound**\n\nBats are not blind, but many of them hunt at night, when eyes are of little use. Instead, they rely on echolocation. A bat produces short, high-pitched sounds, far above the range of human hearing, and listens for the echoes that bounce back from objects around it. The time it takes for an echo to return tells the bat how far away an object is, while small differences between the two ears reveal its direction. In this way a bat can locate a moth the size of a fingernail in complete darkness. Engineers have borrowed the same principle for sonar, which ships use to measure the depth of the sea.",
+      "group": "en-rdg-g2",
+      "q": "לפי ההקשר בקטע, בחרו את המשמעות הקרובה ביותר:\nThe word \"principle\" in the last sentence is closest in meaning to...",
+      "options": [
+        "the head of a school",
+        "a loud sound",
+        "a type of animal",
+        "a basic idea or rule"
+      ],
+      "answer": 3,
+      "explanation": "principle = עיקרון, רעיון בסיסי. המהנדסים 'שאלו את אותו עיקרון' — את רעיון ההדים — לבניית סונאר. אל תתבלבלו עם principal (מנהל בית ספר), שנשמעת זהה אבל נכתבת אחרת.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context",
+        "science"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-006",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "**Seeing with Sound**\n\nBats are not blind, but many of them hunt at night, when eyes are of little use. Instead, they rely on echolocation. A bat produces short, high-pitched sounds, far above the range of human hearing, and listens for the echoes that bounce back from objects around it. The time it takes for an echo to return tells the bat how far away an object is, while small differences between the two ears reveal its direction. In this way a bat can locate a moth the size of a fingernail in complete darkness. Engineers have borrowed the same principle for sonar, which ships use to measure the depth of the sea.",
+      "group": "en-rdg-g2",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat can be inferred from the passage?",
+      "options": [
+        "Bats cannot see anything at all.",
+        "Humans cannot hear the sounds bats use for echolocation.",
+        "Sonar was invented before echolocation was discovered.",
+        "Moths are the only food that bats eat."
+      ],
+      "answer": 1,
+      "explanation": "הסקה היא מסקנה שהטקסט תומך בה גם אם לא נאמרה במילים אלה. כתוב שהצלילים הם \"far above the range of human hearing\" — ומכאן שבני אדם לא שומעים אותם. האפשרות הראשונה סותרת את הפתיחה (\"Bats are not blind\"), והאפשרויות על סונאר ועל עשים אינן נתמכות בטקסט.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference",
+        "science"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-007",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Free Ride for Residents**\n\nA small coastal town has become the first in its region to replace paper bus tickets with a free travel card for residents. The change, which took effect on Monday, followed a two-year trial in which bus use rose by nearly forty percent. Town officials say the card costs less to run than printing and checking tickets, and that fewer private cars on the road have reduced traffic near the harbor. Not everyone is pleased: some shop owners worry that visitors from nearby villages, who still have to pay, will feel treated unfairly. The council has promised to review the policy after one year.",
+      "group": "en-rdg-g3",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat is the main purpose of the passage?",
+      "options": [
+        "to convince readers to visit the town",
+        "to explain how travel cards are produced",
+        "to report on a change in the town's bus system and the reactions to it",
+        "to criticize shop owners who oppose the change"
+      ],
+      "answer": 2,
+      "explanation": "כשהשאלה היא על מטרת הכותב, בדקו את הטון: הקטע מדווח עובדות (מתי השינוי נכנס לתוקף, מה אומרים הפקידים, ממה חוששים בעלי החנויות) בלי לנקוט עמדה. זו כתיבה חדשותית — דיווח, לא שכנוע ולא ביקורת.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "purpose",
+        "news"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-008",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**Free Ride for Residents**\n\nA small coastal town has become the first in its region to replace paper bus tickets with a free travel card for residents. The change, which took effect on Monday, followed a two-year trial in which bus use rose by nearly forty percent. Town officials say the card costs less to run than printing and checking tickets, and that fewer private cars on the road have reduced traffic near the harbor. Not everyone is pleased: some shop owners worry that visitors from nearby villages, who still have to pay, will feel treated unfairly. The council has promised to review the policy after one year.",
+      "group": "en-rdg-g3",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, why are some shop owners unhappy?",
+      "options": [
+        "Visitors from nearby villages still have to pay and may feel treated unfairly.",
+        "The travel card is too expensive for residents.",
+        "The buses have become too crowded.",
+        "Traffic near the harbor has increased."
+      ],
+      "answer": 0,
+      "explanation": "חפשו את המילים shop owners בקטע: \"some shop owners worry that visitors from nearby villages, who still have to pay, will feel treated unfairly\". האפשרות על התנועה ליד הנמל היא ההפך ממה שכתוב — התנועה פחתה. הקפידו לבדוק כל אפשרות מול הטקסט.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "detail",
+        "news"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-rdg-009",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**How the Blue Dot Knows**\n\nThe navigation app on your phone does not know where you are by itself; it calculates your position from satellites. Each GPS satellite constantly broadcasts the exact time and its own location in orbit. Your phone receives these signals and measures how long each one took to arrive. Because radio waves travel at a known speed, a longer delay means a more distant satellite. With signals from at least four satellites, the phone can work out its position on Earth to within a few meters. Tall buildings can block or reflect the signals, which is why the blue dot sometimes jumps around in a city center. Indoors, the app may give up and rely on Wi-Fi networks instead.",
+      "group": "en-rdg-g4",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nThe passage is mainly about...",
+      "options": [
+        "the history of navigation satellites",
+        "why Wi-Fi is more accurate than GPS",
+        "how to repair a navigation app that stopped working",
+        "how a phone calculates its location from satellite signals"
+      ],
+      "answer": 3,
+      "explanation": "הרעיון המרכזי: רוב הקטע מתאר תהליך — לוויינים משדרים זמן ומיקום, הטלפון מודד עיכובים ומחשב מיקום. ההיסטוריה לא מוזכרת, Wi-Fi מופיע רק במשפט האחרון כפתרון חלופי, ותיקון אפליקציה לא נדון כלל.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "main-idea",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-010",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**How the Blue Dot Knows**\n\nThe navigation app on your phone does not know where you are by itself; it calculates your position from satellites. Each GPS satellite constantly broadcasts the exact time and its own location in orbit. Your phone receives these signals and measures how long each one took to arrive. Because radio waves travel at a known speed, a longer delay means a more distant satellite. With signals from at least four satellites, the phone can work out its position on Earth to within a few meters. Tall buildings can block or reflect the signals, which is why the blue dot sometimes jumps around in a city center. Indoors, the app may give up and rely on Wi-Fi networks instead.",
+      "group": "en-rdg-g4",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, why does the blue dot sometimes jump around in a city center?",
+      "options": [
+        "The phone's battery runs low in crowded places.",
+        "Tall buildings block or reflect the satellite signals.",
+        "Satellites move too quickly over cities.",
+        "Too many people use the app at the same time."
+      ],
+      "answer": 1,
+      "explanation": "שאלת פרט על סיבה: חפשו את הביטוי which is why — הוא מחבר סיבה לתוצאה. המשפט אומר שבניינים גבוהים חוסמים או מחזירים את האותות, ולכן הנקודה הכחולה 'קופצת'.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "detail",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-011",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "**How the Blue Dot Knows**\n\nThe navigation app on your phone does not know where you are by itself; it calculates your position from satellites. Each GPS satellite constantly broadcasts the exact time and its own location in orbit. Your phone receives these signals and measures how long each one took to arrive. Because radio waves travel at a known speed, a longer delay means a more distant satellite. With signals from at least four satellites, the phone can work out its position on Earth to within a few meters. Tall buildings can block or reflect the signals, which is why the blue dot sometimes jumps around in a city center. Indoors, the app may give up and rely on Wi-Fi networks instead.",
+      "group": "en-rdg-g4",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat can be inferred about a phone that receives signals from only two satellites?",
+      "options": [
+        "It cannot determine its position precisely.",
+        "It will be more accurate than usual.",
+        "It will automatically switch to a different app.",
+        "It will stop receiving the time from the satellites."
+      ],
+      "answer": 0,
+      "explanation": "הקטע קובע שנדרשים אותות מלפחות ארבעה לוויינים (\"at least four\") כדי לחשב מיקום ברמת דיוק של כמה מטרים. מכאן מסיקים ששני לוויינים אינם מספיקים למיקום מדויק. שימו לב לביטויים כמו at least — הם המפתח לשאלות הסקה.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-012",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**The Update You Keep Postponing**\n\nFew people enjoy installing software updates. They arrive at the wrong moment, take time, and sometimes change features that worked perfectly well. Yet most updates exist for a reason that has nothing to do with new features. Every large program contains mistakes, and some of them can be used by attackers to take control of a device. When a company discovers such a weakness, it releases a fix, and from that moment there is a race: attackers study the fix to understand the weakness, while users who have not yet updated remain exposed. Devices that run old software for months are therefore the easiest targets. Postponing an update is rarely a disaster, but postponing it forever is.",
+      "group": "en-rdg-g5",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat is the author's main purpose?",
+      "options": [
+        "to complain about how annoying software updates are",
+        "to describe how companies design new features",
+        "to explain why installing updates matters for security",
+        "to compare old devices with new ones"
+      ],
+      "answer": 2,
+      "explanation": "הכותב פותח אמנם בתלונות המוכרות על עדכונים, אבל מיד אומר Yet (ובכל זאת) ועובר לטיעון המרכזי: עדכונים סוגרים פרצות אבטחה. מילות ניגוד כמו yet, but ו-however מסמנות לעיתים קרובות היכן מתחיל הרעיון האמיתי.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "purpose",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-013",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**The Update You Keep Postponing**\n\nFew people enjoy installing software updates. They arrive at the wrong moment, take time, and sometimes change features that worked perfectly well. Yet most updates exist for a reason that has nothing to do with new features. Every large program contains mistakes, and some of them can be used by attackers to take control of a device. When a company discovers such a weakness, it releases a fix, and from that moment there is a race: attackers study the fix to understand the weakness, while users who have not yet updated remain exposed. Devices that run old software for months are therefore the easiest targets. Postponing an update is rarely a disaster, but postponing it forever is.",
+      "group": "en-rdg-g5",
+      "q": "לפי ההקשר בקטע, בחרו את המשמעות הקרובה ביותר:\nThe word \"exposed\" in the passage is closest in meaning to...",
+      "options": [
+        "famous",
+        "unprotected",
+        "updated",
+        "expensive"
+      ],
+      "answer": 1,
+      "explanation": "exposed = חשוף, ללא הגנה. ההקשר: משתמשים שעדיין לא עדכנו \"remain exposed\" — נשארים חשופים לתוקפים. אם המילה לא מוכרת, שאלו את עצמכם איזה מצב הגיוני למי שלא התקין את התיקון: לא מוגן.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-014",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "**The Update You Keep Postponing**\n\nFew people enjoy installing software updates. They arrive at the wrong moment, take time, and sometimes change features that worked perfectly well. Yet most updates exist for a reason that has nothing to do with new features. Every large program contains mistakes, and some of them can be used by attackers to take control of a device. When a company discovers such a weakness, it releases a fix, and from that moment there is a race: attackers study the fix to understand the weakness, while users who have not yet updated remain exposed. Devices that run old software for months are therefore the easiest targets. Postponing an update is rarely a disaster, but postponing it forever is.",
+      "group": "en-rdg-g5",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, why is there a \"race\" after a fix is released?",
+      "options": [
+        "Companies compete to release the fastest update.",
+        "Users compete to be the first to download the update.",
+        "Old devices suddenly become faster than new ones.",
+        "Attackers learn about the weakness from the fix while some users are still unprotected."
+      ],
+      "answer": 3,
+      "explanation": "המירוץ מתואר במשפט אחד עם נקודתיים: התוקפים חוקרים את התיקון כדי להבין את החולשה, ובמקביל משתמשים שלא עדכנו נשארים חשופים. שני הצדדים במירוץ הם התוקפים מול המשתמשים — לא חברות ולא מכשירים.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference",
+        "tech"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-015",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Why Ice Floats**\n\nMost substances become denser when they freeze, so their solid form sinks in their own liquid. Water is a rare exception. As it cools below four degrees Celsius, its molecules begin to arrange themselves into an open, six-sided pattern that takes up more space than the loosely packed molecules of liquid water. As a result, ice is about nine percent less dense than water, which is why ice cubes float and why a frozen bottle can crack. This odd behavior matters for life. In winter, a lake freezes from the top down, and the layer of ice insulates the water beneath it. Fish and other creatures survive the cold months in the liquid water below.",
+      "group": "en-rdg-g6",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nAccording to the passage, why does ice float on water?",
+      "options": [
+        "Frozen water molecules form a pattern that takes up more space than liquid water.",
+        "Ice is slightly warmer than the water around it.",
+        "Ice contains many small air bubbles.",
+        "Water becomes heavier as it cools."
+      ],
+      "answer": 0,
+      "explanation": "הסיבה כתובה במפורש: המולקולות מסתדרות בדפוס משושה פתוח שתופס יותר מקום, ולכן הקרח פחות צפוף בכתשעה אחוזים. האפשרות שמים נעשים כבדים יותר היא ההפך ממה שכתוב, ובועות אוויר או טמפרטורה לא מוזכרות כלל.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "detail",
+        "science"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-016",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "**Why Ice Floats**\n\nMost substances become denser when they freeze, so their solid form sinks in their own liquid. Water is a rare exception. As it cools below four degrees Celsius, its molecules begin to arrange themselves into an open, six-sided pattern that takes up more space than the loosely packed molecules of liquid water. As a result, ice is about nine percent less dense than water, which is why ice cubes float and why a frozen bottle can crack. This odd behavior matters for life. In winter, a lake freezes from the top down, and the layer of ice insulates the water beneath it. Fish and other creatures survive the cold months in the liquid water below.",
+      "group": "en-rdg-g6",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat would most likely happen to fish in winter if ice were denser than water?",
+      "options": [
+        "They would move to the surface to breathe.",
+        "The ice layer would be thicker and safer.",
+        "Lakes would freeze from the bottom up, leaving fish without liquid water.",
+        "Nothing would change for them."
+      ],
+      "answer": 2,
+      "explanation": "שאלת הסקה מסוג 'מה היה קורה אילו': הקטע אומר שקרח צף ולכן אגם קופא מלמעלה למטה, ושכבת הקרח מגינה על המים שמתחתיה. אם הקרח היה שוקע, האגם היה קופא מלמטה למעלה והדגים היו נשארים ללא מים נוזליים. מצאו את קשר הסיבה-תוצאה בטקסט והפכו אותו.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "inference",
+        "science"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-017",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Why Ice Floats**\n\nMost substances become denser when they freeze, so their solid form sinks in their own liquid. Water is a rare exception. As it cools below four degrees Celsius, its molecules begin to arrange themselves into an open, six-sided pattern that takes up more space than the loosely packed molecules of liquid water. As a result, ice is about nine percent less dense than water, which is why ice cubes float and why a frozen bottle can crack. This odd behavior matters for life. In winter, a lake freezes from the top down, and the layer of ice insulates the water beneath it. Fish and other creatures survive the cold months in the liquid water below.",
+      "group": "en-rdg-g6",
+      "q": "לפי ההקשר בקטע, בחרו את המשמעות הקרובה ביותר:\nThe word \"insulates\" is closest in meaning to...",
+      "options": [
+        "heats",
+        "freezes",
+        "cleans",
+        "protects from changes in temperature"
+      ],
+      "answer": 3,
+      "explanation": "insulate = לבודד, להגן מפני מעבר חום או קור. ההקשר: שכבת הקרח 'מבודדת' את המים שמתחתיה, והדגים שורדים בזכותה. heats לא הגיוני — קרח לא מחמם — ו-freezes סותר את העובדה שהמים שמתחת נשארים נוזליים.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "vocab-in-context",
+        "science"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-018",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 1,
+      "context": "**Listening to the Pump**\n\nA team of three high-school students has won a national competition with a device that warns farmers when their water pumps are about to fail. The students noticed that pumps usually make a slightly different noise for several days before breaking down. Their device, which costs less than a pizza, listens to the pump through a cheap microphone and sends a text message when the sound changes. During a six-month test on twelve farms, it predicted eight of nine failures. \"The hardest part was not the electronics but convincing farmers to trust a box built by teenagers,\" one team member said. The group now plans to release the design for free so that anyone can build it.",
+      "group": "en-rdg-g7",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhat is the passage mainly about?",
+      "options": [
+        "a cheap, student-built device that predicts pump failures",
+        "a national competition for farmers",
+        "the rising cost of water pumps",
+        "how microphones are manufactured"
+      ],
+      "answer": 0,
+      "explanation": "כל הקטע סובב סביב המכשיר: מה הוא עושה, כמה הוא עולה, איך נבדק ומה יקרה לו בהמשך. התחרות, המיקרופון והמשאבות הם פרטים שמשרתים את הנושא המרכזי, לא הנושא עצמו.",
+      "timeSec": 90,
+      "tags": [
+        "reading",
+        "main-idea",
+        "news"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-019",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 2,
+      "context": "**Listening to the Pump**\n\nA team of three high-school students has won a national competition with a device that warns farmers when their water pumps are about to fail. The students noticed that pumps usually make a slightly different noise for several days before breaking down. Their device, which costs less than a pizza, listens to the pump through a cheap microphone and sends a text message when the sound changes. During a six-month test on twelve farms, it predicted eight of nine failures. \"The hardest part was not the electronics but convincing farmers to trust a box built by teenagers,\" one team member said. The group now plans to release the design for free so that anyone can build it.",
+      "group": "en-rdg-g7",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nHow well did the device perform during the test?",
+      "options": [
+        "It predicted every failure on all twelve farms.",
+        "It predicted eight of the nine failures.",
+        "It failed on most of the farms.",
+        "It was never tested on real farms."
+      ],
+      "answer": 1,
+      "explanation": "שאלת פרט מספרי: חפשו מספרים בקטע. כתוב \"it predicted eight of nine failures\". האפשרות הראשונה נשמעת דומה אבל מגזימה (every failure) — בשאלות פרט, מילים כמו every, all ו-never הן לעיתים קרובות סימן לתשובה שגויה.",
+      "timeSec": 60,
+      "tags": [
+        "reading",
+        "detail",
+        "news"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-rdg-020",
+      "sub": "reading",
+      "subTitle": "הבנת הנקרא",
+      "type": "mcq",
+      "difficulty": 3,
+      "context": "**Listening to the Pump**\n\nA team of three high-school students has won a national competition with a device that warns farmers when their water pumps are about to fail. The students noticed that pumps usually make a slightly different noise for several days before breaking down. Their device, which costs less than a pizza, listens to the pump through a cheap microphone and sends a text message when the sound changes. During a six-month test on twelve farms, it predicted eight of nine failures. \"The hardest part was not the electronics but convincing farmers to trust a box built by teenagers,\" one team member said. The group now plans to release the design for free so that anyone can build it.",
+      "group": "en-rdg-g7",
+      "q": "קראו את הקטע ובחרו את התשובה הנכונה:\nWhy does the writer mention the price of a pizza?",
+      "options": [
+        "to show how big the prize was",
+        "to explain what the students ate while working",
+        "to show how cheap the device is",
+        "to criticize the high cost of farming"
+      ],
+      "answer": 2,
+      "explanation": "כשהשאלה היא 'למה הכותב מזכיר X', שאלו איזה רעיון ההשוואה משרתת. הפיצה היא השוואה מוכרת שמבהירה שהמכשיר זול מאוד — וזה חלק מהסיפור: פתרון זול שכל אחד יכול לבנות.",
+      "timeSec": 75,
+      "tags": [
+        "reading",
+        "purpose",
+        "news"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-001",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\nI ____ this program since 2019, and I still use it every day.",
+      "options": [
+        "have used",
+        "used",
+        "am using",
+        "use"
+      ],
+      "answer": 0,
+      "explanation": "since 2019 יחד עם \"I still use it\" — פעולה שהתחילה בעבר ונמשכת עד היום, ולכן Present Perfect: have used. Past Simple (used) מתאר פעולה שהסתיימה. עם since ו-for כמעט תמיד נבחר ב-Present Perfect.",
+      "timeSec": 35,
+      "tags": [
+        "grammar",
+        "tenses"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-002",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "בחרו את המשפט הנכון מבחינה דקדוקית:",
+      "options": [
+        "The list of files are too long.",
+        "The list of files were too long.",
+        "The list of files is too long.",
+        "The list of files have been too long."
+      ],
+      "answer": 2,
+      "explanation": "הנושא של המשפט הוא the list (יחיד), לא files. הביטוי of files רק מתאר את הרשימה. לכן הפועל ביחיד: is. הדרך המהירה: מחקו בראש את הביטוי שאחרי of ובדקו מה נשאר — The list is too long.",
+      "timeSec": 35,
+      "tags": [
+        "grammar",
+        "agreement"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-003",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\nIf the server ____ faster, we would finish the analysis today.",
+      "options": [
+        "is",
+        "were",
+        "will be",
+        "has been"
+      ],
+      "answer": 1,
+      "explanation": "זהו תנאי מסוג שני (Second Conditional) — מצב דמיוני בהווה: If + Past Simple, ואז would + פועל. הרמז הוא would finish בחלק השני. בתנאי השני נהוג לכתוב were לכל הגופים, גם ל-it: If the server were faster.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "conditionals"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-004",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\nIf the team had tested the code properly, the bug ____ discovered before the launch.",
+      "options": [
+        "would be",
+        "will have been",
+        "was",
+        "would have been"
+      ],
+      "answer": 3,
+      "explanation": "תנאי מסוג שלישי (Third Conditional) מתאר עבר שלא קרה: If + Past Perfect (had tested), ואז would have + V3. הבאג לא התגלה בפועל, ולכן would have been discovered. הרמז המהיר: had + V3 בחלק של ה-if מחייב would have בחלק השני.",
+      "timeSec": 45,
+      "tags": [
+        "grammar",
+        "conditionals"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-005",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\nThe engineer ____ designed the system has left the company.",
+      "options": [
+        "which",
+        "whom",
+        "who",
+        "whose"
+      ],
+      "answer": 2,
+      "explanation": "פסוקית הזיקה מתארת אדם (the engineer) ומשמשת כנושא של הפועל designed, ולכן who. which מתאים לדברים, whom משמש כמושא (למשל the engineer whom we hired), ו-whose מציין שייכות.",
+      "timeSec": 35,
+      "tags": [
+        "grammar",
+        "relative-clauses"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-006",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "רק אחד מהמשפטים הבאים תקין. בחרו אותו:",
+      "options": [
+        "Do you know where the backup files are?",
+        "Do you know where are the backup files?",
+        "Do you know where the backup files is?",
+        "Know you where the backup files are?"
+      ],
+      "answer": 0,
+      "explanation": "זוהי שאלה עקיפה (indirect question): אחרי Do you know או Can you tell me סדר המילים הוא של משפט רגיל — נושא ואז פועל: where the backup files are. ההיפוך (where are the files) נכון רק בשאלה ישירה.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "word-order"
+      ],
+      "pro": false
+    },
+    {
+      "id": "en-grm-007",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\nBy the time the technician arrived, the system ____ already crashed.",
+      "options": [
+        "has",
+        "had",
+        "was",
+        "is"
+      ],
+      "answer": 1,
+      "explanation": "שתי פעולות בעבר: הקריסה קרתה לפני שהטכנאי הגיע. הפעולה המוקדמת יותר מקבלת Past Perfect: had crashed. הביטוי By the time הוא רמז קלאסי ל-Past Perfect.",
+      "timeSec": 35,
+      "tags": [
+        "grammar",
+        "tenses"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-008",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\nThe meeting was postponed ____ next Tuesday because of the holiday.",
+      "options": [
+        "in",
+        "at",
+        "on",
+        "until"
+      ],
+      "answer": 3,
+      "explanation": "postponed until = נדחה עד (לתאריך). in, at ו-on מציינים זמן נתון, אבל אחרי postponed או delayed משתמשים ב-until (או to) כדי להראות עד מתי. טיפ: למדו פעלים יחד עם מילת היחס שלהם.",
+      "timeSec": 30,
+      "tags": [
+        "grammar",
+        "prepositions"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-009",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\nThe speed of the download depends ____ the quality of your connection.",
+      "options": [
+        "on",
+        "of",
+        "from",
+        "at"
+      ],
+      "answer": 0,
+      "explanation": "depend מגיע תמיד עם on: depend on = להיות תלוי ב-. זהו אחד מצירופי מילות היחס הנפוצים ביותר בטקסטים טכניים. אל תתרגמו מעברית ('תלוי ב-') מילה במילה — למדו את הצירוף כיחידה אחת.",
+      "timeSec": 30,
+      "tags": [
+        "grammar",
+        "prepositions"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-010",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\nThe company, ____ servers were attacked last year, has doubled its security budget.",
+      "options": [
+        "which",
+        "that",
+        "whose",
+        "who"
+      ],
+      "answer": 2,
+      "explanation": "whose מציין שייכות: השרתים של החברה — the company, whose servers were attacked. which ו-that אינם מתאימים כי אחריהם היה צריך לבוא פועל ישירות, ו-who מתאים לאנשים ולא לחברה במבנה הזה.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "relative-clauses"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-011",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "סמנו את המשפט שבו הפועל מתאים לנושא:",
+      "options": [
+        "Each of the sensors send a signal every minute.",
+        "Each of the sensors sends a signal every minute.",
+        "Each of the sensor sends a signal every minute.",
+        "Each of the sensors are sending a signal every minute."
+      ],
+      "answer": 1,
+      "explanation": "each הוא תמיד יחיד, גם כשאחריו בא of + רבים: Each of the sensors sends. הפועל מתאים ל-each ולא ל-sensors. האפשרות עם sensor ביחיד שגויה כי אחרי each of חייב לבוא שם עצם ברבים.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "agreement"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-012",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "השלימו את המשפט:\nRight now the team ____ on a new version of the app.",
+      "options": [
+        "work",
+        "works",
+        "has worked",
+        "is working"
+      ],
+      "answer": 3,
+      "explanation": "Right now (ממש עכשיו) הוא רמז ל-Present Continuous — פעולה שמתרחשת ברגע הדיבור: is working. Present Simple (works) מתאר הרגל או עובדה קבועה, ולכן אינו מתאים לפעולה שקורית כרגע.",
+      "timeSec": 30,
+      "tags": [
+        "grammar",
+        "tenses"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-013",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "איזה מהמשפטים הבאים כתוב בסדר מילים נכון?",
+      "options": [
+        "She has never seen such a complex network before.",
+        "She has seen never such a complex network before.",
+        "Never she has seen such a complex network before.",
+        "She has seen such a complex network never before."
+      ],
+      "answer": 0,
+      "explanation": "מילות תדירות כמו never, always ו-often נכנסות בין פועל העזר לפועל הראשי: has never seen. בתחילת משפט never דורש היפוך (Never has she seen...), ולכן האפשרות שפותחת ב-Never שגויה. בסוף המשפט never אינו יכול לעמוד לפני before.",
+      "timeSec": 45,
+      "tags": [
+        "grammar",
+        "word-order"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-014",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "השלימו את המשפט:\nIf the password ____ wrong three times, the account will be locked.",
+      "options": [
+        "will be entered",
+        "entered",
+        "is entered",
+        "would be entered"
+      ],
+      "answer": 2,
+      "explanation": "תנאי מסוג ראשון (First Conditional) — מצב אפשרי בעתיד: If + Present Simple, ואז will + פועל. החלק השני (will be locked) מסגיר את הסוג. בחלק של ה-if לא משתמשים ב-will, גם כשמדובר בעתיד: If the password is entered wrong.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "conditionals"
+      ],
+      "pro": true
+    },
+    {
+      "id": "en-grm-015",
+      "sub": "grammar",
+      "subTitle": "דקדוק ומבנה משפט",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "השלימו את המשפט:\nThe analysts are interested ____ how the attackers got in.",
+      "options": [
+        "to find out",
+        "in finding out",
+        "for finding out",
+        "at finding out"
+      ],
+      "answer": 1,
+      "explanation": "interested בא תמיד עם in, ואחרי מילת יחס הפועל מקבל צורת -ing (gerund): interested in finding out. זהו דפוס קבוע באנגלית: good at doing, responsible for doing, interested in doing.",
+      "timeSec": 40,
+      "tags": [
+        "grammar",
+        "prepositions"
+      ],
+      "pro": true
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מוכנים ל‑8200 — הכנה למיוני 8200 · DATTA</title>
+<meta name="description" content="אפליקציית הכנה למיוני 8200 בעברית: תרגול לפי שלבי המיון (פסיכוטכני, יכולת למידה, מבוא לתכנות, אישיות, ראיונות, אנגלית), בוחני פתע, מעקב התקדמות ומלווה אישי.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="מוכנים ל-8200">
+<meta property="og:title" content="מוכנים ל‑8200 — הכנה למיוני 8200">
+<meta property="og:description" content="תרגול לפי שלבי המיון, בוחני פתע בטלפון, מעקב התקדמות ומלווה אמיתי. מתחילים בחינם.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="./icons/og.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./app.css">
+<script src="./config.js"></script>
+</head>
+<body>
+<div id="demoBanner" hidden>מצב הדגמה — החשבון וההתקדמות נשמרים בדפדפן הזה בלבד. המצב החי (Firebase) מופעל מקובץ ההגדרות.</div>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="#/"><span class="logo">8200</span><span id="appName">מוכנים ל‑8200</span><span class="by">DATTA</span></a>
+  <nav id="topnav" aria-label="ראשי"></nav>
+</div></header>
+<main id="view" class="view"><p class="loading">טוען…</p></main>
+<nav id="tabbar" aria-label="ניווט" hidden></nav>
+<div id="toasts" aria-live="polite"></div>
+<noscript><p style="padding:2rem;text-align:center">האפליקציה צריכה JavaScript.</p></noscript>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

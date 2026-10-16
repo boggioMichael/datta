@@ -1,0 +1,21 @@
+{
+  "name": "מוכנים ל-8200 — הכנה למיוני 8200",
+  "short_name": "מוכנים ל-8200",
+  "description": "תרגול לפי שלבי המיון, בוחני פתע ומעקב התקדמות.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#c8431f",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "בוחן פתע", "url": "./#/surprise", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "האימון היומי", "url": "./#/daily", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

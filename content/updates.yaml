@@ -1,5 +1,13 @@
 # Build log. One entry per real event. Newest can go anywhere — the build sorts by date.
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
+- date: 2026-10-16
+  project: projects/8200-prep
+  title: { en: "Ready for 8200: version 1 live", he: "מוכנים ל‑8200: גרסה 1 באוויר" }
+  text:
+    en: "Six screening-stage categories, ~500 original questions with explanations, unlimited generated items, surprise quizzes, progress tracking and a mentor dashboard. Demo mode; live backend and payments next."
+    he: "שש קטגוריות לפי שלבי המיון, כ-500 שאלות מקוריות עם הסברים, מחוללים ללא הגבלה, בוחני פתע, מעקב התקדמות ולוח ניהול למלווה. מצב הדגמה; השרת החי והסליקה הבאים בתור."
+  link: https://boggiomichael.github.io/datta/8200/
+
 - date: 2026-10-01
   project: writing/a-limit-screenplay
   title: { en: "A Limit: the screenplay draft published, with its full narration", he: "A Limit: טיוטת התסריט פורסמה, עם ההקראה המלאה" }

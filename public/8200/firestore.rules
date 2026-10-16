@@ -1,0 +1,41 @@
+rules_version = '2';
+// חוקי אבטחה ל-Firestore של "מוכנים ל-8200".
+// להדביק ב-Firebase Console → Firestore Database → Rules → Publish.
+// עדכנו את רשימת האדמינים (אימיילים באותיות קטנות) לפי config.js.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.email != null && request.auth.token.email.lower() in ['boggio.michael@gmail.com']; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // פרופיל משתמש: המשתמש קורא/כותב את שלו, אבל לא יכול לשנות לעצמו את המנוי
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && !("plan" in request.resource.data && request.resource.data.plan != "free");
+      allow update: if isAdmin() || (isOwner(uid)
+        && request.resource.data.plan == resource.data.plan
+        && request.resource.data.get("planUntil", null) == resource.data.get("planUntil", null)
+        && request.resource.data.get("role", "student") == resource.data.get("role", "student")
+        && request.resource.data.get("mentorMessage", "") == resource.data.get("mentorMessage", "")
+        && request.resource.data.get("adminNotes", "") == resource.data.get("adminNotes", ""));
+      allow delete: if isAdmin();
+    }
+    match /progress/{uid} {
+      allow read, write: if isOwner(uid) || isAdmin();
+    }
+    match /attempts/{uid}/list/{id} {
+      allow read, create: if isOwner(uid) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    // פניות: כל אחד יכול להשאיר פנייה; רק אדמין קורא ומעדכן
+    match /leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    // המלצות: כולם קוראים, רק אדמין כותב
+    match /public/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
