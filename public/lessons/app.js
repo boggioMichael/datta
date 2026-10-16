@@ -403,7 +403,7 @@ function pricing() {
     <h2>הכנה למיונים טכנולוגיים</h2>
     <div class="plans">
       <div class="plan"><h3>חבילת הכנה למיונים</h3><div class="price">₪${P(pr.mentoring)}</div><ul><li>4 שיעורים אישיים לפי שלבי המיון</li><li>סימולציית ראיון אישי + משוב</li><li>PRO לעונה באפליקציית התרגול</li><li>תוכנית לפי תאריך המיונים שלך</li></ul>${btn("mentoring", "לתאם שיחה")}</div>
-      <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>620 שאלות עם הסברים + מחוללים ללא הגבלה</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
+      <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>מעל 800 שאלות עם הסברים + מחוללים ללא הגבלה</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
     </div>
     <p class="muted">התשלום בביט, פייבוקס או העברה בנקאית — הגישה מופעלת ידנית אחרי אישור התשלום (אין סליקת אשראי).</p>
     <p class="muted small">ביטול תוך 14 יום לפי חוק הגנת הצרכן; מנוי חודשי ניתן לביטול בכל עת; שיעור ניתן להזזה עד 2 ימי עבודה לפני. <a href="#/terms">לתקנון</a>.</p>
