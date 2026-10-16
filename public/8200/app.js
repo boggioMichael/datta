@@ -104,7 +104,7 @@ function landing() {
   wireLeadForm();
   S.store.public.getTestimonials().then((items) => { const el = $("#testimonials"); if (!el) return; if (!items?.length) { el.hidden = true; return; } el.innerHTML = `<h2>מה אומרים</h2><div class="testi">${items.map((t) => `<blockquote><p>${esc(t.text)}</p><footer>${esc(t.name)}${t.role ? ` · ${esc(t.role)}` : ""}</footer></blockquote>`).join("")}</div>`; });
 }
-function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")}. האתר אינו קשור לצה״ל או ליחידה 8200; כל התכנים מקוריים ונועדו לתרגול.</span></footer>`; }
+function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")}. האתר אינו קשור לצה״ל או ליחידה 8200; כל התכנים מקוריים ונועדו לתרגול.</span></footer>`; }
 
 function leadFormHtml(prefill = {}) {
   return `<form class="form lead-form" id="leadForm">
@@ -146,8 +146,10 @@ function authView(kind) {
         <label>כיתה <select name="grade" required><option value="">בחרו</option>${Object.entries(GRADES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label></div>
         <label>מתי בערך המיונים? <input name="targetDate" type="month"></label>
         <label>מי הפנה אותך? (לא חובה) <input name="referrer" placeholder="שם של חבר/ה, מורה…"></label>
-        <label class="check"><input type="checkbox" name="consent" required> אני מעל גיל 18, או שהורה/אפוטרופוס אישר את ההרשמה שלי.</label>
-        <label class="check"><input type="checkbox" name="terms" required> קראתי ואני מסכים/ה ל<a href="#/terms">תקנון ולמדיניות הפרטיות</a>.</label>` : ""}
+        <div id="parentFields" hidden><div class="row2"><label>שם ההורה/אפוטרופוס <input name="parentName" autocomplete="off"></label><label>טלפון/אימייל של ההורה <input name="parentContact" dir="ltr"></label></div></div>
+        <label class="check"><input type="checkbox" name="consent" required> <span id="consentText">אני מעל גיל 18, או שהורה/אפוטרופוס אישר את ההרשמה שלי.</span></label>
+        <label class="check"><input type="checkbox" name="terms" required> קראתי ואני מסכים/ה ל<a href="#/terms">תקנון ולמדיניות הפרטיות</a>.</label>
+        <p class="muted small">למה אנחנו שואלים: הפרטים משמשים רק לניהול החשבון, להתאמת האימון וליצירת קשר על ההתקדמות. מסירתם תלויה בהסכמה; בלעדיהם אי אפשר לפתוח חשבון. המידע נשמר אצל ספק הענן (Google Firebase) ולא נמסר לאף גורם אחר. אפשר לעיין, לתקן או למחוק בכל עת דרך ההגדרות.</p>` : ""}
       <button class="btn primary" type="submit">${isReg ? "יוצרים חשבון" : kind === "reset" ? "שלחו קישור לאיפוס" : "כניסה"}</button>
       ${S.store.mode === "firebase" && kind !== "reset" ? `<button class="btn" type="button" id="googleBtn">המשך עם Google</button>` : ""}
       <p class="form-msg err" aria-live="polite"></p>
@@ -155,13 +157,15 @@ function authView(kind) {
     <p class="muted">${isReg ? `כבר יש חשבון? <a href="#/login">כניסה</a>` : `אין חשבון? <a href="#/register">הרשמה חינם</a> · <a href="#/reset">שכחתי סיסמה</a>`}</p>
   </section>`, "auth-view");
   const f = $("#authForm");
+  const gradeSel = f.querySelector("select[name=grade]");
+  if (gradeSel) { const upd = () => { const minor = ["11", "12"].includes(gradeSel.value); const pf = $("#parentFields"); pf.hidden = !minor; pf.querySelectorAll("input").forEach((i) => (i.required = minor)); $("#consentText").textContent = minor ? "ההורה/אפוטרופוס שלי יודע/ת על ההרשמה ומאשר/ת אותה (ההורה הוא הצד לכל תשלום)." : "אני מעל גיל 18, או שהורה/אפוטרופוס אישר את ההרשמה שלי."; }; gradeSel.addEventListener("change", upd); upd(); }
   f.onsubmit = async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(f).entries());
     const msg = f.querySelector(".form-msg"); msg.textContent = "";
     const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
     try {
-      if (isReg) { await S.store.auth.signUp({ email: fd.email, password: fd.password, name: fd.name.trim(), phone: fd.phone || "", grade: fd.grade || "", targetDate: fd.targetDate || "", referrer: fd.referrer || "", parentConsent: true, termsAt: Date.now() }); toast(`ברוך/ה הבא/ה, ${fd.name.trim().split(" ")[0]}! 🎉`, "ok"); go("#/onboarding"); }
+      if (isReg) { await S.store.auth.signUp({ email: fd.email, password: fd.password, name: fd.name.trim(), phone: fd.phone || "", grade: fd.grade || "", targetDate: fd.targetDate || "", referrer: fd.referrer || "", parentName: fd.parentName || "", parentContact: fd.parentContact || "", parentConsent: true, termsAt: Date.now() }); toast(`ברוך/ה הבא/ה, ${fd.name.trim().split(" ")[0]}! 🎉`, "ok"); go("#/onboarding"); }
       else if (kind === "reset") { await S.store.auth.resetPassword(fd.email); msg.classList.remove("err"); msg.textContent = "שלחנו קישור לאיפוס לאימייל."; }
       else { await S.store.auth.signIn(fd.email, fd.password); go("#/home"); }
     } catch (err) { msg.classList.add("err"); msg.textContent = err.message || "משהו השתבש"; }
@@ -227,6 +231,7 @@ async function home() {
       <p>${u.mentorMessage ? esc(u.mentorMessage) : "אני רואה את ההתקדמות שלך כאן ואשמח לכוון. יש שאלה? רוצה שנעבור יחד על ראיון?"}</p><a class="btn small" href="#/contact">לכתוב למלווה</a></div></div></section>
     ${!isPro() ? `<section class="section upgrade"><h3>PRO — כל המאגר, סימולציות ותרגול חוזר של טעויות</h3><p class="muted">מ-₪${CONFIG.prices?.monthly} לחודש, או ₪${CONFIG.prices?.season} עד המיונים.</p><a class="btn primary" href="#/pricing">לפרטים</a></section>` : ""}
     ${S.deferredInstall ? `<section class="section install"><p>📲 אפשר להתקין את האפליקציה על הטלפון ולקבל בוחני פתע.</p><button class="btn" id="installBtn">התקנה</button></section>` : ""}
+    <p class="muted small center" style="margin-top:2rem"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a></p>
   `);
   $("#installBtn")?.addEventListener("click", async () => { S.deferredInstall.prompt(); const r = await S.deferredInstall.userChoice; if (r.outcome === "accepted") S.deferredInstall = null; });
 }
@@ -386,13 +391,14 @@ function pricing() {
 }
 function contact(params) {
   nav();
-  const plan = params?.get("plan");
-  setView(`<section class="auth contact"><h1>לדבר עם ${esc(CONFIG.mentor?.name || "המלווה")}</h1><p class="muted">${plan ? `מעניין אותך מסלול <b>${plan === "mentoring" ? "ליווי אישי" : "PRO"}</b> — השאירו פרטים ואחזור עם כל הפרטים והתשלום.` : "שאלות, ליווי אישי, או סתם להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
+  const plan = params?.get("plan"); const cancel = params?.get("cancel");
+  setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המלווה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך מסלול <b>${plan === "mentoring" ? "ליווי אישי" : "PRO"}</b> — השאירו פרטים ואחזור עם כל הפרטים והתשלום.` : "שאלות, ליווי אישי, או סתם להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
     ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהאפליקציה של ההכנה ל-8200")}">💬 וואטסאפ</a>` : ""}
     ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("הכנה ל-8200")}">✉️ אימייל</a>` : ""}
     ${leadFormHtml({ name: S.user?.name, phone: S.user?.phone, email: S.user?.email })}
   </section>`);
   if (plan) { const ta = $("#leadForm textarea"); if (ta) ta.value = `מעניין אותי המסלול: ${plan === "mentoring" ? "ליווי אישי" : plan === "season" ? "PRO לעונה" : "PRO חודשי"}`; }
+  if (cancel) { const ta = $("#leadForm textarea"); if (ta) ta.value = `בקשת ביטול: ${S.user ? `החשבון ${S.user.email}` : "(כתבו את האימייל של החשבון)"} — `; }
   wireLeadForm();
 }
 async function settings() {
@@ -422,7 +428,7 @@ function more() {
   if (!requireUser()) return;
   nav("#/more");
   setView(`<section><h1>עוד</h1><div class="menu">
-    <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 מסלולים ו-PRO</a><a href="#/contact">💬 לדבר עם המלווה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
+    <a href="#/map">🗺 מפת המיונים ובדיקת תנאי סף</a><a href="#/profile">🪞 פרופיל האישיות שלי</a><a href="#/pricing">💎 מסלולים ו-PRO</a><a href="#/contact">💬 לדבר עם המלווה</a><a href="#/settings">⚙️ הגדרות והתראות</a><a href="#/terms">📄 תקנון ופרטיות</a><a href="#/contact?cancel=1">✂️ ביטול מנוי / עסקה</a>${isAdmin() ? `<a href="#/admin">🛠 לוח ניהול</a>` : ""}<a href="../he/">🏛 DATTA · דאטא</a>
   </div>${footerHtml()}</section>`);
 }
 function terms() {
@@ -434,11 +440,22 @@ function terms() {
 ## הרשמה וקטינים
 השירות מיועד לבני 16 ומעלה. משתמש/ת מתחת לגיל 18 נרשם/ת באישור הורה או אפוטרופוס, והתשלום (אם יש) מתבצע על ידם. בהרשמה נשמרים: שם, אימייל, טלפון (לא חובה), כיתה ותאריך משוער של המיונים.
 
-## מה נשמר ולמה
-כדי שהאימון יעבוד, אנחנו שומרים את התשובות שלך, הזמנים, הציונים וההתקדמות. המלווה רואה את הנתונים האלה כדי לכוון אותך. הנתונים לא נמכרים ולא מועברים לצד שלישי, למעט ספקי תשתית (אחסון בענן, סליקה) הנדרשים להפעלת השירות. אפשר לבקש בכל עת לקבל עותק של הנתונים או למחוק את החשבון — דרך ההגדרות או בפנייה למלווה.
+## מה נשמר ולמה (יידוע לפי סעיף 11 לחוק הגנת הפרטיות)
+- **מה נאסף:** שם, אימייל, טלפון (לא חובה), כיתה, תאריך משוער של המיונים, פרטי הורה (לקטינים), התשובות שלך בתרגול, זמנים, ציונים, פרופיל אישיות מהשאלון, והודעות שאתם שולחים. אם מאשרים התראות — גם מזהה המכשיר לשליחתן.
+- **למה:** להפעיל את החשבון, להתאים את האימון, להציג התקדמות למלווה כדי שיכוון, וליצור קשר על ההתקדמות או על המנוי. אין חובה חוקית למסור את הפרטים; בלעדיהם לא ניתן לפתוח חשבון.
+- **מי מחזיק:** הנתונים נשמרים בשירותי הענן של Google (Firebase), בשרתים באירופה, ולצורך תשלום אצל ספק הסליקה. איננו מוכרים או מוסרים מידע לאף גורם אחר.
+- **הזכויות שלך:** לעיין במידע, לתקן אותו ולמחוק את החשבון — דרך ההגדרות או בפנייה למלווה. פרטי קשר למטה.
+- **אבטחה:** גישה לנתוני כל התלמידים יש רק למלווה; חוקי הגישה למסד הנתונים מונעים מתלמיד לראות נתונים של אחר. איננו אוספים תעודת זהות, כתובת או פרטי כרטיס אשראי (התשלום מתבצע בדף של ספק הסליקה).
 
 ## מנויים, תשלום וביטול
-מחירי המסלולים מוצגים בעמוד "מסלולים" וכוללים הכול (ללא מע״מ — עוסק פטור). על כל תשלום מונפקת קבלה. ניתן לבטל עסקה תוך 14 יום מיום ההצטרפות (ובלבד שהביטול נעשה לפחות יומיים לפני תום התקופה), בהתאם לחוק הגנת הצרכן; בביטול מאוחר יותר של מנוי תקופתי, יוחזר החלק היחסי. בקשת ביטול — בהודעה למלווה (אימייל/וואטסאפ).
+מחירי המסלולים מוצגים בעמוד "מסלולים" וכוללים את כל התשלומים (עוסק פטור — ללא מע״מ; אם יחול מע״מ בעתיד, המחיר המוצג יכלול אותו). על כל תשלום נשלחים קבלה ומייל אישור עם פרטי העסקה.
+
+- **ביטול תוך 14 יום** מיום ההצטרפות (מכר מרחוק): החזר מלא בניכוי דמי ביטול של עד 5% מהמחיר או 100 ₪, הנמוך מביניהם. ההחזר מבוצע תוך 14 יום.
+- **מנוי חודשי מתחדש** הוא עסקה מתמשכת: אפשר לבטל **בכל עת** — בטופס "ביטול מנוי" שבעמוד הבית, במייל או בוואטסאפ. החיוב נפסק תוך 3 ימי עסקים ממועד הבקשה, ומשלמים רק על התקופה שנוצלה.
+- **חבילת עונה (6 חודשים)** היא עסקה לתקופה קצובה: היא מסתיימת בסופה ואינה מתחדשת אוטומטית.
+- **מפגש ליווי** ניתן לביטול או להזזה עד 2 ימי עבודה לפני מועדו; מפגש שלא בוטל בזמן נחשב כמנוצל.
+
+ביטול = הודעה למלווה בכל אחת מהדרכים; תתקבל הודעת אישור במייל.
 
 ## שימוש הוגן
 החשבון אישי ואינו ניתן להעברה. אין להעתיק או להפיץ את השאלות, השיעורים וההסברים.
