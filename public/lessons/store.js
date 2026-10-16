@@ -120,7 +120,7 @@ async function makeFirebaseStore(cfg) {
   const app = initializeApp(cfg.firebase);
   const auth = A.getAuth(app);
   auth.languageCode = "he";
-  const db = F.getFirestore(app);
+  const db = cfg.firestoreDbId ? F.getFirestore(app, cfg.firestoreDbId) : F.getFirestore(app);
   const listeners = new Set();
   let current = null; // merged auth user + users/{uid} doc
   const emit = () => listeners.forEach((cb) => cb(current));

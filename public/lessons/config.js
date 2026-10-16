@@ -49,6 +49,8 @@ window.PREP_CONFIG = {
     appId: "1:291112758507:web:aa82c8ef54044cab0d62ae",
     measurementId: "G-GJFTTFVFF9",
   },
+  // מזהה מסד הנתונים ב-Firestore. ריק = מסד ברירת המחדל "(default)". כאן: המסד בשם dattacomputerlessons שיצרת.
+  firestoreDbId: "dattacomputerlessons",
   // מפתח VAPID של Cloud Messaging (Project settings → Cloud Messaging → Web Push certificates)
   vapidKey: "",
 
