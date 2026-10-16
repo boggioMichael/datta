@@ -6,7 +6,7 @@ The teacher is an engineer with six years of Android and Linux work in C/C++ and
 
 ## The practice app
 
-Students get a free practice app for the phone. It drills programming, psychotechnic reasoning, learning aptitude, English and personality questionnaires, sends surprise quizzes, and shows the teacher each student's accuracy per topic — so lessons go where the data points. The app also contains a complete, stage-by-stage preparation for the 8200 and similar screenings.
+Lesson packages include a practice app for the phone (also sold as a stand-alone subscription). It drills programming, psychotechnic reasoning, learning aptitude, English and personality questionnaires, sends surprise quizzes, and shows the teacher each student's accuracy per topic — so lessons go where the data points. The app also contains a complete, stage-by-stage preparation for the 8200 and similar screenings.
 
 ## Status
 

@@ -25,7 +25,9 @@ function modal(html, { onClose } = {}) {
 const isPro = () => { const u = S.user; if (!u) return false; if (u.role === "admin" || isAdminEmail(u.email)) return true; return u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()); };
 const isAdmin = () => !!S.user && (S.user.role === "admin" || isAdminEmail(S.user.email));
 const todayCount = () => S.progress.days?.[today()] || 0;
-const freeLeft = () => Math.max(0, (CONFIG.free?.dailyItems || 20) - todayCount());
+const freeLeft = () => Math.max(0, (CONFIG.free?.dailyItems || 0) - todayCount());
+const PAYWALL_TITLE = "התרגול זמין למנויים";
+const PAYWALL_TEXT = "אפליקציית התרגול פתוחה למנויי PRO ולתלמידים בחבילת שיעורים. אפשר להצטרף כאן, או לכתוב לי ואפעיל אחרי התשלום.";
 function requireUser() { if (!S.user) { S.afterLogin = location.hash && !/^#\/(login|register|reset)/.test(location.hash) ? location.hash : null; go("#/login"); return false; } return true; }
 function firstName() { return (S.user?.name || "").trim().split(/\s+/)[0] || "היי"; }
 function setView(html, cls = "") { document.querySelectorAll(".modal-wrap").forEach((m) => m.remove()); const v = view(); v.className = `view ${cls}`; v.innerHTML = html; window.scrollTo({ top: 0 }); return v; }
@@ -35,8 +37,8 @@ function nav(active) {
   $("#tabbar").innerHTML = S.user ? tabs.map(([h, i, t]) => `<a href="${h}" class="${active === h ? "active" : ""}"><span class="ti">${i}</span><span>${t}</span></a>`).join("") : "";
   $("#tabbar").hidden = !S.user;
   const tb = $("#topnav");
-  if (S.user) tb.innerHTML = `${isAdmin() ? `<a href="#/admin" class="top-link">לוח ניהול</a>` : ""}<a href="#/home" class="top-link ${isPro() ? "pro" : ""}">${isPro() ? "PRO" : "חינם"}</a>`;
-  else tb.innerHTML = `<a href="#/login" class="top-link">כניסה</a><a href="#/register" class="btn small primary">הרשמה חינם</a>`;
+  if (S.user) tb.innerHTML = `${isAdmin() ? `<a href="#/admin" class="top-link">לוח ניהול</a>` : ""}<a href="#/home" class="top-link ${isPro() ? "pro" : ""}">${isPro() ? "PRO" : "ללא מנוי"}</a>`;
+  else tb.innerHTML = `<a href="#/login" class="top-link">כניסה</a><a href="#lead" class="btn small primary">לתאם שיעור</a>`;
 }
 
 // ---------- progress bookkeeping ----------
@@ -71,13 +73,13 @@ function landing() {
   nav();
   const m = CONFIG.mentor || {};
   const topics = CONFIG.topics || [];
-  const steps = [["1", "שיעור ניסיון בחינם", "30 דקות בזום: מספרים איפה אתם, מה המטרה (בגרות, מיונים, פרויקט, סקרנות), ובודקים שהכימיה עובדת."], ["2", "תוכנית אישית", "מסלול קצר עם יעדים ברורים, ושיעורים אחד על אחד בקצב שלכם — פעם או פעמיים בשבוע."], ["3", "תרגול בין השיעורים", "אפליקציית תרגול חינמית עם בוחני פתע ומעקב התקדמות, כך שאני רואה מה עובד ומה צריך עוד עבודה."]];
+  const steps = [["1", "שיעור ראשון", "50 דקות בזום או פרונטלי: מספרים איפה אתם ומה המטרה (בגרות, מיונים, פרויקט, סקרנות), ומתחילים לעבוד מהדקה הראשונה."], ["2", "תוכנית אישית", "מסלול קצר עם יעדים ברורים, ושיעורים אחד על אחד בקצב שלכם — פעם או פעמיים בשבוע."], ["3", "תרגול בין השיעורים", "אפליקציית תרגול עם בוחני פתע ומעקב התקדמות (כלולה בחבילות השיעורים), כך שאני רואה מה עובד ומה צריך עוד עבודה."]];
   setView(`
     <section class="hero">
       <p class="eyebrow">אחד על אחד · בזום או פרונטלי · ${esc(m.name || "")}</p>
       <h1>${esc(CONFIG.appName || "שיעורים פרטיים במחשבים")}</h1>
       <p class="hero-lead">${bidi(CONFIG.tagline || "")}.</p>
-      <div class="cta-row"><a class="btn primary big" href="#lead">שיעור ניסיון בחינם</a><a class="btn big" href="#/register">לאפליקציית התרגול</a></div>
+      <div class="cta-row"><a class="btn primary big" href="#lead">לתאם שיעור</a><a class="btn big" href="#/pricing">מחירים</a></div>
       <p class="muted small">${esc((CONFIG.audiences || []).join(" · "))}</p>
     </section>
     <section class="section">
@@ -89,12 +91,12 @@ function landing() {
       <div class="steps">${steps.map(([n, t, d]) => `<div class="step"><span class="step-n">${n}</span><strong>${t}</strong><p class="muted">${d}</p></div>`).join("")}</div>
     </section>
     <section class="section mentor" id="mentor">
-      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור ניסיון</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}</div></div></div>
+      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}</div></div></div>
     </section>
     <section class="section" id="testimonials"></section>
     <section class="section app-teaser">
-      <div class="sec-head"><h2>אפליקציית התרגול — חינם לתלמידים</h2><a href="#/register" class="small">הרשמה ›</a></div>
-      <p class="muted">מתרגלים מהטלפון בין השיעורים, ואני רואה את ההתקדמות בלוח שלי. יש בה גם הכנה מלאה למיונים הטכנולוגיים (8200, ממר״ם, עתודה) לפי שלבי המיון: ${CATEGORIES.map((c) => esc(c.short)).join(", ")}.</p>
+      <div class="sec-head"><h2>אפליקציית התרגול</h2><a href="#/pricing" class="small">מנוי ›</a></div>
+      <p class="muted">כלולה בחבילות השיעורים, או במנוי נפרד. מתרגלים מהטלפון בין השיעורים, ואני רואה את ההתקדמות בלוח שלי. יש בה גם הכנה מלאה למיונים הטכנולוגיים (8200, ממר״ם, עתודה) לפי שלבי המיון: ${CATEGORIES.map((c) => esc(c.short)).join(", ")}.</p>
       <div class="features">
         <div class="feat"><span>⚡</span><strong>בוחני פתע</strong><p class="muted">התראה בטלפון, 5 שאלות, 2 דקות.</p></div>
         <div class="feat"><span>📈</span><strong>מעקב התקדמות</strong><p class="muted">שליטה בכל נושא, רצף ימים, מה לחזור עליו.</p></div>
@@ -104,9 +106,9 @@ function landing() {
     </section>
     <section class="section pricing-teaser">
       <h2>כמה זה עולה?</h2>
-      <p>שיעור ניסיון — חינם. שיעור של 50 דקות — ₪${P(CONFIG.prices?.lesson)}; חבילת 10 שיעורים — ₪${P(CONFIG.prices?.pack10)} (כולל אפליקציית התרגול המלאה). <a href="#/pricing">לכל המחירים</a>.</p>
+      <p>שיעור של 50 דקות — ₪${P(CONFIG.prices?.lesson)}; חבילת 10 שיעורים — ₪${P(CONFIG.prices?.pack10)} (כולל אפליקציית התרגול); אפליקציית התרגול לבד — ₪${P(CONFIG.prices?.monthly)} לחודש. <a href="#/pricing">לכל המחירים</a>.</p>
     </section>
-    <section class="section lead" id="lead"><h2>שיעור ניסיון בחינם</h2><p class="muted">השאירו פרטים ואחזור אליכם לתיאום (גם להורים). בלי התחייבות.</p>${leadFormHtml()}</section>
+    <section class="section lead" id="lead"><h2>לתאם שיעור</h2><p class="muted">השאירו פרטים ואחזור אליכם לתיאום השיעור הראשון (גם להורים).</p>${leadFormHtml()}</section>
     ${footerHtml()}
   `, "landing");
   wireLeadForm();
@@ -143,7 +145,7 @@ function wireLeadForm() {
 function authView(kind) {
   nav();
   const isReg = kind === "register";
-  setView(`<section class="auth"><h1>${isReg ? "הרשמה לאפליקציית התרגול" : kind === "reset" ? "איפוס סיסמה" : "כניסה"}</h1>${isReg ? `<p class="muted">חינם. תרגול מהטלפון, בוחני פתע ומעקב התקדמות — ואני רואה איפה כדאי לעזור.</p>` : ""}
+  setView(`<section class="auth"><h1>${isReg ? "הרשמה לאפליקציית התרגול" : kind === "reset" ? "איפוס סיסמה" : "כניסה"}</h1>${isReg ? `<p class="muted">פותחים חשבון כאן; התרגול נפתח עם מנוי PRO או חבילת שיעורים (אני מפעיל אחרי התשלום).</p>` : ""}
     ${S.store.mode === "local" ? `<p class="demo-note">מצב הדגמה: החשבון נשמר בדפדפן הזה בלבד.</p>` : ""}
     <form class="form" id="authForm">
       ${isReg ? `<label>שם מלא <input name="name" required autocomplete="name"></label>` : ""}
@@ -162,7 +164,7 @@ function authView(kind) {
       ${S.store.mode === "firebase" && kind !== "reset" ? `<button class="btn" type="button" id="googleBtn">המשך עם Google</button>` : ""}
       <p class="form-msg err" aria-live="polite"></p>
     </form>
-    <p class="muted">${isReg ? `כבר יש חשבון? <a href="#/login">כניסה</a>` : `אין חשבון? <a href="#/register">הרשמה חינם</a> · <a href="#/reset">שכחתי סיסמה</a>`}</p>
+    <p class="muted">${isReg ? `כבר יש חשבון? <a href="#/login">כניסה</a>` : `אין חשבון? <a href="#/register">הרשמה</a> · <a href="#/reset">שכחתי סיסמה</a>`}</p>
   </section>`, "auth-view");
   const f = $("#authForm");
   const gradeSel = f.querySelector("select[name=grade]");
@@ -229,7 +231,7 @@ async function home() {
       <div><h2>${done >= goal ? "היעד היומי הושלם! 🏆" : "האימון של היום"}</h2><p class="muted">${done >= goal ? "אפשר להמשיך — כל שאלה נוספת נספרת." : `${goal - done} שאלות ליעד. מעורב מכל הנושאים, עם דגש על מה שפחות חזק.`}</p>
       <div class="cta-row"><a class="btn primary" href="#/daily">${done ? "ממשיכים" : "מתחילים"} (${Math.max(5, Math.min(15, goal - done))} שאלות)</a><a class="btn" href="#/surprise">⚡ בוחן פתע</a></div></div>
     </section>
-    ${!isPro() ? `<p class="muted small center">נשארו היום ${freeLeft()} שאלות במסלול החינמי · <a href="#/pricing">PRO ללא הגבלה</a></p>` : ""}
+    ${!isPro() ? `<section class="section upgrade"><h3>${PAYWALL_TITLE}</h3><p class="muted">${PAYWALL_TEXT}</p><div class="cta-row"><a class="btn primary" href="#/pricing">מנוי וחבילות</a><a class="btn" href="#/contact?plan=monthly">לכתוב לי</a></div></section>` : ""}
     <section class="section"><div class="sec-head"><h2>מסלול ההכנה</h2><a href="#/train" class="muted small">כל הנושאים</a></div>
       <div class="cat-list">${catMastery.map(({ c, m }) => `<a class="cat-row" href="#/cat/${c.id}" style="--c:${c.color}"><span class="cat-emoji">${c.emoji}</span><span class="cat-main"><strong>${esc(c.title)}</strong><span class="bar"><i style="width:${Math.round(m * 100)}%"></i></span></span><span class="cat-pct">${Math.round(m * 100)}%</span></a>`).join("")}</div>
       ${next ? `<p class="muted small">המלצה להיום: <a href="#/cat/${next.id}">${esc(next.short)}</a> — הנושא הכי פחות מתורגל.</p>` : ""}
@@ -237,7 +239,7 @@ async function home() {
     </section>
     <section class="section mentor-msg"><div class="mentor-card small"><div class="avatar">${esc((CONFIG.mentor?.name || "מ")[0])}</div><div><p class="eyebrow">${esc(CONFIG.mentor?.name || "המורה")}</p>
       <p>${u.mentorMessage ? esc(u.mentorMessage) : "אני רואה את ההתקדמות שלך כאן ואשמח לכוון. רוצה שיעור על משהו שתקוע? כתוב/כתבי לי."}</p><a class="btn small" href="#/contact">לכתוב למורה</a></div></div></section>
-    ${!isPro() ? `<section class="section upgrade"><h3>רוצים שיעור על מה שתקוע?</h3><p class="muted">שיעור ניסיון בחינם, ו-PRO לאפליקציה (כל המאגר, סימולציות, תרגול חוזר) מ-₪${CONFIG.prices?.monthly} לחודש — כלול בחבילות השיעורים.</p><a class="btn primary" href="#/pricing">לשיעורים ולמחירים</a></section>` : ""}
+    ${isPro() ? `<section class="section upgrade"><h3>רוצים שיעור על מה שתקוע?</h3><p class="muted">שיעור בודד או חבילה — אחד על אחד, בזום או פרונטלי.</p><a class="btn primary" href="#/pricing">לשיעורים ולמחירים</a></section>` : ""}
     ${S.deferredInstall ? `<section class="section install"><p>📲 אפשר להתקין את האפליקציה על הטלפון ולקבל בוחני פתע.</p><button class="btn" id="installBtn">התקנה</button></section>` : ""}
     <p class="muted small center" style="margin-top:2rem"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a></p>
   `);
@@ -250,7 +252,7 @@ async function train() {
   const subsAll = await allSubs();
   const p = S.progress;
   setView(`<section><h1>תרגול לפי נושא</h1><p class="muted">בחרו נושא. בכל נושא יש שאלות עם הסברים, ובחלק מהם גם מחולל אינסופי.</p>
-    ${CATEGORIES.map((c) => `<div class="train-cat" style="--c:${c.color}"><h2><a href="#/cat/${c.id}">${c.emoji} ${esc(c.title)}</a></h2><div class="sub-list">${subsAll.filter((s) => s.cat.id === c.id).map((s) => { const st = subStats(p, s.id); return `<a class="sub-row" href="#/practice/${c.id}/${s.id}"><span><strong>${esc(s.title)}</strong><span class="muted small"> · ${s.generated ? "מחולל" : `${s.items.filter((i) => isPro() || !i.pro).length} שאלות`}${st.n ? ` · ${Math.round(st.acc * 100)}% מ-${st.n}` : ""}</span></span><span class="bar"><i style="width:${Math.round(st.acc * Math.min(1, st.n / 30) * 100)}%"></i></span></a>`; }).join("")}</div></div>`).join("")}
+    ${CATEGORIES.map((c) => `<div class="train-cat" style="--c:${c.color}"><h2><a href="#/cat/${c.id}">${c.emoji} ${esc(c.title)}</a></h2><div class="sub-list">${subsAll.filter((s) => s.cat.id === c.id).map((s) => { const st = subStats(p, s.id); return `<a class="sub-row" href="#/practice/${c.id}/${s.id}"><span><strong>${esc(s.title)}</strong><span class="muted small"> · ${s.generated ? "מחולל" : `${s.items.length} שאלות`}${st.n ? ` · ${Math.round(st.acc * 100)}% מ-${st.n}` : ""}</span></span><span class="bar"><i style="width:${Math.round(st.acc * Math.min(1, st.n / 30) * 100)}%"></i></span></a>`; }).join("")}</div></div>`).join("")}
     <div class="section"><h2>סימולציות</h2><p class="muted">מבחן מלא עם שעון, הסברים בסוף. ${isPro() ? "" : "זמין ב-PRO."}</p><div class="cta-row"><a class="btn ${isPro() ? "primary" : ""}" href="#/sim/all">סימולציה מלאה מעורבת</a>${CATEGORIES.filter((c) => c.sim).map((c) => `<a class="btn" href="#/sim/${c.id}">${c.emoji} ${esc(c.short)}</a>`).join("")}</div></div>
   </section>`);
 }
@@ -268,7 +270,8 @@ async function category(id) {
     <div class="cat-stat"><span class="bar"><i style="width:${Math.round(m * 100)}%"></i></span><b>${Math.round(m * 100)}% שליטה</b></div>
     ${lessons.length ? `<h2>שיעורים קצרים</h2><div class="lessons">${lessons.map((l) => `<a class="lesson-row" href="#/lesson/${c.id}/${l.id}"><span>📖</span><span><strong>${esc(l.title)}</strong><span class="muted small"> · ${l.minutes} דק׳</span></span></a>`).join("")}</div>` : ""}
     <h2>תרגול</h2>
-    <div class="sub-list">${subs.map((s) => { const st = subStats(p, s.id); const n = s.generated ? "∞" : s.items.filter((i) => isPro() || !i.pro).length; return `<div class="sub-card"><div><strong>${esc(s.title)}</strong><div class="muted small">${s.generated ? esc(s.desc || "מחולל שאלות") : `${n} שאלות${!isPro() && s.items.some((i) => i.pro) ? ` (+${s.items.filter((i) => i.pro).length} ב-PRO)` : ""}`}${st.n ? ` · דיוק ${Math.round(st.acc * 100)}% (${st.n})` : ""}</div></div>
+    ${!isPro() ? `<p class="muted small">${PAYWALL_TEXT} <a href="#/pricing">למחירים</a></p>` : ""}
+    <div class="sub-list">${subs.map((s) => { const st = subStats(p, s.id); const n = s.generated ? "∞" : s.items.length; return `<div class="sub-card"><div><strong>${esc(s.title)}</strong><div class="muted small">${s.generated ? esc(s.desc || "מחולל שאלות") : `${n} שאלות`}${st.n ? ` · דיוק ${Math.round(st.acc * 100)}% (${st.n})` : ""}</div></div>
       <div class="sub-actions">${s.id === "likert" ? `<a class="btn small primary" href="#/practice/${c.id}/${s.id}?n=30">שאלון (30)</a><a class="btn small" href="#/profile">הפרופיל שלי</a>` : `<a class="btn small primary" href="#/practice/${c.id}/${s.id}?n=10">10 שאלות</a><a class="btn small" href="#/practice/${c.id}/${s.id}?n=20">20</a>${s.generated || s.items.some((i) => i.difficulty === 3) ? `<a class="btn small" href="#/practice/${c.id}/${s.id}?n=10&d=3" title="קשה">קשה</a>` : ""}`}</div></div>`; }).join("")}</div>
     ${c.sim ? `<div class="section"><h2>סימולציה — ${esc(c.short)}</h2><p class="muted">${c.sim.items} שאלות · ${c.sim.minutes} דקות · הסברים בסוף.</p><a class="btn ${isPro() ? "primary" : ""}" href="#/sim/${c.id}">${isPro() ? "להתחיל סימולציה" : "סימולציה (PRO)"}</a></div>` : ""}
   </section>`);
@@ -276,6 +279,7 @@ async function category(id) {
 
 async function lesson(catId, lessonId) {
   if (!requireUser()) return;
+  if (!isPro()) return upgradePrompt(PAYWALL_TITLE, PAYWALL_TEXT);
   const c = catById(catId); const { lessons } = await loadCategory(catId);
   const l = lessons.find((x) => x.id === lessonId); if (!l) return go(`#/cat/${catId}`);
   nav("#/train");
@@ -293,7 +297,7 @@ async function practice(catId, subId, params) {
   const sub = subs.find((s) => s.id === subId); if (!sub) return go(`#/cat/${catId}`);
   let n = Math.min(60, parseInt(params.get("n") || "10", 10) || 10);
   const d = parseInt(params.get("d") || "0", 10) || 0;
-  if (!isPro() && sub.id !== "likert") { if (freeLeft() <= 0) return upgradePrompt("נגמרו השאלות החינמיות להיום", "מחר יתאפסו 20 שאלות חדשות — או ש-PRO פותח הכול עכשיו."); n = Math.min(n, freeLeft()); }
+  if (!isPro()) { if (freeLeft() <= 0) return upgradePrompt(PAYWALL_TITLE, PAYWALL_TEXT); n = Math.min(n, freeLeft()); }
   const items = pickItems({ sub, progress: S.progress, isPro: isPro(), n, difficulty: d });
   if (!items.length) { toast("אין כרגע שאלות בנושא הזה"); return go(`#/cat/${catId}`); }
   runQuiz({ items, title: `${sub.title} · ${c.short}`, mode: sub.id === "likert" ? "personality" : "practice", immediate: sub.id !== "likert", cat: catId, sub: subId, back: `#/cat/${catId}`, again: `#/practice/${catId}/${subId}?n=${n}${d ? `&d=${d}` : ""}` });
@@ -301,7 +305,7 @@ async function practice(catId, subId, params) {
 async function daily() {
   if (!requireUser()) return;
   const goal = S.progress.dailyGoal || 15; let n = Math.max(5, Math.min(15, goal - todayCount() || goal));
-  if (!isPro()) { if (freeLeft() <= 0) return upgradePrompt("נגמרו השאלות החינמיות להיום", "מחר יתאפסו 20 שאלות חדשות — או ש-PRO פותח הכול עכשיו."); n = Math.min(n, freeLeft()); }
+  if (!isPro()) { if (freeLeft() <= 0) return upgradePrompt(PAYWALL_TITLE, PAYWALL_TEXT); n = Math.min(n, freeLeft()); }
   const tracks = S.progress.onboarding?.tracks || [];
   const cats = ["dapar", "learning", "english"]; if (tracks.includes("coding") || !tracks.length) cats.push("coding");
   nav("#/home"); setView(`<p class="loading">מרכיבים את האימון של היום…</p>`);
@@ -310,14 +314,14 @@ async function daily() {
 }
 async function surprise() {
   if (!requireUser()) return;
-  if (!isPro() && freeLeft() <= 0) return upgradePrompt("נגמרו השאלות החינמיות להיום", "בוחני פתע ללא הגבלה — ב-PRO.");
+  if (!isPro() && freeLeft() <= 0) return upgradePrompt(PAYWALL_TITLE, PAYWALL_TEXT);
   nav("#/home"); setView(`<p class="loading">⚡ בוחן פתע בדרך…</p>`);
   const items = await pickMixed({ catIds: ["dapar", "learning"], progress: S.progress, isPro: isPro(), n: 5, seed: Date.now() });
   runQuiz({ items: items.slice(0, 5), title: "⚡ בוחן פתע", mode: "surprise", immediate: false, timeLimitSec: 150, back: "#/home", again: "#/surprise" });
 }
 async function sim(catId) {
   if (!requireUser()) return;
-  if (!isPro() && !CONFIG.free?.simulations) return upgradePrompt("סימולציות מלאות זמינות ב-PRO", "סימולציה = מבחן מלא עם שעון, בדיוק כמו ביום האמיתי. הסברים לכל שאלה בסוף.");
+  if (!isPro() && !CONFIG.free?.simulations) return upgradePrompt(PAYWALL_TITLE, PAYWALL_TEXT);
   nav("#/train"); setView(`<p class="loading">מכינים סימולציה…</p>`);
   let items, title, minutes;
   if (catId === "all") { items = await pickMixed({ catIds: ["dapar", "learning", "english"], progress: S.progress, isPro: true, n: 40 }); title = "סימולציה מלאה"; minutes = 35; }
@@ -345,7 +349,7 @@ function runQuiz({ items, title, mode, immediate, timeLimitSec, cat, sub, back, 
 }
 function upgradePrompt(title, text) {
   nav();
-  setView(`<section class="auth"><h1>${esc(title)}</h1><p>${esc(text)}</p><div class="cta-row"><a class="btn primary" href="#/pricing">לשיעורים ול-PRO</a><a class="btn" href="#/home">חזרה</a></div></section>`);
+  setView(`<section class="auth"><h1>${esc(title)}</h1><p>${esc(text)}</p><div class="cta-row"><a class="btn primary" href="#/pricing">מנוי וחבילות</a><a class="btn" href="#/contact?plan=monthly">לכתוב לי</a><a class="btn" href="#/home">חזרה</a></div></section>`);
 }
 
 // ---------- progress ----------
@@ -389,27 +393,26 @@ function pricing() {
   nav();
   const pr = CONFIG.prices || {}; const pl = CONFIG.payLinks || {};
   const btn = (key, label, cls = "") => pl[key] ? `<a class="btn ${cls}" target="_blank" rel="noopener" href="${esc(pl[key])}">${label}</a>` : (S.store.mode === "local" && S.user && ["monthly", "season"].includes(key) ? `<button class="btn ${cls}" data-demo-pro="${key}">${label} (הדגמה)</button>` : `<a class="btn ${cls}" href="#/contact?plan=${key}">${label}</a>`);
-  setView(`<section class="pricing"><h1>מחירים</h1><p class="muted">מתחילים בשיעור ניסיון חינם. המחירים כוללים הכול (עוסק פטור — ללא מע״מ).</p>
+  setView(`<section class="pricing"><h1>מחירים</h1><p class="muted">המחירים כוללים הכול (עוסק פטור — ללא מע״מ). תשלום לפני השיעור הראשון.</p>
     <h2>שיעורים פרטיים</h2>
     <div class="plans">
-      <div class="plan"><h3>שיעור ניסיון</h3><div class="price">₪0</div><ul><li>30 דקות בזום</li><li>מבינים איפה אתם ומה המטרה</li><li>בלי התחייבות</li></ul><a class="btn primary" href="#/contact?plan=trial">לתאם</a></div>
-      <div class="plan"><h3>שיעור בודד</h3><div class="price">₪${P(pr.lesson)}<small>/50 דק׳</small></div><ul><li>אחד על אחד, בזום או פרונטלי</li><li>חומר וסיכום אחרי כל שיעור</li><li>גישה לאפליקציית התרגול (חינם)</li></ul>${btn("lesson", "לתאם שיעור")}</div>
+      <div class="plan"><h3>שיעור בודד</h3><div class="price">₪${P(pr.lesson)}<small>/50 דק׳</small></div><ul><li>אחד על אחד, בזום או פרונטלי</li><li>חומר וסיכום אחרי כל שיעור</li><li>שיעור ראשון = היכרות ותוכנית עבודה</li></ul>${btn("lesson", "לתאם שיעור")}</div>
       <div class="plan hi"><span class="tag">הכי משתלם</span><h3>חבילת 10 שיעורים</h3><div class="price">₪${P(pr.pack10)}<small> · ₪${P(Math.round(pr.pack10 / 10))} לשיעור</small></div><p class="muted small">או 5 שיעורים — ₪${P(pr.pack5)}</p><ul><li>תוכנית אישית עם יעדים</li><li>וואטסאפ פתוח לשאלות בין השיעורים</li><li>PRO לעונה באפליקציית התרגול — כלול</li><li>תוקף 6 חודשים</li></ul><div class="cta-col">${btn("pack10", "חבילת 10", "primary")}${btn("pack5", "חבילת 5 — ₪" + pr.pack5)}</div></div>
     </div>
     <h2>הכנה למיונים טכנולוגיים</h2>
     <div class="plans">
       <div class="plan"><h3>חבילת הכנה למיונים</h3><div class="price">₪${P(pr.mentoring)}</div><ul><li>4 שיעורים אישיים לפי שלבי המיון</li><li>סימולציית ראיון אישי + משוב</li><li>PRO לעונה באפליקציית התרגול</li><li>תוכנית לפי תאריך המיונים שלך</li></ul>${btn("mentoring", "לתאם שיחה")}</div>
-      <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>ללא הגבלת שאלות (חינם: ${CONFIG.free?.dailyItems || 20} ביום)</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
+      <div class="plan"><h3>אפליקציית התרגול — PRO</h3><div class="price">₪${P(pr.monthly)}<small>/חודש</small></div><p class="muted small">או ₪${P(pr.season)} לעונה (6 חודשים)</p><ul><li>620 שאלות עם הסברים + מחוללים ללא הגבלה</li><li>סימולציות מלאות עם שעון</li><li>תרגול חוזר של טעויות ופרופיל אישיות</li><li>אני עוקב אחרי ההתקדמות ומכוון</li></ul><div class="cta-col">${btn("monthly", "חודשי")}${btn("season", "עונה — ₪" + pr.season)}</div></div>
     </div>
     <p class="muted small">ביטול תוך 14 יום לפי חוק הגנת הצרכן; מנוי חודשי ניתן לביטול בכל עת; שיעור ניתן להזזה עד 2 ימי עבודה לפני. <a href="#/terms">לתקנון</a>.</p>
   </section>`);
   document.querySelectorAll("[data-demo-pro]").forEach((b) => { b.onclick = async () => { const until = Date.now() + (b.dataset.demoPro === "season" ? 183 : 31) * 864e5; await S.store.users.update(S.user.uid, { plan: "pro", planUntil: until, planSource: "demo" }); toast("PRO הופעל (הדגמה) ✨", "ok"); go("#/home"); }; });
 }
-const PLAN_LABELS = { trial: "שיעור ניסיון", lesson: "שיעור בודד", pack5: "חבילת 5 שיעורים", pack10: "חבילת 10 שיעורים", mentoring: "חבילת הכנה למיונים", monthly: "PRO חודשי באפליקציה", season: "PRO לעונה באפליקציה" };
+const PLAN_LABELS = { lesson: "שיעור בודד", pack5: "חבילת 5 שיעורים", pack10: "חבילת 10 שיעורים", mentoring: "חבילת הכנה למיונים", monthly: "PRO חודשי באפליקציה", season: "PRO לעונה באפליקציה" };
 function contact(params) {
   nav();
   const plan = params?.get("plan"); const cancel = params?.get("cancel");
-  setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המורה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך <b>${PLAN_LABELS[plan] || plan}</b> — השאירו פרטים ואחזור לתיאום.` : "שיעור ניסיון, שאלות, או סתם להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
+  setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המורה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך <b>${PLAN_LABELS[plan] || plan}</b> — השאירו פרטים ואחזור לתיאום.` : "לתאם שיעור, לשאול, או להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
     ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">💬 וואטסאפ</a>` : ""}
     ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("שיעורים פרטיים במחשבים")}">✉️ אימייל</a>` : ""}
     ${leadFormHtml({ name: S.user?.name, phone: S.user?.phone, email: S.user?.email })}
@@ -434,7 +437,7 @@ async function settings() {
     </form>
     <div class="section"><h3>התראות בטלפון</h3><p class="muted small">${S.store.mode === "firebase" ? "בוחני פתע ותזכורות גם כשהאפליקציה סגורה." : "במצב הדגמה ההתראות עובדות רק כשהאפליקציה פתוחה."} באייפון: קודם 'הוסף למסך הבית' (שיתוף ← הוסף למסך הבית) ואז לאשר כאן.</p>
       <button class="btn" id="notifBtn">${window.Notification?.permission === "granted" ? "ההתראות פעילות ✓" : "הפעלת התראות"}</button></div>
-    <div class="section"><h3>החשבון</h3><p class="muted small">${esc(S.user.email)} · ${isPro() ? `PRO${S.user.planUntil ? ` עד ${fmtDate(S.user.planUntil)}` : ""}` : "חינם"} · ${S.store.mode === "firebase" ? "מצב חי" : "מצב הדגמה"}</p><div class="cta-row"><button class="btn" id="logoutBtn">יציאה</button>${S.store.mode === "local" ? `<button class="btn danger" id="deleteBtn">מחיקת החשבון</button>` : ""}</div></div>
+    <div class="section"><h3>החשבון</h3><p class="muted small">${esc(S.user.email)} · ${isPro() ? `PRO${S.user.planUntil ? ` עד ${fmtDate(S.user.planUntil)}` : ""}` : "ללא מנוי"} · ${S.store.mode === "firebase" ? "מצב חי" : "מצב הדגמה"}</p><div class="cta-row"><button class="btn" id="logoutBtn">יציאה</button>${S.store.mode === "local" ? `<button class="btn danger" id="deleteBtn">מחיקת החשבון</button>` : ""}</div></div>
   </section>`);
   $("#setForm").onsubmit = async (e) => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target).entries()); p.dailyGoal = +fd.dailyGoal; p.settings = { ...st, surprise: !!fd.surprise, theme: fd.theme }; applyTheme(); await S.store.progress.save(S.user.uid, p); await S.store.users.update(S.user.uid, { name: fd.name.trim(), phone: fd.phone, grade: fd.grade, targetDate: fd.targetDate, dailyGoal: p.dailyGoal }); toast("נשמר ✓", "ok"); scheduleSurprise(); };
   $("#notifBtn").onclick = () => enableNotifications();
@@ -529,7 +532,7 @@ async function admin(sub, id) {
     <div class="cta-row"><a class="btn" href="#/admin/leads">פניות (${leads.length})</a><a class="btn" href="#/admin/testimonials">המלצות</a><button class="btn" id="csvBtn">ייצוא CSV</button>${S.store.mode === "local" ? `<button class="btn" id="seedBtn">${users.some((u) => u.demo) ? "מחיקת נתוני הדגמה" : "יצירת תלמידי הדגמה"}</button>` : ""}</div>
     <input class="search" id="q" placeholder="חיפוש לפי שם / אימייל / טלפון">
     <div class="tbl"><table id="stuTable"><thead><tr><th>תלמיד/ה</th><th>כיתה</th><th>מיונים</th><th>מסלול</th><th>שאלות</th><th>דיוק</th><th>רצף</th><th>פעיל/ה</th></tr></thead><tbody>
-      ${users.map((u) => `<tr data-uid="${u.uid}" data-s="${esc((u.name || "") + " " + u.email + " " + (u.phone || ""))}"><td><a href="#/admin/student/${u.uid}">${esc(u.name || "—")}</a>${u.demo ? ' <span class="pill">דמו</span>' : ""}<br><span class="muted small" dir="ltr">${esc(u.email)}</span></td><td>${esc(GRADES[u.grade] || u.grade || "—")}</td><td>${esc(u.targetDate || "—")}</td><td>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO</span>` : "חינם"}</td><td>${Number(u.stats?.items) || 0}</td><td>${Number(u.stats?.items) ? Math.round((Number(u.stats.ok) / Number(u.stats.items)) * 100) + "%" : "—"}</td><td>${Number(u.stats?.streak) || 0}</td><td>${u.lastActive ? (daysAgo(u.lastActive) === 0 ? "היום" : `לפני ${daysAgo(u.lastActive)} ימים`) : "—"}</td></tr>`).join("") || `<tr><td colspan="8" class="muted">עדיין אין תלמידים. כשמישהו נרשם הוא יופיע כאן.</td></tr>`}
+      ${users.map((u) => `<tr data-uid="${u.uid}" data-s="${esc((u.name || "") + " " + u.email + " " + (u.phone || ""))}"><td><a href="#/admin/student/${u.uid}">${esc(u.name || "—")}</a>${u.demo ? ' <span class="pill">דמו</span>' : ""}<br><span class="muted small" dir="ltr">${esc(u.email)}</span></td><td>${esc(GRADES[u.grade] || u.grade || "—")}</td><td>${esc(u.targetDate || "—")}</td><td>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO</span>` : "ללא מנוי"}</td><td>${Number(u.stats?.items) || 0}</td><td>${Number(u.stats?.items) ? Math.round((Number(u.stats.ok) / Number(u.stats.items)) * 100) + "%" : "—"}</td><td>${Number(u.stats?.streak) || 0}</td><td>${u.lastActive ? (daysAgo(u.lastActive) === 0 ? "היום" : `לפני ${daysAgo(u.lastActive)} ימים`) : "—"}</td></tr>`).join("") || `<tr><td colspan="8" class="muted">עדיין אין תלמידים. כשמישהו נרשם הוא יופיע כאן.</td></tr>`}
     </tbody></table></div></section>`);
   $("#q").oninput = (e) => { const q = e.target.value.trim().toLowerCase(); document.querySelectorAll("#stuTable tbody tr").forEach((tr) => { tr.hidden = q && !(tr.dataset.s || "").toLowerCase().includes(q); }); };
   $("#csvBtn").onclick = () => { const rows = [["name", "email", "phone", "grade", "targetDate", "plan", "planUntil", "items", "accuracy", "streak", "lastActive", "createdAt", "referrer"], ...users.map((u) => [u.name, u.email, u.phone, u.grade, u.targetDate, u.plan, u.planUntil ? new Date(u.planUntil).toISOString().slice(0, 10) : "", u.stats?.items ?? 0, u.stats?.items ? Math.round((u.stats.ok / u.stats.items) * 100) : "", u.stats?.streak ?? 0, u.lastActive ? new Date(u.lastActive).toISOString() : "", u.createdAt ? new Date(u.createdAt).toISOString() : "", u.referrer])]; const csv = "﻿" + rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n"); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `students-${today()}.csv`; a.click(); };
@@ -559,7 +562,7 @@ async function adminStudent(uid) {
   const p = await S.store.progress.get(uid); const subsAll = await allSubs(); const attempts = await S.store.attempts.list(uid, 20);
   const t = p.traits || {};
   setView(`<section class="admin"><a class="back" href="#/admin">‹ לוח ניהול</a>
-    <div class="sec-head"><h1>${esc(u.name || "—")}</h1>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO${u.planUntil ? ` עד ${fmtDate(u.planUntil)}` : ""}</span>` : `<span class="pill">חינם</span>`}</div>
+    <div class="sec-head"><h1>${esc(u.name || "—")}</h1>${u.plan === "pro" && (!u.planUntil || u.planUntil > Date.now()) ? `<span class="pill pro">PRO${u.planUntil ? ` עד ${fmtDate(u.planUntil)}` : ""}</span>` : `<span class="pill">ללא מנוי</span>`}</div>
     <p class="muted small" dir="auto">${esc(u.email)} · ${esc(u.phone || "ללא טלפון")} · ${esc(GRADES[u.grade] || "—")} · מיונים: ${esc(u.targetDate || "—")} · נרשם/ה ${fmtDate(u.createdAt)} · פעיל/ה ${fmtDateTime(u.lastActive)}${u.referrer ? ` · הפניה: ${esc(u.referrer)}` : ""}${Array.isArray(u.tracks) && u.tracks.length ? ` · מסלולים: ${esc(u.tracks.join(", "))}` : ""}${u.parentName ? ` · הורה: ${esc(u.parentName)} <span dir="ltr">${esc(u.parentContact || "")}</span>` : ""}</p>
     <div class="cta-row">${u.phone ? `<a class="btn small" target="_blank" rel="noopener" href="https://wa.me/${esc(String(u.phone).replace(/\D/g, "").replace(/^0/, "972"))}">וואטסאפ</a>` : ""}<a class="btn small" href="mailto:${esc(u.email)}">אימייל</a></div>
     <div class="kpis"><div class="kpi"><b>${Number(u.stats?.items) || 0}</b><span>שאלות</span></div><div class="kpi"><b>${Number(u.stats?.items) ? Math.round((Number(u.stats.ok) / Number(u.stats.items)) * 100) : 0}%</b><span>דיוק</span></div><div class="kpi"><b>${p.streak || 0}</b><span>רצף</span></div><div class="kpi"><b>${Object.keys(p.days || {}).length}</b><span>ימי אימון</span></div></div>
@@ -569,7 +572,7 @@ async function adminStudent(uid) {
     ${attempts.length ? `<h2>תרגולים אחרונים</h2><div class="attempts">${attempts.map((a) => `<div class="att"><span>${esc(a.title)}</span><span class="muted small">${fmtDateTime(a.startedAt)}</span><b>${a.scoredTotal ? `${a.score}/${a.scoredTotal}` : "✓"}</b></div>`).join("")}</div>` : ""}
     <h2>ניהול</h2>
     <form class="form" id="mgForm">
-      <div class="row2"><label>מסלול <select name="plan"><option value="free" ${u.plan !== "pro" ? "selected" : ""}>חינם</option><option value="pro" ${u.plan === "pro" ? "selected" : ""}>PRO</option></select></label><label>PRO עד <input type="date" name="planUntil" value="${u.planUntil ? new Date(u.planUntil).toISOString().slice(0, 10) : ""}"></label></div>
+      <div class="row2"><label>מסלול <select name="plan"><option value="free" ${u.plan !== "pro" ? "selected" : ""}>ללא מנוי</option><option value="pro" ${u.plan === "pro" ? "selected" : ""}>PRO</option></select></label><label>PRO עד <input type="date" name="planUntil" value="${u.planUntil ? new Date(u.planUntil).toISOString().slice(0, 10) : ""}"></label></div>
       <label>הודעה אישית לתלמיד/ה (מוצגת במסך הבית) <textarea name="mentorMessage" rows="3">${esc(u.mentorMessage || "")}</textarea></label>
       <label>הערות פנימיות (רק אתה רואה) <textarea name="adminNotes" rows="3">${esc(u.adminNotes || "")}</textarea></label>
       <button class="btn primary" type="submit">שמירה</button>

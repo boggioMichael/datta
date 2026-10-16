@@ -4,8 +4,8 @@
   project: projects/computer-lessons
   title: { en: "Private computer lessons: page and practice app live", he: "שיעורים פרטיים במחשבים: הדף ואפליקציית התרגול באוויר" }
   text:
-    en: "Topics, pricing and a trial-lesson form, plus a free practice app: six screening-stage categories, ~620 original questions with explanations, unlimited generated drills, surprise quizzes, progress tracking and a teacher dashboard. Demo mode; live backend and payments next."
-    he: "נושאים, מחירים וטופס שיעור ניסיון, ועוד אפליקציית תרגול חינמית: שש קטגוריות לפי שלבי המיון, כ-620 שאלות מקוריות עם הסברים, מחוללים ללא הגבלה, בוחני פתע, מעקב התקדמות ולוח מורה. מצב הדגמה; השרת החי והסליקה הבאים בתור."
+    en: "Topics, pricing and a booking form, plus a practice app for subscribers: six screening-stage categories, ~620 original questions with explanations, unlimited generated drills, surprise quizzes, progress tracking and a teacher dashboard. Demo mode; live backend and payments next."
+    he: "נושאים, מחירים וטופס תיאום, ועוד אפליקציית תרגול למנויים: שש קטגוריות לפי שלבי המיון, כ-620 שאלות מקוריות עם הסברים, מחוללים ללא הגבלה, בוחני פתע, מעקב התקדמות ולוח מורה. מצב הדגמה; השרת החי והסליקה הבאים בתור."
   link: https://boggiomichael.github.io/datta/lessons/
 
 - date: 2026-10-01

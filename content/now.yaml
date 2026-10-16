@@ -4,8 +4,8 @@ items:
   - project: projects/computer-lessons
     title: { en: "Private computer lessons", he: "שיעורים פרטיים במחשבים" }
     text:
-      en: "Wiring the live backend and the payment page for the lessons page and practice app; first students booking trial lessons."
-      he: "מחברים את השרת החי ואת דף התשלום לדף השיעורים ולאפליקציית התרגול; תלמידים ראשונים קובעים שיעורי ניסיון."
+      en: "Wiring the live backend and the payment page for the lessons page and practice app; first students booking lessons."
+      he: "מחברים את השרת החי ואת דף התשלום לדף השיעורים ולאפליקציית התרגול; תלמידים ראשונים קובעים שיעורים."
   - project: projects/rasa
     title: { en: "Rasa", he: "ראסא" }
     text:
