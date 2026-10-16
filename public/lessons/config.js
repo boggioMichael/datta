@@ -52,7 +52,7 @@ window.PREP_CONFIG = {
   // מזהה מסד הנתונים ב-Firestore. ריק = מסד ברירת המחדל "(default)". כאן: המסד בשם dattacomputerlessons שיצרת.
   firestoreDbId: "dattacomputerlessons",
   // מפתח VAPID של Cloud Messaging (Project settings → Cloud Messaging → Web Push certificates)
-  vapidKey: "",
+  vapidKey: "BKE_pqXgPgEdOFb220r5RQEp51_5ODovTb8a2GL7MxwgNRog1kA728YwIe2bLfCfo59tutJB9lIjdobFpzNsPVU",
 
   // ---- שיעורים, מנויים ותשלום ----
   // המחירים מוצגים בעמוד "מחירים". הקישורים הם דפי תשלום מהסולק (Grow / PayPlus / וכו').

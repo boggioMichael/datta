@@ -1,5 +1,5 @@
 rules_version = '2';
-// חוקי אבטחה ל-Firestore של "מוכנים ל-8200".
+// חוקי אבטחה ל-Firestore של "שיעורים פרטיים במחשבים".
 // להדביק ב-Firebase Console → Firestore Database → Rules → Publish.
 // עדכנו את רשימת האדמינים (אימיילים באותיות קטנות) לפי config.js.
 service cloud.firestore {
