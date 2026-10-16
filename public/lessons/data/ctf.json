@@ -1,0 +1,845 @@
+{
+  "pack": "ctf",
+  "category": "ctf",
+  "title": "CTF — מערכת, בינארי ומיגונים",
+  "items": [
+    {
+      "id": "ctf-pf-1",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה יודפס?",
+      "options": [
+        "42",
+        "%d",
+        "0",
+        "שגיאת קומפילציה"
+      ],
+      "answer": 0,
+      "explanation": "המרת %d מדפיסה את השלם העשרוני 42.",
+      "timeSec": 30,
+      "tags": [
+        "printf"
+      ],
+      "pro": false,
+      "code": "printf(\"%d\\n\", 42);"
+    },
+    {
+      "id": "ctf-pf-2",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה יודפס?",
+      "options": [
+        "65",
+        "A",
+        "a",
+        "הבית הגולמי 0x41"
+      ],
+      "answer": 1,
+      "explanation": "%c מדפיס את התו שקוד ה-ASCII שלו 65 — האות A.",
+      "timeSec": 30,
+      "tags": [
+        "printf"
+      ],
+      "pro": false,
+      "code": "printf(\"%c\\n\", 65);"
+    },
+    {
+      "id": "ctf-pf-3",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה יודפס?",
+      "options": [
+        "42",
+        "0042",
+        "00042",
+        "42000"
+      ],
+      "answer": 2,
+      "explanation": "רוחב 5 עם אפס מוביל נותן 00042.",
+      "timeSec": 35,
+      "tags": [
+        "printf"
+      ],
+      "pro": true,
+      "code": "printf(\"%05d\\n\", 42);"
+    },
+    {
+      "id": "ctf-pf-4",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה יודפס?",
+      "options": [
+        "3.1",
+        "3.142",
+        "3.14159",
+        "3.14"
+      ],
+      "answer": 3,
+      "explanation": "דיוק של שתי ספרות אחרי הנקודה מעגל ל-3.14.",
+      "timeSec": 40,
+      "tags": [
+        "printf"
+      ],
+      "pro": true,
+      "code": "printf(\"%.2f\\n\", 3.14159);"
+    },
+    {
+      "id": "ctf-pf-5",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה יודפס, ובאיזה סדר?",
+      "options": [
+        "ab2",
+        "2ab",
+        "ab",
+        "2"
+      ],
+      "answer": 0,
+      "explanation": "ה-printf הפנימי מדפיס ab ומחזיר 2, ואז מודפס 2 — כלומר ab2.",
+      "timeSec": 55,
+      "tags": [
+        "printf",
+        "eval-order"
+      ],
+      "pro": true,
+      "code": "printf(\"%d\\n\", printf(\"ab\"));"
+    },
+    {
+      "id": "ctf-pf-6",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מאפיין את הקוד?",
+      "options": [
+        "מדפיס 5 ואז 0",
+        "התנהגות בלתי־מוגדרת: אין ארגומנט ל-%d השני",
+        "שגיאת קומפילציה ודאית",
+        "מדפיס 5 5"
+      ],
+      "answer": 1,
+      "explanation": "ספציפייר פורמט בלי ארגומנט מתאים הוא התנהגות בלתי־מוגדרת.",
+      "timeSec": 60,
+      "tags": [
+        "printf",
+        "ub"
+      ],
+      "pro": true,
+      "code": "int a = 5;\nprintf(\"%d %d\\n\", a);"
+    },
+    {
+      "id": "ctf-pf-7",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה נכון לגבי הפלט?",
+      "options": [
+        "תמיד 1 2",
+        "תמיד 2 1",
+        "התנהגות בלתי־מוגדרת — אין נקודת רצף בין הארגומנטים",
+        "תמיד 1 1"
+      ],
+      "answer": 2,
+      "explanation": "שינוי i פעמיים בלי נקודת רצף ביניהם הוא התנהגות בלתי־מוגדרת.",
+      "timeSec": 75,
+      "tags": [
+        "printf",
+        "ub"
+      ],
+      "pro": true,
+      "code": "int i = 1;\nprintf(\"%d %d\\n\", i++, i++);"
+    },
+    {
+      "id": "ctf-pf-8",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה עושה המרת %n ב-printf?",
+      "options": [
+        "מדפיסה כתובת בהקס",
+        "אין לה משמעות בתקן C",
+        "מדפיסה שורה חדשה",
+        "כותבת אל מצביע int את מספר הבתים שהודפסו עד כה"
+      ],
+      "answer": 3,
+      "explanation": "%n כותבת אל int* את מספר התווים שהודפסו — ולכן קלט פורמט לא מבוקר מסוכן.",
+      "timeSec": 70,
+      "tags": [
+        "printf",
+        "security"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-pf-9",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "המשתמש שולט בתוכן user_input. איזו מחלקת פגיעות מתוארת כאן?",
+      "options": [
+        "פגיעות מחרוזת פורמט (format string)",
+        "שימוש לאחר שחרור",
+        "מרוץ תהליכים",
+        "גלישת חוצץ במחסנית"
+      ],
+      "answer": 0,
+      "explanation": "העברת קלט משתמש כמחרוזת פורמט ל-printf היא פגיעות format string.",
+      "timeSec": 65,
+      "tags": [
+        "printf",
+        "security"
+      ],
+      "pro": true,
+      "code": "printf(user_input);"
+    },
+    {
+      "id": "ctf-pf-10",
+      "sub": "ctf-printf",
+      "subTitle": "printf והתנהגות בלתי מוגדרת",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה הבעיה בקוד (x86-64, Linux)?",
+      "options": [
+        "אין בעיה, יודפס הערך הנכון",
+        "אי-התאמת ספציפייר: long עם %d היא התנהגות בלתי־מוגדרת",
+        "שגיאת קומפילציה עוצרת",
+        "יודפס 0 תמיד"
+      ],
+      "answer": 1,
+      "explanation": "ל-long צריך %ld; שימוש ב-%d הוא אי-התאמת טיפוס ולכן התנהגות בלתי־מוגדרת.",
+      "timeSec": 60,
+      "tags": [
+        "printf",
+        "ub"
+      ],
+      "pro": true,
+      "code": "long x = 1L << 40;\nprintf(\"%d\\n\", x);"
+    },
+    {
+      "id": "ctf-elf-1",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מהם ארבעת הבתים הראשונים של קובץ ELF?",
+      "options": [
+        "0xCAFEBABE",
+        "\"MZ\"",
+        "0x7F ואחריו \"ELF\"",
+        "\"#!\""
+      ],
+      "answer": 2,
+      "explanation": "חתימת הקסם של ELF: הבית 0x7F ואחריו התווים E, L, F.",
+      "timeSec": 35,
+      "tags": [
+        "elf"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-elf-2",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה מציגה הפקודה ldd על תוכנית?",
+      "options": [
+        "את טבלת הסימבולים",
+        "את זמן הריצה",
+        "את קוד המקור",
+        "את הספריות המשותפות שהתוכנית תלויה בהן"
+      ],
+      "answer": 3,
+      "explanation": "ldd מפרטת את הספריות המשותפות הנדרשות בזמן ריצה.",
+      "timeSec": 35,
+      "tags": [
+        "elf",
+        "loader"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-elf-3",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "קובץ מתואר בפקודת file כ-\"statically linked\". מה נכון?",
+      "options": [
+        "קוד הספריות כבר בתוך הקובץ, ואין תלות במטען הדינמי",
+        "הוא תמיד קטן יותר",
+        "אי אפשר להריץ אותו",
+        "הוא זקוק ל-libc חיצונית בזמן ריצה"
+      ],
+      "answer": 0,
+      "explanation": "קישור סטטי מכליל את קוד הספריות בתוך הקובץ, בלי טעינה דינמית.",
+      "timeSec": 50,
+      "tags": [
+        "elf"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-4",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "לְמה משמשת טבלת ה-PLT בבינארי מקושר דינמית?",
+      "options": [
+        "לאחסון מחרוזות",
+        "לתיווך קריאות לפונקציות חיצוניות שכתובתן נפתרת (בד\"כ באופן עצל) דרך ה-GOT",
+        "להצפנת הקוד",
+        "לשמירת משתני סביבה"
+      ],
+      "answer": 1,
+      "explanation": "ה-PLT מתווכת קריאה לפונקציות ספרייה שכתובתן נפתרת דרך ה-GOT, לרוב בפתרון עצל.",
+      "timeSec": 75,
+      "tags": [
+        "elf",
+        "loader"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-5",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מסירה הפקודה strip מבינארי?",
+      "options": [
+        "את ה-headers",
+        "את קטע הקוד",
+        "את טבלת הסימבולים ומידע ניפוי השגיאות",
+        "את ה-entry point"
+      ],
+      "answer": 2,
+      "explanation": "strip מסירה סימבולים ומידע דיבוג שאינם נחוצים להרצה.",
+      "timeSec": 45,
+      "tags": [
+        "elf"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-6",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה מכיל בדרך כלל קטע .text?",
+      "options": [
+        "מחרוזות קבועות בלבד",
+        "את המחסנית",
+        "משתנים גלובליים מאופסים",
+        "קוד הרצה (הוראות מכונה)"
+      ],
+      "answer": 3,
+      "explanation": "קטע .text מכיל את הוראות המכונה הניתנות להרצה.",
+      "timeSec": 35,
+      "tags": [
+        "elf"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-7",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מאפיין את קטע .bss?",
+      "options": [
+        "מכיל נתונים לא-מאותחלים/מאופסים ואינו תופס מקום בקובץ",
+        "מכיל את קוד ההרצה",
+        "מכיל את טבלת ה-GOT",
+        "נטען תמיד לקריאה-בלבד"
+      ],
+      "answer": 0,
+      "explanation": ".bss שומר נתונים מאופסים/לא-מאותחלים ואינו צורך מקום בקובץ עצמו.",
+      "timeSec": 50,
+      "tags": [
+        "elf"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-8",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "בבינארי דינמי, מהו /lib64/ld-linux-x86-64.so.2?",
+      "options": [
+        "ספריית ה-C",
+        "המטען הדינמי (מפרש ה-PT_INTERP) שמביא ומקשר ספריות",
+        "מנהל חבילות",
+        "קובץ ליבת הקרנל"
+      ],
+      "answer": 1,
+      "explanation": "זהו המטען/מקשר הדינמי המצוין ב-PT_INTERP, שטוען ומקשר ספריות בזמן ריצה.",
+      "timeSec": 70,
+      "tags": [
+        "elf",
+        "loader"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-9",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה תחזיר לרוב הרצת nm על בינארי שעבר strip?",
+      "options": [
+        "שגיאת הרשאות",
+        "רשימת כל הפונקציות",
+        "\"no symbols\"",
+        "את קוד המקור"
+      ],
+      "answer": 2,
+      "explanation": "אחרי strip אין טבלת סימבולים, ולכן nm מדווח \"no symbols\".",
+      "timeSec": 45,
+      "tags": [
+        "elf"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-elf-10",
+      "sub": "ctf-elf",
+      "subTitle": "ELF והטוען הדינמי",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה ההבדל בין sections ל-segments ב-ELF?",
+      "options": [
+        "segments משמשים לדיבוג בלבד",
+        "sections קיימים רק בקבצים סטטיים",
+        "אין הבדל מעשי",
+        "sections משמשים לקישור; segments (program headers) מתארים כיצד לטעון לזיכרון בריצה"
+      ],
+      "answer": 3,
+      "explanation": "Sections משמשים לקישור; segments/program-headers מגדירים את מפת הטעינה לזיכרון.",
+      "timeSec": 75,
+      "tags": [
+        "elf",
+        "loader"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-1",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מגרילה הגנת ASLR?",
+      "options": [
+        "את כתובות הבסיס של המחסנית, הערימה והספריות",
+        "את שם המשתמש",
+        "את תוכן ה-GOT",
+        "את ערכי המשתנים"
+      ],
+      "answer": 0,
+      "explanation": "ASLR מגרילה כתובות בסיס (מחסנית, ערימה, ספריות) כדי להקשות על חיזוי כתובות.",
+      "timeSec": 50,
+      "tags": [
+        "mitigations",
+        "aslr"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-mit-2",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה תפקיד ה-stack canary?",
+      "options": [
+        "להצפין את המחסנית",
+        "לזהות דריסה של אזור השמירה לפני ה-return באמצעות ערך שומר",
+        "להאיץ קריאות פונקציה",
+        "למנוע ריבוי תהליכונים"
+      ],
+      "answer": 1,
+      "explanation": "ערך הקנרי נבדק לפני החזרה מהפונקציה; שינויו מעיד על גלישת מחסנית.",
+      "timeSec": 50,
+      "tags": [
+        "mitigations",
+        "canary"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-mit-3",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה עושה הגנת NX/DEP?",
+      "options": [
+        "מגרילה כתובות",
+        "בודקת חתימה דיגיטלית",
+        "מסמנת אזורי נתונים כלא-ניתנים-להרצה, כך שנתונים שהוזרקו לא ירוצו כקוד",
+        "מצפינה את הקוד"
+      ],
+      "answer": 2,
+      "explanation": "NX מסמנת מחסנית/ערימה כלא-ניתנות-להרצה, כדי שלא יורץ משם קוד.",
+      "timeSec": 55,
+      "tags": [
+        "mitigations",
+        "nx"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-4",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה מאפשרת הידור כ-PIE?",
+      "options": [
+        "קומפילציה מהירה יותר",
+        "הסרת סימבולים",
+        "הרצה בלי libc",
+        "קוד בלתי-תלוי-מיקום, כך ש-ASLR חל גם על הבינארי הראשי"
+      ],
+      "answer": 3,
+      "explanation": "PIE הופך את הבינארי הראשי לבלתי-תלוי-מיקום כך ש-ASLR חל גם עליו.",
+      "timeSec": 70,
+      "tags": [
+        "mitigations",
+        "pie"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-5",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה עושה Full RELRO?",
+      "options": [
+        "ממַנֶּה את ה-GOT לקריאה-בלבד אחרי הפתרון",
+        "מוחק את המחסנית",
+        "מכפיל את הקנרי",
+        "מבטל קריאות מערכת"
+      ],
+      "answer": 0,
+      "explanation": "RELRO מלא הופך את ה-GOT לקריאה-בלבד אחרי הקישור, כדי למנוע דריסתו.",
+      "timeSec": 70,
+      "tags": [
+        "mitigations",
+        "relro"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-6",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "איזה דגל הידור מוסיף stack canaries?",
+      "options": [
+        "-O2",
+        "-fstack-protector",
+        "-static",
+        "-g"
+      ],
+      "answer": 1,
+      "explanation": "הדגל -fstack-protector (וּוריאנטים) מוסיף בדיקות קנרי.",
+      "timeSec": 45,
+      "tags": [
+        "mitigations",
+        "gcc"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-7",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "איזו הגנה מונעת ישירות הרצת קוד שהוזרק אל המחסנית?",
+      "options": [
+        "Stack canary",
+        "ASLR",
+        "NX/DEP",
+        "RELRO"
+      ],
+      "answer": 2,
+      "explanation": "NX מסמנת את המחסנית כלא-ניתנת-להרצה, ולכן קוד שהוזרק לשם לא ירוץ.",
+      "timeSec": 70,
+      "tags": [
+        "mitigations",
+        "nx"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-8",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "פלט checksec: Canary found, NX enabled, No PIE, No RELRO. מה החשיפה הבולטת?",
+      "options": [
+        "המחסנית ניתנת להרצה",
+        "אין הגנות כלל",
+        "אין קנרי",
+        "ה-GOT ניתן לכתיבה וכתובות הבינארי הראשי קבועות וחזויות"
+      ],
+      "answer": 3,
+      "explanation": "ללא RELRO ה-GOT כתיב, וללא PIE כתובות הבינארי הראשי קבועות — ולכן חזויות.",
+      "timeSec": 75,
+      "tags": [
+        "mitigations",
+        "checksec"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-mit-9",
+      "sub": "ctf-mit",
+      "subTitle": "מנגנוני הגנה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "היכן ממוקם ה-stack canary במסגרת המחסנית?",
+      "options": [
+        "בין החוצצים המקומיים לבין כתובת החזרה/מצביע המסגרת השמור",
+        "בתחילת הערימה",
+        "ברגיסטר בלבד",
+        "אחרי כתובת החזרה"
+      ],
+      "answer": 0,
+      "explanation": "הקנרי מונח בין החוצצים המקומיים לכתובת החזרה, כך שגלישה רציפה תדרוס אותו.",
+      "timeSec": 55,
+      "tags": [
+        "mitigations",
+        "canary"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-1",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה עושות הפקודות insmod / lsmod / rmmod?",
+      "options": [
+        "מגדירות רשת",
+        "טוענות / מציגות / מסירות מודולי קרנל",
+        "מנהלות משתמשים",
+        "עורכות קבצים"
+      ],
+      "answer": 1,
+      "explanation": "הן טוענות, מציגות ומסירות מודולי קרנל.",
+      "timeSec": 35,
+      "tags": [
+        "kernel",
+        "modules"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-kern-2",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 1,
+      "q": "מה מציגה הפקודה dmesg?",
+      "options": [
+        "את רשימת הקבצים",
+        "את תעבורת הרשת",
+        "את יומן טבעת ההודעות של הקרנל",
+        "את היסטוריית הפקודות"
+      ],
+      "answer": 2,
+      "explanation": "dmesg מציגה את חוצץ-הטבעת של הודעות הקרנל.",
+      "timeSec": 35,
+      "tags": [
+        "kernel"
+      ],
+      "pro": false
+    },
+    {
+      "id": "ctf-kern-3",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מתרחש בעת קריאת מערכת (syscall)?",
+      "options": [
+        "התהליך מסתיים",
+        "הזיכרון מתאפס",
+        "המעבד נשאר במצב משתמש",
+        "מעבר ממצב משתמש (ring 3) למצב קרנל מיוחס (ring 0)"
+      ],
+      "answer": 3,
+      "explanation": "קריאת מערכת מעבירה את המעבד ממצב משתמש למצב קרנל מיוחס.",
+      "timeSec": 55,
+      "tags": [
+        "kernel",
+        "syscall"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-4",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מציג הקובץ /proc/<pid>/maps?",
+      "options": [
+        "את מיפויי הזיכרון של התהליך וכתובותיהם",
+        "את סיסמת המשתמש",
+        "את קוד המקור",
+        "את טבלת ה-inode"
+      ],
+      "answer": 0,
+      "explanation": "הקובץ מפרט את אזורי הזיכרון הממופים של התהליך.",
+      "timeSec": 55,
+      "tags": [
+        "kernel",
+        "proc"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-5",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "באיזו רמת הרשאה רץ מודול קרנל, ומה המשמעות?",
+      "options": [
+        "ring 3, מבודד מהמערכת",
+        "ring 0 — תקלה בו עלולה לסכן את כל המערכת",
+        "בתוך דפדפן",
+        "ללא הרשאות"
+      ],
+      "answer": 1,
+      "explanation": "מודול רץ ב-ring 0 עם הרשאות מלאות; באג בו מסכן את כל המערכת.",
+      "timeSec": 70,
+      "tags": [
+        "kernel",
+        "modules"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-6",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מה תפקיד ה-MMU?",
+      "options": [
+        "להצפין זיכרון",
+        "להאיץ חישובי נקודה צפה",
+        "לתרגם כתובות וירטואליות לפיזיות דרך טבלאות דפים",
+        "לנהל את הדיסק"
+      ],
+      "answer": 2,
+      "explanation": "ה-MMU מתרגם כתובות וירטואליות לפיזיות באמצעות טבלאות דפים.",
+      "timeSec": 70,
+      "tags": [
+        "kernel",
+        "hardware",
+        "mmu"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-7",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה תפקידו של דרייבר התקן?",
+      "options": [
+        "לעצב ממשק משתמש",
+        "להדר קוד",
+        "לנהל חשבונות",
+        "לתווך בין מערכת ההפעלה/הקרנל לבין חומרה"
+      ],
+      "answer": 3,
+      "explanation": "דרייבר מתווך בין מערכת ההפעלה לבין רכיב חומרה מסוים.",
+      "timeSec": 50,
+      "tags": [
+        "kernel",
+        "hardware",
+        "drivers"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-8",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 2,
+      "q": "מה מראה strace על תוכנית?",
+      "options": [
+        "את קריאות המערכת (והאותות) שהתוכנית מבצעת",
+        "את צריכת הזיכרון בלבד",
+        "את קוד המקור",
+        "את הסיסמאות"
+      ],
+      "answer": 0,
+      "explanation": "strace מתעד את קריאות המערכת והאותות של התהליך.",
+      "timeSec": 50,
+      "tags": [
+        "kernel",
+        "syscall",
+        "tools"
+      ],
+      "pro": true
+    },
+    {
+      "id": "ctf-kern-9",
+      "sub": "ctf-kern",
+      "subTitle": "קרנל, מודולים וחומרה",
+      "type": "mcq",
+      "difficulty": 3,
+      "q": "מתי מתרחש page fault?",
+      "options": [
+        "כשמחלקים באפס",
+        "כשניגשים לדף וירטואלי שאינו ממופה/נוכח כרגע בזיכרון",
+        "כשסוגרים קובץ",
+        "כשמסתיים תהליך"
+      ],
+      "answer": 1,
+      "explanation": "Page fault מתרחש בגישה לדף וירטואלי שאינו נוכח/ממופה, והקרנל מטפל בו.",
+      "timeSec": 70,
+      "tags": [
+        "kernel",
+        "memory"
+      ],
+      "pro": true
+    }
+  ],
+  "lessons": []
+}
