@@ -1,4 +1,4 @@
-title: { en: "Private computer lessons", he: "שיעורים פרטיים במחשבים" }
+title: { en: "The Open College of Computer Science", he: "המכללה הפתוחה למדעי המחשב" }
 subtitle: { en: "One-to-one lessons in programming and systems, with a practice app that includes full prep for the IDF technological screenings.", he: "שיעורים אחד על אחד בתכנות ובמערכות, עם אפליקציית תרגול שכוללת הכנה מלאה למיונים הטכנולוגיים." }
 summary:
   en: "Michael's tutoring practice: Python and intro to programming, C/C++, Linux, Android, high-school computer science, a CTF (capture-the-flag) course, and preparation for the technological unit screenings (8200, Mamram) — over Zoom or in person, with a mobile practice app and a progress dashboard."
@@ -6,7 +6,7 @@ summary:
 category: { en: "Education · teaching", he: "חינוך · הוראה" }
 status: live
 started: "2026-10"
-updated: "2026-10-16"
+updated: "2026-10-17"
 featured: true
 weight: 2
 order: 2

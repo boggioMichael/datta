@@ -1,5 +1,5 @@
 /* service worker — מטמון לאפליקציה (עובדת גם בלי רשת) + התראות push */
-const VERSION = "lessons-v7";
+const VERSION = "lessons-v8";
 const SHELL = ["./", "./index.html", "./app.css", "./app.js", "./config.js", "./store.js", "./content.js", "./quiz.js", "./gen.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "../fonts/assistant.woff2", "../fonts/frankruhllibre.woff2", "../fonts/plexmono-regular.woff2", "../fonts/plexmono-medium.woff2"];
 
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL).catch(() => {})).then(() => self.skipWaiting())); });
@@ -25,7 +25,7 @@ self.addEventListener("fetch", (e) => {
 // Web Push (FCM שולח payload עם notification או data)
 self.addEventListener("push", (e) => {
   let data = {};
-  try { data = e.data ? e.data.json() : {}; } catch { data = { notification: { title: "שיעורים פרטיים במחשבים", body: e.data?.text() } }; }
+  try { data = e.data ? e.data.json() : {}; } catch { data = { notification: { title: "המכללה הפתוחה למדעי המחשב", body: e.data?.text() } }; }
   const n = data.notification || {};
   const d = data.data || {};
   const title = n.title || d.title || "⚡ בוחן פתע!";

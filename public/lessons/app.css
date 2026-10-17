@@ -220,3 +220,10 @@ main#view { max-width: var(--max); margin: 0 auto; padding: 1.2rem var(--gutter)
 .pay-methods { display: flex; flex-direction: column; gap: .6rem; margin: 1rem 0; }
 .pay-method { display: flex; gap: .7rem; align-items: flex-start; background: var(--bg-elev); border: 1px solid var(--rule); border-radius: var(--radius-s); padding: .7rem .9rem; }
 .pay-method .pm-ico { font-size: 1.4rem; line-height: 1; } .pay-method b { display: block; }
+
+/* ---- long brand name on phones: wrap to two lines instead of pushing the nav off-screen ---- */
+@media (max-width: 600px) {
+  .topbar .brand { white-space: normal; min-width: 0; }
+  .topbar .brand #appName { line-height: 1.1; text-wrap: balance; }
+  #topnav { flex: none; }
+}

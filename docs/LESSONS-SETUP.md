@@ -1,4 +1,4 @@
-# שיעורים פרטיים במחשבים — הפעלה, מצב חי ותשלומים
+# המכללה הפתוחה למדעי המחשב — הפעלה, מצב חי ותשלומים
 
 האפליקציה יושבת ב-`public/lessons/` ונפרסת כמו שאר האתר (push ל-`main` → GitHub Pages) לכתובת
 `https://boggiomichael.github.io/datta/lessons/` (הכתובת הישנה `/8200/` מפנה לשם). אין build — אלה קבצים סטטיים: `index.html`, `app.js`, `app.css`, `store.js`, `content.js`, `quiz.js`, `gen.js`, `config.js`, `sw.js`, `data/*.json`.

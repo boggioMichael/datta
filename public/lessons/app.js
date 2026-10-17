@@ -76,8 +76,8 @@ function landing() {
   const steps = [["1", "שיעור ראשון", "50 דקות בזום או פרונטלי: מספרים איפה אתם ומה המטרה (בגרות, מיונים, פרויקט, סקרנות), ומתחילים לעבוד מהדקה הראשונה."], ["2", "תוכנית אישית", "מסלול קצר עם יעדים ברורים, ושיעורים אחד על אחד בקצב שלכם — פעם או פעמיים בשבוע."], ["3", "תרגול בין השיעורים", "אפליקציית תרגול עם בוחני פתע ומעקב התקדמות (כלולה בחבילות השיעורים), כך שאני רואה מה עובד ומה צריך עוד עבודה."]];
   setView(`
     <section class="hero">
-      <p class="eyebrow">אחד על אחד · בזום או פרונטלי · ${esc(m.name || "")}</p>
-      <h1>${esc(CONFIG.appName || "שיעורים פרטיים במחשבים")}</h1>
+      <p class="eyebrow">שיעורים פרטיים · בזום או פרונטלי · ${esc(m.name || "")}</p>
+      <h1>${esc(CONFIG.appName || "המכללה הפתוחה למדעי המחשב")}</h1>
       <p class="hero-lead">${bidi(CONFIG.tagline || "")}.</p>
       <div class="cta-row"><a class="btn primary big" href="#lead">לתאם שיעור</a><a class="btn big" href="#/pricing">מחירים</a></div>
       <p class="muted small">${esc((CONFIG.audiences || []).join(" · "))}</p>
@@ -91,7 +91,7 @@ function landing() {
       <div class="steps">${steps.map(([n, t, d]) => `<div class="step"><span class="step-n">${n}</span><strong>${t}</strong><p class="muted">${d}</p></div>`).join("")}</div>
     </section>
     <section class="section mentor" id="mentor">
-      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">וואטסאפ</a>` : ""}${m.phone ? `<a class="btn" href="tel:${esc(String(m.phone).replace(/[^\d+]/g, ""))}">📞 <span dir="ltr">${esc(m.phone)}</span></a>` : ""}</div><p class="muted small" dir="ltr" style="text-align:start">${esc(m.email || "")}</p></div></div>
+      <div class="mentor-card"><div class="avatar">${esc((m.name || "מ")[0])}</div><div><p class="eyebrow">המורה</p><h3>${esc(m.name || "")}</h3><p>${bidi(m.bio || "")}</p><div class="cta-row"><a class="btn" href="#lead">לתאם שיעור</a>${m.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(m.whatsapp)}?text=${encodeURIComponent(`היי, הגעתי מהדף של ${CONFIG.appName || "המכללה הפתוחה למדעי המחשב"}`)}">וואטסאפ</a>` : ""}${m.phone ? `<a class="btn" href="tel:${esc(String(m.phone).replace(/[^\d+]/g, ""))}">📞 <span dir="ltr">${esc(m.phone)}</span></a>` : ""}</div><p class="muted small" dir="ltr" style="text-align:start">${esc(m.email || "")}</p></div></div>
     </section>
     <section class="section" id="testimonials"></section>
     <section class="section app-teaser">
@@ -114,7 +114,7 @@ function landing() {
   wireLeadForm();
   S.store.public.getTestimonials().then((items) => { const el = $("#testimonials"); if (!el) return; if (!items?.length) { el.hidden = true; return; } el.innerHTML = `<h2>מה אומרים</h2><div class="testi">${items.map((t) => `<blockquote><p>${esc(t.text)}</p><footer>${esc(t.name)}${t.role ? ` · ${esc(t.role)}` : ""}</footer></blockquote>`).join("")}</div>`; });
 }
-function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")} · שיעורים פרטיים במחשבים · <span dir="ltr">${esc(CONFIG.mentor?.phone || "")}</span> · <span dir="ltr">${esc(CONFIG.mentor?.email || "")}</span>. הדף אינו קשור לצה״ל או לאף יחידה; תכני ההכנה למיונים מקוריים ונועדו לתרגול.</span></footer>`; }
+function footerHtml() { return `<footer class="foot"><a href="#/terms">תקנון ופרטיות</a> · <a href="#/contact?cancel=1">ביטול מנוי / עסקה</a> · <a href="#/contact">יצירת קשר</a> · <a href="../he/">DATTA · דאטא</a><br><span class="muted small">© ${new Date().getFullYear()} ${esc(CONFIG.mentor?.name || "")} · ${esc(CONFIG.appName || "המכללה הפתוחה למדעי המחשב")} · <span dir="ltr">${esc(CONFIG.mentor?.phone || "")}</span> · <span dir="ltr">${esc(CONFIG.mentor?.email || "")}</span>. הדף אינו קשור לצה״ל או לאף יחידה; תכני ההכנה למיונים מקוריים ונועדו לתרגול.</span></footer>`; }
 
 function leadFormHtml(prefill = {}) {
   return `<form class="form lead-form" id="leadForm">
@@ -134,7 +134,7 @@ function wireLeadForm() {
     const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
     const lead = { name: fd.name, phone: fd.phone, email: fd.email || "", grade: fd.grade || "", msg: fd.msg || "", source: "site", page: location.hash, uid: S.user?.uid || null };
     try { await S.store.leads.add(lead); } catch (err) { console.warn(err); }
-    if (CONFIG.leadsEndpoint) { try { await fetch(CONFIG.leadsEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: `פנייה חדשה — שיעורים פרטיים במחשבים: ${fd.name}`, ...lead }) }); } catch (err) { console.warn("lead email", err); } }
+    if (CONFIG.leadsEndpoint) { try { await fetch(CONFIG.leadsEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: `פנייה חדשה — ${CONFIG.appName || "המכללה הפתוחה למדעי המחשב"}: ${fd.name}`, ...lead }) }); } catch (err) { console.warn("lead email", err); } }
     f.querySelector(".form-msg").textContent = "תודה! הפנייה נשמרה ואחזור אליכם בהקדם.";
     f.reset(); btn.disabled = false;
     toast("הפנייה נשלחה 🙌", "ok");
@@ -415,9 +415,9 @@ function contact(params) {
   nav();
   const plan = params?.get("plan"); const cancel = params?.get("cancel");
   setView(`<section class="auth contact"><h1>${cancel ? "ביטול מנוי או עסקה" : `לדבר עם ${esc(CONFIG.mentor?.name || "המורה")}`}</h1>${cancel ? `<p class="muted">אפשר לבטל בכל עת. כתבו כאן (או במייל/וואטסאפ) את שם החשבון ומה לבטל — החיוב נפסק תוך 3 ימי עסקים ותקבלו אישור במייל. ביטול תוך 14 יום מההצטרפות — החזר מלא בניכוי דמי ביטול עד 5% או 100 ₪ (הנמוך). <a href="#/terms">לתקנון</a>.</p>` : ""}<p class="muted">${plan ? `מעניין אותך <b>${PLAN_LABELS[plan] || plan}</b> — השאירו פרטים ואחזור לתיאום.` : "לתאם שיעור, לשאול, או להתייעץ מאיפה להתחיל — גם הורים מוזמנים."}</p>
-    ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent("היי, הגעתי מהדף של השיעורים הפרטיים במחשבים")}">💬 וואטסאפ</a>` : ""}
+    ${CONFIG.mentor?.whatsapp ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(CONFIG.mentor.whatsapp)}?text=${encodeURIComponent(`היי, הגעתי מהדף של ${CONFIG.appName || "המכללה הפתוחה למדעי המחשב"}`)}">💬 וואטסאפ</a>` : ""}
     ${CONFIG.mentor?.phone ? `<a class="btn" href="tel:${esc(String(CONFIG.mentor.phone).replace(/[^\d+]/g, ""))}">📞 <span dir="ltr">${esc(CONFIG.mentor.phone)}</span></a>` : ""}
-    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent("שיעורים פרטיים במחשבים")}">✉️ <span dir="ltr">${esc(CONFIG.mentor.email)}</span></a>` : ""}
+    ${CONFIG.mentor?.email ? `<a class="btn" href="mailto:${esc(CONFIG.mentor.email)}?subject=${encodeURIComponent(CONFIG.appName || "המכללה הפתוחה למדעי המחשב")}">✉️ <span dir="ltr">${esc(CONFIG.mentor.email)}</span></a>` : ""}
     ${leadFormHtml({ name: S.user?.name, phone: S.user?.phone, email: S.user?.email })}
   </section>`);
   if (plan) { const ta = $("#leadForm textarea"); if (ta) ta.value = `מעניין אותי: ${PLAN_LABELS[plan] || plan}`; }
@@ -507,7 +507,7 @@ function terms() {
   nav();
   setView(`<article class="lesson"><h1>תקנון ומדיניות פרטיות</h1><div class="prose">${md(`
 ## מי אנחנו
-"${CONFIG.appName || "שיעורים פרטיים במחשבים"}" הוא שירות שיעורים פרטיים במחשבים ותכנות, יחד עם אפליקציית תרגול (כולל הכנה למיונים טכנולוגיים), שמפעיל ${CONFIG.mentor?.name || ""} (עוסק פטור, ישראל). השירות **אינו קשור** לצה״ל, לאף יחידה או לכל גוף רשמי, ואינו מתיימר לשחזר מבחנים אמיתיים. כל תכני התרגול מקוריים.
+"${CONFIG.appName || "המכללה הפתוחה למדעי המחשב"}" הוא שירות שיעורים פרטיים במחשבים ותכנות, יחד עם אפליקציית תרגול (כולל הכנה למיונים טכנולוגיים), שמפעיל ${CONFIG.mentor?.name || ""} (עוסק פטור, ישראל). השירות **אינו קשור** לצה״ל, לאף יחידה או לכל גוף רשמי, ואינו מתיימר לשחזר מבחנים אמיתיים. כל תכני התרגול מקוריים.
 
 ## הרשמה וקטינים
 השירות מיועד לבני 16 ומעלה. משתמש/ת מתחת לגיל 18 נרשם/ת באישור הורה או אפוטרופוס, והתשלום (אם יש) מתבצע על ידם. בהרשמה נשמרים: שם, אימייל, טלפון (לא חובה), כיתה ותאריך משוער של המיונים.
@@ -728,7 +728,7 @@ async function route() {
 }
 
 async function boot() {
-  $("#appName").textContent = CONFIG.appName || "שיעורים פרטיים במחשבים";
+  $("#appName").textContent = CONFIG.appName || "המכללה הפתוחה למדעי המחשב";
   S.store = await createStore();
   if (S.store.mode === "error") { setView(`<section class="auth"><h1>השירות לא זמין כרגע</h1><p class="muted">לא הצלחנו להתחבר לשרת. נסו לרענן בעוד כמה דקות.</p></section>`); return; }
   if (S.store.mode === "local") $("#demoBanner").hidden = false;
