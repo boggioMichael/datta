@@ -2,7 +2,7 @@
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
 - date: 2026-10-16
   project: projects/computer-lessons
-  title: { en: "Private computer lessons: page and practice app live", he: "שיעורים פרטיים במחשבים: הדף ואפליקציית התרגול באוויר" }
+  title: { en: "The Online College for Computer Science: page and practice app live", he: "המכללה הפתוחה למדעי המחשב: הדף ואפליקציית התרגול באוויר" }
   text:
     en: "Topics, pricing and a booking form, plus a practice app for subscribers: six screening-stage categories, ~620 original questions with explanations, unlimited generated drills, surprise quizzes, progress tracking and a teacher dashboard. Demo mode; live backend and payments next."
     he: "נושאים, מחירים וטופס תיאום, ועוד אפליקציית תרגול למנויים: שש קטגוריות לפי שלבי המיון, כ-620 שאלות מקוריות עם הסברים, מחוללים ללא הגבלה, בוחני פתע, מעקב התקדמות ולוח מורה. מצב הדגמה; השרת החי והסליקה הבאים בתור."

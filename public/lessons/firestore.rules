@@ -1,5 +1,5 @@
 rules_version = '2';
-// חוקי אבטחה ל-Firestore של "המכללה הפתוחה למדעי המחשב" (שיעורים פרטיים במחשבים).
+// חוקי אבטחה ל-Firestore של "המכללה הפתוחה למדעי המחשב".
 // להדביק ב-Firebase Console → Firestore Database → Rules → Publish.
 // עדכנו את רשימת האדמינים (אימיילים באותיות קטנות) לפי config.js.
 service cloud.firestore {
