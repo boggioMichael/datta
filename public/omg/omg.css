@@ -64,7 +64,7 @@ a { color: inherit; }
 #rec-badge i { width: 9px; height: 9px; border-radius: 50%; background: #ff3b3b; animation: pulse 1s infinite; }
 
 /* ── screens */
-.screen { position: fixed; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); z-index: 10; }
+.screen { position: fixed; inset: 0; display: grid; place-items: center; overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); z-index: 10; }
 #start { background: radial-gradient(120% 80% at 50% 30%, #1a1030 0%, #07050d 55%, #000 100%); }
 .glass { background: rgba(0,0,0,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .start-inner, .end-inner { width: min(460px, 100%); text-align: center; display: grid; gap: 14px; justify-items: center; }
