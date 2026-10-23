@@ -1,8 +1,8 @@
 title: { en: "OH MY GOD", he: "OH MY GOD" }
-subtitle: { en: "A merge game from a Kia Picanto to the God of Israel — written in Rust.", he: "משחק מיזוג מקיה פיקנטו עד אלוהי ישראל — כתוב ב-Rust." }
+subtitle: { en: "A merge game from crawling to the God of Israel — 124 tiers, written in Rust.", he: "משחק מיזוג מזחילה עד אלוהי ישראל — 124 דרגות, כתוב ב-Rust." }
 summary:
-  en: "Two identical rides touching merge into the next one up a 37-step ladder: cars, planes, real spacecraft, science fiction, the vehicles of the gods, Elijah's chariot, the Messiah's donkey and, last, God. Every merge screams “oh my god” — deeper, bigger and louder at each step. Physics, rules and the whole sound engine are Rust compiled to WebAssembly."
-  he: "שתי מכוניות זהות שנוגעות מתמזגות לשלב הבא בסולם של 37: מכוניות, מטוסים, חלליות אמיתיות, מדע בדיוני, הרכבים של האלים, מרכבת האש של אליהו, חמורו של המשיח ולבסוף — אלוהים. כל מיזוג צועק ״oh my god״ — עמוק, גדול ורועש יותר בכל שלב. הפיזיקה, החוקים ומנוע הסאונד כולו כתובים ב-Rust ומקומפלים ל-WebAssembly."
+  en: "Every run starts with a crawling baby. Two identical rides that touch merge into the next one up a 124-step ladder in 14 eras: walking, running, bikes, scooters and motorbikes, everyday cars, premium cars, supercars and hypercars, monster machines, trains, ships, planes, real spacecraft, science fiction, the rides of the gods from many mythologies, the holy finale with Elijah's chariot and the Messiah's donkey — and, last, God. Every merge screams “oh my god”, deeper and louder at each step. Physics, rules, scenery and the whole sound engine are Rust compiled to WebAssembly."
+  he: "כל סיבוב מתחיל בתינוק שזוחל. שני כלי רכב זהים שנוגעים מתמזגים לשלב הבא בסולם של 124 דרגות ב-14 עידנים: הליכה, ריצה, אופניים, קורקינטים ואופנועים, מכוניות, פרימיום, סופרקארים והיפרקארים, מכונות־מפלצת, רכבות, ספינות, מטוסים, חלליות אמיתיות, מדע בדיוני, רכבי האלים מכל המיתולוגיות, וסיום קודש עם מרכבת האש של אליהו וחמורו של המשיח — ולבסוף אלוהים. כל מיזוג צועק ״oh my god״ — עמוק ורועש יותר בכל שלב. הפיזיקה, החוקים, הנופים ומנוע הסאונד כולו כתובים ב-Rust ומקומפלים ל-WebAssembly."
 category: { en: "Game · Rust + WebAssembly", he: "משחק · Rust + WebAssembly" }
 status: live
 started: "2026-10"
@@ -11,16 +11,20 @@ order: 0
 accent: "#FFB627"
 demo: https://boggiomichael.github.io/datta/omg/
 languages: ["Rust", "WebAssembly", "JavaScript"]
-milestone: { en: "Version 1 playable at /omg — six modes, six tools, 29 settings", he: "גרסה 1 זמינה ב-/omg — שישה מצבים, שישה כלים, 29 הגדרות" }
+milestone: { en: "Version 2 at /omg — 124 tiers, 14 eras, 123 new illustrations, 8 modes, 36 settings", he: "גרסה 2 ב-/omg — 124 דרגות, 14 עידנים, 123 איורים חדשים, 8 מצבים, 36 הגדרות" }
 builtLevels:
   built:
     en:
-      - "Engine in Rust with no dependencies: ring-and-chute physics at 480 Hz sub-steps, merge rules, the 37-tier ladder, spout upgrades, six modes, six tools, saves and stats"
-      - "Sound engine in Rust, running in a Web Worker: pitch-shift and time-stretch, vocoder choirs, reverb, side-chained effects and per-stage music — every sound rendered live from 33 short voice clips"
+      - "Engine in Rust with no dependencies: bouncy ring-and-chute physics at 480 Hz with a sweep-and-prune broad phase, merge rules, chain reactions, random events, the 124-tier ladder, eight modes, six tools, saves and stats"
+      - "Drama layer: slow-motion beats, camera punches, era title cards, speed lines, shockwaves, lightning, and a backdrop for every era — all built as draw commands in Rust"
+      - "Sound engine in Rust, running in a Web Worker: 124 OMGs and their effects (bike bells, two-strokes, V-twins, train horns, ship horns, rotors, rockets, gongs, a shofar), a loop for every era and a bounce melody — every sound rendered live from 33 short voice clips"
+      - "123 sticker-style illustrations drawn for the game, with no logos"
       - "Reel recorder: captures the game as a 9:16 video with its sound"
     he:
-      - "מנוע ב-Rust בלי תלויות: פיזיקה של טבעת ופיה ב-480 צעדים לשנייה, חוקי מיזוג, סולם של 37 דרגות, שדרוגי פיה, שישה מצבים, שישה כלים, שמירה וסטטיסטיקה"
-      - "מנוע סאונד ב-Rust שרץ ב-Web Worker: שינוי גובה ומהירות, מקהלות ווקודר, ריוורב, אפקטים עם סייד-צ׳יין ומוזיקה לכל שלב — כל צליל מרונדר בזמן אמת מ-33 קטעי קול קצרים"
+      - "מנוע ב-Rust בלי תלויות: פיזיקה קופצנית של טבעת ופיה ב-480 צעדים לשנייה עם sweep-and-prune, חוקי מיזוג, תגובות שרשרת, אירועים אקראיים, סולם של 124 דרגות, שמונה מצבים, שישה כלים, שמירה וסטטיסטיקה"
+      - "שכבת דרמה: הילוך איטי, זום מצלמה, כרטיסי עידן, קווי מהירות, גלי הדף, ברקים ונוף לכל עידן — כולם נבנים כפקודות ציור ב-Rust"
+      - "מנוע סאונד ב-Rust שרץ ב-Web Worker: ‏124 צעקות OMG והאפקטים שלהן (פעמון אופניים, דו־פעימתי, V-twin, צופר רכבת, צופר אונייה, רוטורים, טילים, גונג, שופר), לופ לכל עידן ומנגינת קפיצות — כל צליל מרונדר בזמן אמת מ-33 קטעי קול קצרים"
+      - "‏123 איורים בסגנון מדבקה שצוירו במיוחד למשחק, בלי לוגואים"
       - "מקליט רילז: מקליט את המשחק כסרטון 9:16 עם הסאונד"
 related:
   - lab/datta-site

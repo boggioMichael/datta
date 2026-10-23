@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#EEF2F8" stroke-width="8" d="M200 378 L168 410 L168 440 L200 422 Z"/>
+<path fill="#EEF2F8" stroke-width="8" d="M312 378 L344 410 L344 440 L312 422 Z"/>
+<path fill="#FF8A3D" stroke-width="8" d="M200 438 C186 466 228 482 256 482 C284 482 326 466 312 438 Z"/>
+<path fill="#FFD23F" stroke="none" d="M220 440 C216 462 240 472 256 472 C272 472 296 462 292 440 Z"/>
+<path fill="#FFF4C7" stroke="none" d="M240 440 C240 454 250 462 256 462 C262 462 272 454 272 440 Z"/>
+<path fill="#4A5064" stroke-width="8" d="M208 418 L232 418 L238 446 L202 446 Z"/>
+<path fill="#4A5064" stroke-width="8" d="M244 418 L268 418 L274 446 L238 446 Z"/>
+<path fill="#4A5064" stroke-width="8" d="M280 418 L304 418 L310 446 L274 446 Z"/>
+<path fill="#EEF2F8" d="M224 138 L288 138 L288 168 L300 204 L300 264 L314 284 L314 420 L198 420 L198 284 L212 264 L212 204 L224 168 Z"/>
+<path fill="#23232F" stroke="none" d="M256 246 L300 246 L300 264 L256 264 Z M198 284 L314 284 L314 294 L198 294 Z M198 342 L256 342 L256 366 L198 366 Z M256 394 L314 394 L314 420 L256 420 Z"/>
+<path fill="#15152A" stroke="none" opacity="0.16" d="M290 174 L300 204 L300 264 L314 284 L314 420 L290 420 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.7" d="M220 420 L206 420 L206 273 L212 264 L212 204 L220 180 Z"/>
+<path fill="none" d="M224 138 L288 138 L288 168 L300 204 L300 264 L314 284 L314 420 L198 420 L198 284 L212 264 L212 204 L224 168 Z"/>
+<path fill="none" stroke-width="7" d="M212 264 L300 264 M198 342 L314 342 M224 168 L288 168 M212 204 L300 204"/>
+<path fill="#CFD4DE" stroke-width="8" d="M224 138 L288 138 L288 168 L224 168 Z"/>
+<path fill="#CFD4DE" stroke-width="8" d="M246 104 L266 104 L288 138 L224 138 Z"/>
+<path fill="#A7AFC1" stroke="none" d="M266 104 L288 138 L276 138 L258 104 Z"/>
+<path fill="none" stroke-width="8" d="M246 104 L266 104 L288 138 L224 138 Z"/>
+<path fill="#FF5A4E" stroke-width="8" d="M256 34 L263 54 L265 104 L247 104 L249 54 Z"/>
+<path fill="none" stroke-width="6" d="M249 76 L263 76"/>
+</g>
+</svg>

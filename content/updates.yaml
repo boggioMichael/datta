@@ -2,6 +2,14 @@
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
 - date: 2026-10-23
   project: lab/omg
+  title: { en: "OH MY GOD 2: from crawling to God in 124 tiers", he: "OH MY GOD 2: מזחילה עד אלוהים ב-124 דרגות" }
+  text:
+    en: "Every run now starts with a crawling baby and climbs 14 eras — bikes, cars, trains, ships, planes, spacecraft, science fiction, the rides of the gods and the holy finale. 123 new illustrations, bouncier physics, bigger balls for bigger rides, a much bigger ring, slow-motion and camera drama, chain reactions, random events and a bounce melody."
+    he: "כל סיבוב מתחיל עכשיו בתינוק זוחל ומטפס דרך 14 עידנים — אופניים, מכוניות, רכבות, ספינות, מטוסים, חלליות, מדע בדיוני, רכבי האלים וסיום הקודש. 123 איורים חדשים, פיזיקה קופצנית, כדורים שגדלים עם הרכב, טבעת גדולה בהרבה, הילוך איטי וזום, תגובות שרשרת, אירועים אקראיים ומנגינת קפיצות."
+  link: https://boggiomichael.github.io/datta/omg/
+
+- date: 2026-10-23
+  project: lab/omg
   title: { en: "OH MY GOD: a merge game from a Kia Picanto to the God of Israel, written in Rust", he: "OH MY GOD: משחק מיזוג מקיה פיקנטו עד אלוהי ישראל, כתוב ב-Rust" }
   text:
     en: "37 tiers, six modes, six tools and 29 settings. Physics, rules and the sound engine are Rust compiled to WebAssembly; every “oh my god” is rendered live and gets deeper and louder with each tier."

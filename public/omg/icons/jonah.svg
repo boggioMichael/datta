@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#9ED8FF" d="M348 112 Q326 82 288 78 Q320 62 340 88 Q332 68 342 52 Q358 74 362 110 Z"/>
+<path fill="#3DA5FF" d="M122 232 Q84 216 56 170 Q92 168 112 196 Q104 148 134 116 Q146 168 136 228 Z"/>
+<path fill="#B83A4B" d="M460 194 L318 262 L450 334 Q444 264 460 194 Z"/>
+<path fill="#FF8FA3" stroke-width="8" d="M326 266 Q392 262 446 326 L448 332 L320 268 Z"/>
+<path fill="#3DA5FF" d="M460 194 C460 148 420 110 362 106 C292 102 240 128 196 166 C164 194 138 212 114 222 L122 262 C160 300 200 344 270 360 C340 376 412 370 446 340 Q456 332 450 330 L318 262 Z"/>
+<path fill="#2B7FD6" stroke="none" d="M124 258 C160 294 196 330 250 350 L262 330 C214 316 170 284 132 240 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M318 266 L446 334 C410 366 338 372 270 356 C230 346 204 330 184 312 C240 324 286 300 318 266 Z"/>
+<path fill="none" stroke-width="6" d="M232 334 C276 340 322 324 352 298 M282 352 C334 352 376 336 398 318"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.45" d="M250 132 C290 116 340 112 384 120 C336 126 292 136 256 152 Z"/>
+<path fill="none" d="M460 194 C460 148 420 110 362 106 C292 102 240 128 196 166 C164 194 138 212 114 222 L122 262 C160 300 200 344 270 360 C340 376 412 370 446 340 Q456 332 450 330 L318 262 Z"/>
+<path fill="#2B7FD6" d="M282 318 Q246 360 208 366 Q228 334 254 312 Z"/>
+<circle cx="326" cy="206" r="19" fill="#FFFFFF" stroke-width="8"/>
+<circle cx="331" cy="207" r="8.5" fill="#15152A" stroke="none"/>
+<circle cx="334" cy="203" r="3" fill="#FFFFFF" stroke="none"/>
+<path fill="#FFF4D6" stroke-width="7" d="M386 296 L392 262 L410 262 L416 296 Z"/>
+<path fill="none" stroke-width="7" d="M410 270 L426 252"/>
+<circle cx="401" cy="248" r="12" fill="#F2C29B" stroke-width="7"/>
+<path fill="#3DA5FF" d="M74 372 Q92 358 108 370 Q132 384 156 370 Q180 356 204 370 Q228 384 252 370 Q276 356 300 370 Q324 384 348 370 Q372 356 396 370 Q420 384 440 370 Q450 382 438 396 Q350 428 256 428 Q160 428 82 398 Q64 388 74 372 Z"/>
+<path fill="none" stroke="#9ED8FF" stroke-width="7" d="M110 398 L150 398 M230 410 L280 410 M356 400 L396 400"/>
+</g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<path fill="none" stroke-width="16" d="M246 316 L238 348 M366 316 L374 348 M206 348 L406 348 Q426 348 432 334"/>
+<path fill="none" stroke="#CFD4DE" stroke-width="6" d="M246 316 L238 348 M366 316 L374 348 M206 348 L406 348 Q426 348 432 334"/>
+<path fill="#FF4747" d="M210 206 L82 214 L82 236 L212 256 Z"/>
+<path fill="#FF4747" d="M56 166 Q58 158 68 160 L86 164 L100 222 L76 240 Q62 236 60 226 Z"/>
+<circle cx="74" cy="190" r="26" fill="#FFFFFF" opacity="0.45" stroke-width="6"/>
+<path fill="none" stroke-width="6" d="M58 174 L90 206 M90 174 L58 206"/>
+<path fill="#FFFFFF" d="M112 228 L148 226 L150 236 L110 240 Z"/>
+<path fill="#C92E36" d="M254 190 Q260 166 286 164 L326 164 Q348 166 352 188 Z"/>
+<path fill="#FF4747" d="M206 210 Q212 188 250 186 L330 186 Q394 190 420 248 Q430 284 406 306 Q394 316 366 316 L242 316 Q208 314 204 284 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M208 262 L422 262 Q426 288 404 304 Q392 313 366 313 L242 313 Q210 311 208 284 Z"/>
+<path fill="#C9D4E5" stroke="none" d="M212 294 L418 294 Q410 306 398 310 Q386 313 366 313 L242 313 Q218 311 212 294 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.45" d="M212 222 Q216 200 242 196 L246 204 Q226 208 220 226 Z"/>
+<path fill="none" d="M206 210 Q212 188 250 186 L330 186 Q394 190 420 248 Q430 284 406 306 Q394 316 366 316 L242 316 Q208 314 204 284 Z"/>
+<path fill="#9ED8FF" d="M336 190 Q392 194 416 248 L348 248 Q340 248 340 240 Z M258 198 L316 198 Q322 198 322 204 L322 238 Q322 244 316 244 L258 244 Q252 244 252 238 L252 204 Q252 198 258 198 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M354 202 L368 202 L358 238 L350 238 Z M266 204 L280 204 L268 236 L260 236 Z"/>
+<path fill="none" stroke-width="8" d="M280 164 L280 156"/>
+<ellipse cx="280" cy="156" rx="176" ry="14" fill="#FFFFFF" opacity="0.4" stroke="none"/>
+<path fill="none" stroke-width="10" d="M112 158 L448 154"/>
+<circle cx="280" cy="156" r="9" fill="#CFD4DE" stroke-width="6"/>
+</g>
+</svg>

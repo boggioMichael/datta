@@ -1,4 +1,5 @@
-//! Background loops, one per stage. Simple, consonant, quiet — the OMGs are the show.
+//! Background loops, one per era, and the bounce melody that plays in the same key.
+//! Simple, consonant, quiet — the OMGs are the show.
 
 use alloc::vec::Vec;
 
@@ -7,30 +8,85 @@ use crate::m::*;
 
 #[inline] fn midi(m: f32) -> f32 { 440.0 * pow(2.0, (m - 69.0) / 12.0) }
 
-struct Song { bpm: f32, chords: &'static [(&'static [f32], f32)], kick: bool, hats: bool, arp: bool, toms: bool, pluck: bool, bells: bool, pad_bright: f32, bass: bool }
+struct Song {
+    bpm: f32,
+    /// (chord notes, bass root)
+    chords: &'static [(&'static [f32], f32)],
+    kick: bool, hats: bool, arp: bool, toms: bool, pluck: bool, bells: bool, pad_bright: f32, bass: bool,
+    /// steady eighth-note "train" hats
+    chug: bool,
+    /// key for the bounce melody (MIDI root) and minor pentatonic or major
+    key: f32, minor: bool,
+}
 
-fn song(cat: u8) -> Song {
-    match cat {
-        0 => Song { bpm: 104.0, chords: &[(&[57.0, 60.0, 64.0], 45.0), (&[57.0, 60.0, 65.0], 41.0), (&[55.0, 60.0, 64.0], 48.0), (&[55.0, 59.0, 62.0], 43.0)], kick: true, hats: true, arp: false, toms: false, pluck: false, bells: false, pad_bright: 0.5, bass: true },
-        1 => Song { bpm: 92.0, chords: &[(&[62.0, 66.0, 69.0], 50.0), (&[59.0, 62.0, 66.0], 47.0), (&[59.0, 62.0, 67.0], 43.0), (&[57.0, 61.0, 64.0], 45.0)], kick: false, hats: false, arp: false, toms: false, pluck: true, bells: false, pad_bright: 0.65, bass: true },
-        2 => Song { bpm: 70.0, chords: &[(&[55.0, 59.0, 64.0, 71.0], 48.0), (&[55.0, 60.0, 64.0, 69.0], 45.0), (&[57.0, 60.0, 64.0, 69.0], 41.0), (&[55.0, 59.0, 62.0, 64.0], 43.0)], kick: false, hats: false, arp: false, toms: false, pluck: false, bells: true, pad_bright: 0.35, bass: false },
-        3 => Song { bpm: 112.0, chords: &[(&[55.0, 59.0, 64.0], 40.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 66.0], 50.0), (&[54.0, 59.0, 62.0], 47.0)], kick: true, hats: true, arp: true, toms: false, pluck: false, bells: false, pad_bright: 0.55, bass: true },
-        4 => Song { bpm: 80.0, chords: &[(&[57.0, 62.0, 65.0], 38.0), (&[58.0, 62.0, 65.0], 46.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 65.0], 38.0)], kick: false, hats: false, arp: false, toms: true, pluck: false, bells: false, pad_bright: 0.4, bass: true },
-        5 => Song { bpm: 64.0, chords: &[(&[59.0, 62.0, 67.0], 43.0), (&[60.0, 64.0, 67.0], 48.0), (&[59.0, 62.0, 67.0], 43.0), (&[57.0, 62.0, 66.0], 50.0)], kick: false, hats: false, arp: false, toms: false, pluck: false, bells: true, pad_bright: 0.45, bass: false },
-        _ => Song { bpm: 50.0, chords: &[(&[60.0, 64.0, 67.0, 72.0], 48.0), (&[60.0, 64.0, 67.0, 72.0], 48.0)], kick: false, hats: false, arp: false, toms: false, pluck: false, bells: false, pad_bright: 0.3, bass: false },
+const C_MAJ: &[(&[f32], f32)] = &[(&[60.0, 64.0, 67.0], 48.0), (&[60.0, 65.0, 69.0], 41.0), (&[59.0, 62.0, 67.0], 43.0), (&[60.0, 64.0, 69.0], 45.0)];
+const G_MAJ: &[(&[f32], f32)] = &[(&[59.0, 62.0, 67.0], 43.0), (&[60.0, 64.0, 67.0], 48.0), (&[57.0, 62.0, 66.0], 50.0), (&[59.0, 64.0, 67.0], 40.0)];
+const A_MIN: &[(&[f32], f32)] = &[(&[57.0, 60.0, 64.0], 45.0), (&[57.0, 60.0, 65.0], 41.0), (&[55.0, 60.0, 64.0], 48.0), (&[55.0, 59.0, 62.0], 43.0)];
+const D_MIN: &[(&[f32], f32)] = &[(&[57.0, 62.0, 65.0], 50.0), (&[58.0, 62.0, 65.0], 46.0), (&[57.0, 60.0, 65.0], 41.0), (&[55.0, 60.0, 64.0], 48.0)];
+const E_MIN: &[(&[f32], f32)] = &[(&[55.0, 59.0, 64.0], 40.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 66.0], 50.0), (&[54.0, 59.0, 62.0], 47.0)];
+const F_MAJ: &[(&[f32], f32)] = &[(&[57.0, 60.0, 65.0], 41.0), (&[58.0, 62.0, 65.0], 46.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 65.0], 50.0)];
+const D_MAJ: &[(&[f32], f32)] = &[(&[62.0, 66.0, 69.0], 50.0), (&[59.0, 62.0, 66.0], 47.0), (&[59.0, 62.0, 67.0], 43.0), (&[57.0, 61.0, 64.0], 45.0)];
+const SPACE: &[(&[f32], f32)] = &[(&[55.0, 59.0, 64.0, 71.0], 48.0), (&[55.0, 60.0, 64.0, 69.0], 45.0), (&[57.0, 60.0, 64.0, 69.0], 41.0), (&[55.0, 59.0, 62.0, 64.0], 43.0)];
+const SCIFI: &[(&[f32], f32)] = &[(&[55.0, 59.0, 64.0], 40.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 66.0], 50.0), (&[54.0, 59.0, 62.0], 47.0)];
+const MYTH: &[(&[f32], f32)] = &[(&[57.0, 62.0, 65.0], 38.0), (&[58.0, 62.0, 65.0], 46.0), (&[55.0, 60.0, 64.0], 48.0), (&[57.0, 62.0, 65.0], 38.0)];
+const HOLY: &[(&[f32], f32)] = &[(&[59.0, 62.0, 67.0], 43.0), (&[60.0, 64.0, 67.0], 48.0), (&[59.0, 62.0, 67.0], 43.0), (&[57.0, 62.0, 66.0], 50.0)];
+const GOD: &[(&[f32], f32)] = &[(&[60.0, 64.0, 67.0, 72.0], 48.0), (&[60.0, 64.0, 67.0, 72.0], 48.0)];
+
+fn song(era: u8) -> Song {
+    let s = |bpm, chords, kick, hats, arp, toms, pluck, bells, pad_bright, bass, chug, key, minor| Song { bpm, chords, kick, hats, arp, toms, pluck, bells, pad_bright, bass, chug, key, minor };
+    match era {
+        0 => s(112.0, C_MAJ, false, false, false, false, true, true, 0.6, true, false, 72.0, false),
+        1 => s(100.0, G_MAJ, true, true, false, false, true, false, 0.5, true, false, 67.0, false),
+        2 => s(104.0, A_MIN, true, true, false, false, false, false, 0.5, true, false, 69.0, true),
+        3 => s(96.0, A_MIN, true, false, false, false, true, false, 0.45, true, false, 69.0, true),
+        4 => s(118.0, E_MIN, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
+        5 => s(124.0, D_MIN, true, true, true, false, false, true, 0.6, true, false, 62.0, true),
+        6 => s(90.0, E_MIN, true, false, false, true, false, false, 0.4, true, false, 64.0, true),
+        7 => s(108.0, F_MAJ, false, false, false, false, true, false, 0.5, true, true, 65.0, false),
+        8 => s(84.0, D_MAJ, false, false, false, false, false, true, 0.45, true, false, 62.0, false),
+        9 => s(92.0, D_MAJ, false, false, false, false, true, false, 0.65, true, false, 62.0, false),
+        10 => s(70.0, SPACE, false, false, false, false, false, true, 0.35, false, false, 67.0, false),
+        11 => s(112.0, SCIFI, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
+        12 => s(80.0, MYTH, false, false, false, true, false, false, 0.4, true, false, 62.0, true),
+        13 => s(64.0, HOLY, false, false, false, false, false, true, 0.45, false, false, 67.0, false),
+        _ => s(50.0, GOD, false, false, false, false, false, false, 0.3, false, false, 72.0, false),
     }
 }
 
-pub fn render(sr: f32, cat: u8) -> St {
-    let s = song(cat);
+/// Bounce-melody timbre for an era (see sfx::mallet).
+pub fn note_timbre(era: u8) -> u8 {
+    match era { 0 | 7 => 0, 1 | 2 | 3 | 4 | 6 | 11 => 1, 5 | 8 | 9 => 2, 12 | 13 => 3, _ => 4 }
+}
+
+/// The i-th note of an era's bounce melody (MIDI), in the key of its music.
+pub fn melody_note(era: u8, i: u32) -> f32 {
+    const MAJ: [f32; 5] = [0.0, 2.0, 4.0, 7.0, 9.0];
+    const MIN: [f32; 5] = [0.0, 3.0, 5.0, 7.0, 10.0];
+    // four phrases, original, built to sound like a tune when played one note per bounce
+    const PH: [[i8; 16]; 4] = [
+        [0, 2, 4, 2, 5, 4, 2, 0, 1, 2, 4, 5, 7, 5, 4, 2],
+        [4, 4, 5, 4, 2, 0, 2, 4, 5, 7, 5, 4, 2, 1, 0, 0],
+        [0, 1, 2, 4, 2, 1, 0, -1, 0, 2, 4, 7, 5, 4, 2, 4],
+        [7, 5, 4, 5, 4, 2, 0, 2, 4, 2, 1, 2, 0, -1, 0, 2],
+    ];
+    let s = song(era);
+    let sc = if s.minor { &MIN } else { &MAJ };
+    let phrase = ((i / 16) as usize + era as usize) % 4;
+    let d = PH[phrase][(i % 16) as usize] as i32;
+    let oct = d.div_euclid(5);
+    let deg = d.rem_euclid(5) as usize;
+    s.key + 12.0 * oct as f32 + sc[deg]
+}
+
+pub fn render(sr: f32, era: u8) -> St {
+    let s = song(era);
     let beat = 60.0 / s.bpm;
     let bar = beat * 4.0;
     let total = bar * s.chords.len() as f32;
     let tail = 2.5;
     let n = ((total + tail) * sr) as usize;
     let mut out = St::new(n);
-    let mut rng = Rng::new(cat as u64 * 7 + 3);
-    // pad
+    let mut rng = Rng::new(era as u64 * 7 + 3);
     for (ci, (notes, root)) in s.chords.iter().enumerate() {
         let t0 = ci as f32 * bar;
         let len = ((bar + 1.2) * sr) as usize;
@@ -46,7 +102,7 @@ pub fn render(sr: f32, cat: u8) -> St {
         }
         if s.bass {
             let f = midi(*root);
-            let steps = if cat == 0 || cat == 3 { 8 } else { 2 };
+            let steps = if s.kick { 8 } else { 2 };
             for st in 0..steps {
                 let at = t0 + st as f32 * bar / steps as f32;
                 let len = ((bar / steps as f32) * 0.9 * sr) as usize;
@@ -91,7 +147,7 @@ pub fn render(sr: f32, cat: u8) -> St {
     let beats = (total / beat) as usize;
     for b in 0..beats {
         let at = (b as f32 * beat * sr) as usize;
-        if s.kick && (cat == 3 || b % 2 == 0) {
+        if s.kick && (era == 4 || era == 5 || era == 11 || b % 2 == 0) {
             let len = (0.3 * sr) as usize; let mut o = Osc::default();
             let x: Vec<f32> = (0..len).map(|i| { let t = i as f32 / sr; o.sine(48.0 + 90.0 * exp(-t * 30.0), sr) * exp(-t * 9.0) * 0.55 }).collect();
             out.add_mono(&x, at, 1.0, 0.0);
@@ -101,11 +157,13 @@ pub fn render(sr: f32, cat: u8) -> St {
             let x: Vec<f32> = (0..len).map(|i| { let t = i as f32 / sr; o.sine(70.0 + 50.0 * exp(-t * 18.0), sr) * exp(-t * 5.0) * 0.6 + nz.white() * exp(-t * 60.0) * 0.1 }).collect();
             out.add_mono(&x, at, 1.0, if b % 8 == 7 { 0.3 } else { -0.1 });
         }
-        if s.hats {
-            for h in 0..2 {
-                let a2 = at + (h as f32 * beat * 0.5 * sr) as usize;
-                let len = (0.05 * sr) as usize; let mut nz = Noise::new((b * 2 + h) as u32 + 77); let mut f = Bq::hp(sr, 7000.0, 0.7);
-                let x: Vec<f32> = (0..len).map(|i| { let t = i as f32 / sr; f.run(nz.white()) * exp(-t * 70.0) * if h == 1 { 0.12 } else { 0.07 } }).collect();
+        if s.hats || s.chug {
+            let subs = if s.chug { 4 } else { 2 };
+            for h in 0..subs {
+                let a2 = at + (h as f32 * beat / subs as f32 * sr) as usize;
+                let len = (0.05 * sr) as usize; let mut nz = Noise::new((b * 4 + h) as u32 + 77); let mut f = Bq::hp(sr, if s.chug { 4500.0 } else { 7000.0 }, 0.7);
+                let acc = if s.chug { if h == 0 { 0.13 } else if h == 2 { 0.09 } else { 0.05 } } else if h == 1 { 0.12 } else { 0.07 };
+                let x: Vec<f32> = (0..len).map(|i| { let t = i as f32 / sr; f.run(nz.white()) * exp(-t * 70.0) * acc }).collect();
                 out.add_mono(&x, a2, 1.0, 0.25);
             }
         }
@@ -119,4 +177,15 @@ pub fn render(sr: f32, cat: u8) -> St {
     if l > -69.0 { lp_.gain(db(-24.0 - l)); }
     limiter(&mut lp_, db(-3.0), sr);
     lp_
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn melodies_stay_in_range() {
+        for era in 0..15u8 {
+            for i in 0..64 { let m = melody_note(era, i); assert!((50.0..=96.0).contains(&m), "era {era} note {m}"); }
+        }
+    }
 }

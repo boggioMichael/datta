@@ -3,6 +3,8 @@
 'use strict';
 let X = null;
 let style = 0;
+let GOD = 123, IAM = 211;
+const isVoice = (id) => id <= GOD || id === IAM;
 const queue = [];
 let busy = false;
 
@@ -29,6 +31,8 @@ onmessage = async (e) => {
       const { instance } = await WebAssembly.instantiate(m.wasm, {});
       X = instance.exports;
       X.snd_init(m.sampleRate);
+      if (m.god) GOD = m.god;
+      if (m.iam) IAM = m.iam;
       (m.clips || []).forEach((c, id) => {
         if (!c || !c.data || !c.data.length) return;
         const p = X.snd_clip_alloc(id, c.data.length);
@@ -39,7 +43,7 @@ onmessage = async (e) => {
       renderNext();
     } else if (m.type === 'style') {
       style = m.style; if (X) X.snd_style(style);
-      for (let i = queue.length - 1; i >= 0; i--) if (queue[i].id <= 36 || queue[i].id === 51) queue[i].style = style;
+      for (let i = queue.length - 1; i >= 0; i--) if (isVoice(queue[i].id)) queue[i].style = style;
     } else if (m.type === 'render') {
       // newest requests for voices first; keep one copy per id
       if (!queue.some((q) => q.id === m.id)) {

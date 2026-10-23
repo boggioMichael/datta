@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" transform="rotate(-8 256 256) translate(-8 22)">
+<path fill="#E9EDF4" d="M264 202 L180 90 L148 90 L136 202 Z"/>
+<path fill="#C3CAD8" stroke="none" d="M153 96 L166 96 L157 198 L142 198 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M240 196 L176 106 L184 106 L250 196 Z"/>
+<path fill="#B4BCCB" d="M130 214 L130 232 L76 230 Q68 210 76 190 Z"/>
+<path fill="#B4BCCB" d="M130 268 L130 286 L76 310 Q68 290 76 270 Z"/>
+<path fill="#B4BCCB" d="M130 241 L130 259 L74 270 Q66 250 74 230 Z"/>
+<ellipse cx="76" cy="210" rx="6" ry="16" fill="#454B66" stroke-width="6"/>
+<ellipse cx="74" cy="250" rx="6" ry="16" fill="#454B66" stroke-width="6"/>
+<ellipse cx="76" cy="290" rx="6" ry="16" fill="#454B66" stroke-width="6"/>
+<path fill="#454B66" d="M402 296 C374 304 330 314 296 324 L196 356 L164 356 L150 296 Z"/>
+<path fill="#6A7194" stroke="none" d="M368 302 L300 310 L214 344 L232 340 L304 318 Z"/>
+<path fill="#E9EDF4" d="M126 202 L126 186 C150 174 212 176 246 202 Z"/>
+<path fill="#E9EDF4" d="M126 200 L356 200 C372 200 384 184 404 182 L416 182 C440 184 460 212 468 236 C474 254 472 274 462 286 C452 298 436 300 418 300 L126 300 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M136 206 L356 206 C366 206 374 200 382 196 L382 216 L136 216 Z"/>
+<path fill="#C3CAD8" stroke="none" d="M126 262 L452 262 L446 282 L126 282 Z"/>
+<path fill="#454B66" d="M126 278 L402 278 C426 278 442 264 450 246 C454 236 458 228 464 225 C474 252 472 274 462 286 C452 298 436 300 418 300 L126 300 Z"/>
+<path fill="none" d="M126 200 L356 200 C372 200 384 184 404 182 L416 182 C440 184 460 212 468 236 C474 254 472 274 462 286 C452 298 436 300 418 300 L126 300 Z"/>
+<path fill="none" stroke-width="6" d="M152 225 L352 225"/>
+<path fill="#9ED8FF" stroke-width="6" d="M400 194 L418 192 L424 214 L398 214 Z"/>
+<path fill="#9ED8FF" stroke-width="6" d="M424 194 C432 197 438 204 441 214 L428 214 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M404 197 L410 197 L405 210 Z"/>
+</g>
+</svg>

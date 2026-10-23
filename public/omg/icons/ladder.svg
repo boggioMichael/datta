@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="256" cy="452" rx="104" ry="12" fill="#000" opacity="0.18" stroke="none"/>
+<path fill="none" stroke-width="26" d="M187 408 L328 408 M199 343 L322 343 M210 277 L315 277 M222 212 L309 212"/>
+<path fill="none" stroke="#FFC93C" stroke-width="14" d="M187 408 L328 408 M199 343 L322 343 M210 277 L315 277 M222 212 L309 212"/>
+<path fill="#FFC93C" d="M166 450 L194 450 L246 120 L230 120 Z"/>
+<path fill="#FFC93C" d="M318 450 L346 450 L308 120 L292 120 Z"/>
+<path fill="#E39A2B" stroke="none" d="M184 446 L194 446 L244 128 L238 128 Z"/>
+<path fill="#E39A2B" stroke="none" d="M336 446 L344 446 L306 128 L300 128 Z"/>
+<path fill="#FFF4CC" d="M128 180 A30 30 0 0 1 120 126 A40 40 0 0 1 184 90 A44 44 0 0 1 262 64 A42 42 0 0 1 338 84 A40 40 0 0 1 396 128 A30 30 0 0 1 384 180 Q256 198 128 180 Z"/>
+<path fill="#F5D77E" stroke="none" d="M134 170 Q256 186 380 170 Q388 160 394 150 Q398 178 380 178 Q256 194 130 178 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M150 120 A30 30 0 0 1 196 98 A40 40 0 0 1 252 80 A36 36 0 0 0 202 108 A26 26 0 0 0 160 128 Z"/>
+<path fill="#FFFFFF" d="M160 302 C130 282 110 304 120 332 C142 334 160 326 170 314 Z"/>
+<path fill="#FFFFFF" d="M164 300 L194 300 L208 362 L150 362 Z"/>
+<path fill="#E3E6F5" stroke="none" d="M182 304 L192 304 L203 357 L188 357 Z"/>
+<circle cx="179" cy="285" r="15" fill="#F2C29B"/>
+<ellipse cx="179" cy="262" rx="15" ry="5" fill="none" stroke-width="12"/>
+<ellipse cx="179" cy="262" rx="15" ry="5" fill="none" stroke="#FFD23F" stroke-width="5"/>
+<path fill="#FFFFFF" d="M352 214 C382 194 402 216 392 244 C370 246 352 238 342 226 Z"/>
+<path fill="#FFFFFF" d="M318 212 L348 212 L362 274 L304 274 Z"/>
+<path fill="#E3E6F5" stroke="none" d="M336 216 L346 216 L357 269 L342 269 Z"/>
+<circle cx="333" cy="197" r="15" fill="#A86B45"/>
+<ellipse cx="333" cy="174" rx="15" ry="5" fill="none" stroke-width="12"/>
+<ellipse cx="333" cy="174" rx="15" ry="5" fill="none" stroke="#FFD23F" stroke-width="5"/>
+</g>
+</svg>

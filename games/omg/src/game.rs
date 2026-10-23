@@ -1,10 +1,11 @@
 //! Game state, physics and rules.
 //!
-//! World units: the inside of the ring has radius `ring_r` (≈1), centred on the
-//! origin, y pointing down. The chute is a vertical channel of half-width
-//! CHUTE_W that meets the ring at its top. Items are discs whose radius depends
-//! on how far their tier is above the current spout tier, so the picture
-//! "zooms out" as the journey climbs.
+//! World units: the inside of the ring has radius `ring_r` (1 by default), centred
+//! on the origin, y pointing down. The chute is a vertical channel of half-width
+//! CHUTE_W that meets the ring at its top. Every run starts by dropping crawling
+//! babies; when you've built `gap` tiers above the spout, the spout upgrades.
+//! A ball's size depends on its tier: one merge makes it visibly bigger, and the
+//! whole ladder grows from tiny babies to huge chariots and the God of Israel.
 
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -13,33 +14,41 @@ use crate::m::*;
 use crate::opts::*;
 use crate::tiers::*;
 
-pub const R0: f32 = 0.105;
-pub const GROW: f32 = 1.26;
-pub const CHUTE_W: f32 = 0.16;
+/// Size of the spout's ball at the start and at the end of the ladder (world units).
+pub const A0: f32 = 0.05;
+pub const A1: f32 = 0.13;
+pub const GOD_R: f32 = 0.42;
+pub const CHUTE_W: f32 = 0.14;
 pub const BASE_G: f32 = 4.2;
-pub const MAX_BODIES: usize = 170;
+pub const MAX_BODIES: usize = 300;
+pub const MAX_BODIES_MEGA: usize = 460;
 pub const SUB_HZ: f32 = 480.0;
 
-// sound ids (0..=36 are the tiers' OMGs)
-pub const S_DROP: u32 = 40;
-pub const S_POP: u32 = 41;
-pub const S_SOLD: u32 = 42;
-pub const S_SHAKE: u32 = 43;
-pub const S_MAGNET: u32 = 44;
-pub const S_BOMB: u32 = 45;
-pub const S_SLOWMO: u32 = 46;
-pub const S_FLIP: u32 = 47;
-pub const S_UPGRADE: u32 = 48;
-pub const S_WHOOSH: u32 = 49;
-pub const S_SPOUT: u32 = 50;
-pub const S_IAM: u32 = 51;
-pub const S_JAM: u32 = 52;
-pub const S_CLICK: u32 = 53;
-pub const S_TIMEUP: u32 = 54;
-pub const S_MUSIC0: u32 = 60; // + category
+// sound ids: 0..=GOD are the tiers' OMGs
+pub const S_DROP: u32 = 200;
+pub const S_POP: u32 = 201;
+pub const S_SOLD: u32 = 202;
+pub const S_SHAKE: u32 = 203;
+pub const S_MAGNET: u32 = 204;
+pub const S_BOMB: u32 = 205;
+pub const S_SLOWMO: u32 = 206;
+pub const S_FLIP: u32 = 207;
+pub const S_UPGRADE: u32 = 208;
+pub const S_WHOOSH: u32 = 209;
+pub const S_SPOUT: u32 = 210;
+pub const S_IAM: u32 = 211;
+pub const S_JAM: u32 = 212;
+pub const S_CLICK: u32 = 213;
+pub const S_TIMEUP: u32 = 214;
+pub const S_ERA: u32 = 215;
+pub const S_HIT: u32 = 216;
+pub const S_COMBO: u32 = 217;
+pub const S_BOING: u32 = 218;
+pub const S_NOTE0: u32 = 230; // + timbre (0..=4)
+pub const S_MUSIC0: u32 = 240; // + era
 
 // event opcodes (5 floats each: op, a, b, c, d)
-pub const EV_SOUND: f32 = 1.0;
+pub const EV_SOUND: f32 = 1.0; // id, gain, pan, rate
 pub const EV_BANNER: f32 = 2.0;
 pub const EV_CATEGORY: f32 = 3.0;
 pub const EV_END: f32 = 4.0;
@@ -50,6 +59,7 @@ pub const EV_UNLOCK: f32 = 8.0;
 pub const EV_DUCK: f32 = 9.0;
 pub const EV_TOOLS: f32 = 10.0;
 pub const EV_MUSIC: f32 = 11.0;
+pub const EV_NOTE: f32 = 12.0; // timbre, midi, gain, pan
 
 #[derive(Clone, Copy, Default)]
 pub struct Body {
@@ -70,12 +80,17 @@ pub struct Body {
     pub rest_t: f32,
     pub dying: f32,
     pub hl: f32,
+    pub squash: f32,
+    pub squash_a: f32,
+    /// chain-reaction depth: how many merges in a row led to this ball
+    pub chain: u16,
     pub trail: [V2; 4],
 }
 
 #[derive(Clone, Copy, Default)]
 pub struct Particle {
-    pub kind: u8, // 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti
+    /// 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti, 7 smoke, 8 droplet, 9 shock
+    pub kind: u8,
     pub p: V2,
     pub v: V2,
     pub life: f32,
@@ -87,6 +102,9 @@ pub struct Particle {
     pub angle: f32,
     pub spin: f32,
 }
+
+#[derive(Clone, Copy, Default)]
+pub struct Bolt { pub a: V2, pub b: V2, pub t: f32, pub max: f32, pub col: u32, pub seed: u32 }
 
 #[derive(Clone, Copy, Default)]
 pub struct Layout {
@@ -110,14 +128,17 @@ pub struct ToolState { pub cd: f32, pub active: f32, pub charges: u8 }
 #[derive(Clone, Default)]
 pub struct Stats {
     pub runs: u32, pub merges: u32, pub omgs: u32, pub drops: u32, pub gods: u32,
-    pub best: [f32; N_MODES], pub best_tier_ta: u8, pub played: f32, pub top_tier: u8,
+    pub best: [f32; N_MODES], pub best_tier_ta: u8, pub played: f32, pub top_tier: u8, pub best_combo: u32,
 }
 
 pub struct Game {
     pub rng: Rng,
     pub bodies: Vec<Body>,
+    order: Vec<u16>,
+    by_tier: Vec<u16>,
     pub parts: Vec<Particle>,
     pub stars: Vec<Particle>,
+    pub bolts: Vec<Bolt>,
     pub next_id: u32,
     pub mode: Mode,
     pub opts: Options,
@@ -126,8 +147,8 @@ pub struct Game {
     pub spout: u8,
     pub base: f32,
     pub run_max: u8,
-    pub run_seen: u64,
-    pub unlocked: u64,
+    pub run_seen: u128,
+    pub unlocked: u128,
     pub time: f32,
     pub real: f32,
     pub drop_t: f32,
@@ -150,25 +171,45 @@ pub struct Game {
     pub blocked: bool,
     pub ta_left: f32,
     pub sandbox_tier: u8,
-    // presentation state
+    // ── presentation
     pub shake: f32,
     pub flash: f32,
     pub flash_col: u32,
     pub ring_pulse: f32,
     pub ring_col: u32,
+    pub ring_wob: f32,
     pub hue: f32,
     pub cat: u8,
     pub cat_mix: f32,
     pub prev_cat: u8,
     pub banner_tier: i32,
     pub banner_t: f32,
-    pub toast: (&'static str, &'static str),
-    pub toast_t: f32,
+    pub banner_new: bool,
+    pub era_t: f32,
+    pub era_card: u8,
+    pub hitstop: f32,
+    pub ts: f32,
+    pub cam_k: f32,
+    pub cam_v: f32,
+    pub cam_f: V2,
+    pub sl_t: f32,
+    pub sl_p: V2,
+    pub sl_col: u32,
+    pub combo_n: u32,
+    pub combo_t: f32,
+    pub combo_show: f32,
+    pub combo_shown: u32,
+    pub combo_p: V2,
+    pub note_cd: f32,
+    pub note_i: u32,
+    note_req: f32,
+    note_x: f32,
     pub voice_busy: f32,
     pub voice_tier: i32,
     pub pop_cd: f32,
     pub sold_cd: f32,
     pub drop_snd_cd: f32,
+    pub boing_cd: f32,
     pub lang_he: bool,
     pub caption: String,
     pub stats: Stats,
@@ -176,17 +217,55 @@ pub struct Game {
     pub run_drops: u32,
     pub events: Vec<f32>,
     pub draw: Vec<f32>,
+    pub paths: Vec<f32>,
     pub text: String,
     pub dirty_save: f32,
+    /// a ball must have existed this long (game seconds) before it can merge again,
+    /// so every new ride visibly lands and bounces before the next pop
+    pub merge_age: f32,
+    /// seconds between drops at "Normal"
+    pub drop_base: f32,
+    /// how long rides left below the spout linger (alone / at most)
+    pub orphan_alone: f32,
+    pub orphan_max: f32,
+    // ── random events
+    pub ev_next: f32,
+    pub ev_kind: u8,
+    pub ev_left: f32,
+    pub ev_burst: u32,
+    pub ev_dir: f32,
+    pub toast: (&'static str, &'static str),
+    pub toast_t: f32,
+    pub toast_col: u32,
 }
+
+pub const EV_NONE: u8 = 0;
+pub const EV_RUSH: u8 = 1;
+pub const EV_QUAKE: u8 = 2;
+pub const EV_WIND: u8 = 3;
+pub const EV_ZEROG: u8 = 4;
+pub const EV_STORM: u8 = 5;
+pub static EVENTS: [(&str, &str, u32); 6] = [
+    ("", "", 0xFFFFFF),
+    ("שעת עומס!", "Rush hour!", 0xFFB627),
+    ("רעידת אדמה!", "Earthquake!", 0xFF5A4A),
+    ("רוח צד!", "Crosswind!", 0x8FD3FF),
+    ("אפס כבידה!", "Zero-G!", 0xC59CFF),
+    ("סערה מגנטית!", "Magnetic storm!", 0x7CFFB2),
+];
+
+#[inline] pub fn bit(t: u8) -> u128 { 1u128 << (t as u32) }
 
 impl Game {
     pub fn new(seed: u32) -> Game {
         let mut g = Game {
             rng: Rng::new(seed as u64 ^ 0x5eed_0f_60d),
-            bodies: Vec::with_capacity(MAX_BODIES + 8),
-            parts: Vec::with_capacity(1600),
-            stars: Vec::with_capacity(180),
+            bodies: Vec::with_capacity(MAX_BODIES_MEGA + 8),
+            order: Vec::with_capacity(MAX_BODIES_MEGA + 8),
+            by_tier: Vec::with_capacity(MAX_BODIES_MEGA + 8),
+            parts: Vec::with_capacity(2400),
+            stars: Vec::with_capacity(200),
+            bolts: Vec::with_capacity(16),
             next_id: 1,
             mode: Mode::Classic,
             opts: Options::new(),
@@ -217,35 +296,68 @@ impl Game {
             jam_t: 0.0,
             fill: 0.0,
             blocked: false,
-            ta_left: 90.0,
+            ta_left: 120.0,
             sandbox_tier: 0,
             shake: 0.0,
             flash: 0.0,
             flash_col: 0xFFFFFF,
             ring_pulse: 0.0,
             ring_col: 0xFFFFFF,
+            ring_wob: 0.0,
             hue: 0.0,
             cat: 0,
             cat_mix: 1.0,
             prev_cat: 0,
             banner_tier: -1,
             banner_t: 0.0,
-            toast: ("", ""),
-            toast_t: 0.0,
+            banner_new: false,
+            era_t: 0.0,
+            era_card: 0,
+            hitstop: 0.0,
+            ts: 1.0,
+            cam_k: 0.0,
+            cam_v: 0.0,
+            cam_f: V2::default(),
+            sl_t: 0.0,
+            sl_p: V2::default(),
+            sl_col: 0xFFFFFF,
+            combo_n: 0,
+            combo_t: 0.0,
+            combo_show: 0.0,
+            combo_shown: 0,
+            combo_p: V2::default(),
+            note_cd: 0.0,
+            note_i: 0,
+            note_req: 0.0,
+            note_x: 0.0,
             voice_busy: 0.0,
             voice_tier: -1,
             pop_cd: 0.0,
             sold_cd: 0.0,
             drop_snd_cd: 0.0,
+            boing_cd: 0.0,
             lang_he: true,
             caption: String::new(),
             stats: Stats::default(),
             run_merges: 0,
             run_drops: 0,
-            events: Vec::with_capacity(256),
-            draw: Vec::with_capacity(16 * 900),
+            events: Vec::with_capacity(512),
+            draw: Vec::with_capacity(16 * 1400),
+            paths: Vec::with_capacity(8192),
             text: String::with_capacity(4096),
             dirty_save: 0.0,
+            merge_age: 0.6,
+            drop_base: 0.07,
+            orphan_alone: 8.0,
+            orphan_max: 20.0,
+            ev_next: 30.0,
+            ev_kind: EV_NONE,
+            ev_left: 0.0,
+            ev_burst: 0,
+            ev_dir: 1.0,
+            toast: ("", ""),
+            toast_t: 0.0,
+            toast_col: 0xFFFFFF,
         };
         g.tools[Tool::Upgrade as usize].charges = 1;
         g.make_stars();
@@ -254,7 +366,7 @@ impl Game {
 
     fn make_stars(&mut self) {
         self.stars.clear();
-        for _ in 0..170 {
+        for _ in 0..190 {
             let p = Particle {
                 kind: 5,
                 p: V2::new(self.rng.f(), self.rng.f()),
@@ -272,24 +384,26 @@ impl Game {
     // ───────────────────────────────────────────── events
     #[inline]
     pub fn ev(&mut self, op: f32, a: f32, b: f32, c: f32, d: f32) {
-        if self.events.len() < 5 * 200 { self.events.extend_from_slice(&[op, a, b, c, d]); }
+        if self.events.len() < 5 * 300 { self.events.extend_from_slice(&[op, a, b, c, d]); }
     }
-    pub fn sound(&mut self, id: u32, gain: f32, pan: f32) { self.ev(EV_SOUND, id as f32, gain, pan, 0.0); }
+    pub fn sound(&mut self, id: u32, gain: f32, pan: f32) { self.ev(EV_SOUND, id as f32, gain, pan, 1.0); }
+    pub fn sound_rate(&mut self, id: u32, gain: f32, pan: f32, rate: f32) { self.ev(EV_SOUND, id as f32, gain, pan, rate); }
     fn haptic(&mut self, ms: f32) { if self.opts.on(Opt::Haptics) { self.ev(EV_HAPTIC, ms, 0.0, 0.0, 0.0); } }
+    #[inline] pub fn drama(&self) -> f32 { self.opts.get(Opt::Drama) }
 
     // ───────────────────────────────────────────── run control
     pub fn start(&mut self, mode: Mode) {
         self.mode = mode;
         self.bodies.clear();
+        self.order.clear();
         self.parts.clear();
-        self.ring_r = self.opts.get(Opt::RingSize);
-        let st = (self.opts.get(Opt::StartTier) as i32 - 1).clamp(0, 35) as u8;
-        let st = if self.unlocked & (1u64 << st) != 0 { st } else { 0 };
-        let st = st.min(GOD - 1);
-        self.spout = st;
-        self.base = st as f32;
-        self.run_max = st;
-        self.run_seen = 1u64 << st;
+        self.bolts.clear();
+        self.ring_r = self.opts.get(Opt::RingSize) * if mode == Mode::Mega { 1.55 } else { 1.0 };
+        // every run starts from the very bottom of the ladder
+        self.spout = 0;
+        self.base = 0.0;
+        self.run_max = 0;
+        self.run_seen = bit(0);
         self.time = 0.0;
         self.drop_t = 0.25;
         self.spout_cd = 0.0;
@@ -307,24 +421,40 @@ impl Game {
         self.god_t = 0.0;
         self.god_id = 0;
         self.jam_t = 0.0;
-        self.ta_left = 90.0;
+        self.ta_left = 120.0;
         self.banner_tier = -1;
         self.banner_t = 0.0;
-        self.toast_t = 0.0;
         self.voice_busy = 0.0;
         self.voice_tier = -1;
         self.run_merges = 0;
         self.run_drops = 0;
-        self.cat = tier(st).cat as u8;
-        self.prev_cat = self.cat;
+        self.cat = 0;
+        self.prev_cat = 0;
         self.cat_mix = 1.0;
         self.flash = 0.0;
         self.shake = 0.0;
+        self.hitstop = 0.0;
+        self.ts = 1.0;
+        self.cam_k = 0.0; self.cam_v = 0.0;
+        self.sl_t = 0.0;
+        self.combo_n = 0; self.combo_t = 0.0; self.combo_show = 0.0; self.combo_shown = 0;
+        self.note_i = 0;
+        self.ev_next = 22.0 + self.rng.range(0.0, 10.0);
+        self.ev_kind = EV_NONE; self.ev_left = 0.0; self.ev_burst = 0;
+        self.toast_t = 0.0;
         self.stats.runs += 1;
-        self.sandbox_tier = st;
         if mode == Mode::Sandbox {
+            let st = self.sandbox_tier.min(GOD - 1);
+            let st = if self.unlocked & bit(st) != 0 { st } else { 0 };
+            self.sandbox_tier = st;
             self.spout = st;
             self.base = st as f32;
+            self.cat = cat_of(st);
+            self.prev_cat = self.cat;
+        } else {
+            // title card for the first era
+            self.era_card = 0;
+            self.era_t = if self.drama() > 0.0 { 2.4 } else { 0.0 };
         }
         self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
         self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
@@ -332,32 +462,53 @@ impl Game {
     }
 
     pub fn gap(&self) -> u8 { self.opts.get(Opt::Gap) as u8 }
+    fn max_bodies(&self) -> usize { if self.mode == Mode::Mega { MAX_BODIES_MEGA } else { MAX_BODIES } }
 
+    /// Ball radius for a tier: a merge is visibly bigger, and the spout's own ball
+    /// grows from a tiny baby to a big chariot over the whole ladder.
     pub fn radius_for(&self, t: u8) -> f32 {
-        if t == GOD { return 0.36; }
-        let d = t as f32 - self.base;
-        let r = R0 * pow(GROW, d);
-        clamp(r, 0.028, 0.62)
+        if t == GOD { return GOD_R; }
+        if self.mode == Mode::Sandbox {
+            // any tier can sit next to any other: a gentler, absolute curve
+            let k = t as f32 / (GOD as f32 - 1.0);
+            return clamp(1.45 * A0 * pow(A1 / A0, k) * (1.0 + 0.35 * k), 0.03, 0.4);
+        }
+        let g = self.opts.get(Opt::SizeGrow);
+        let k = clamp(self.base / (GOD as f32 - 1.0), 0.0, 1.0);
+        let a = A0 * pow(A1 / A0, k);
+        clamp(a * pow(g, t as f32 - self.base), 0.02, 0.56)
     }
 
-    fn new_body(&mut self, t: u8, p: V2, v: V2) -> Option<usize> { self.new_body_ex(t, p, v, false) }
     fn new_body_ex(&mut self, t: u8, p: V2, v: V2, force: bool) -> Option<usize> {
-        if !force && self.bodies.iter().filter(|b| b.alive).count() >= MAX_BODIES { return None; }
+        if !force && self.bodies.len() >= self.max_bodies() { return None; }
         let r = self.radius_for(t);
         let b = Body {
-            id: self.next_id, tier: t, p, v, acc: V2::default(), r, angle: self.rng.range(-0.4, 0.4), spin: 0.0,
+            id: self.next_id, tier: t, p, v, acc: V2::default(), r, angle: self.rng.range(-0.3, 0.3), spin: 0.0,
             age: 0.0, pop: 0.0, flash: 0.0, alive: true, merged: false, orphan_t: 0.0, rest_t: 0.0, dying: 0.0, hl: 0.0,
-            trail: [p; 4],
+            squash: 0.0, squash_a: 0.0, chain: 0, trail: [p; 4],
         };
         self.next_id += 1;
         self.bodies.push(b);
+        self.order.push((self.bodies.len() - 1) as u16);
         Some(self.bodies.len() - 1)
     }
+    fn new_body(&mut self, t: u8, p: V2, v: V2) -> Option<usize> { self.new_body_ex(t, p, v, false) }
 
     // ───────────────────────────────────────────── geometry helpers
     #[inline] pub fn join_y(&self) -> f32 { -sqrt(self.ring_r * self.ring_r - CHUTE_W * CHUTE_W) }
-    pub fn to_screen(&self, p: V2) -> (f32, f32) { (self.lay.cx + p.x * self.lay.scale, self.lay.cy + p.y * self.lay.scale) }
-    pub fn to_world(&self, x: f32, y: f32) -> V2 { V2::new((x - self.lay.cx) / self.lay.scale, (y - self.lay.cy) / self.lay.scale) }
+    /// Camera: zoom `z` around focus `f` (the focus keeps its screen position).
+    #[inline] pub fn cam(&self) -> (f32, V2) {
+        let z = 1.0 + self.cam_k;
+        (z, self.cam_f * (1.0 - 1.0 / z))
+    }
+    pub fn to_screen(&self, p: V2) -> (f32, f32) {
+        let (z, pan) = self.cam();
+        (self.lay.cx + (p.x - pan.x) * self.lay.scale * z, self.lay.cy + (p.y - pan.y) * self.lay.scale * z)
+    }
+    pub fn to_world(&self, x: f32, y: f32) -> V2 {
+        let (z, pan) = self.cam();
+        V2::new((x - self.lay.cx) / (self.lay.scale * z) + pan.x, (y - self.lay.cy) / (self.lay.scale * z) + pan.y)
+    }
 
     pub fn resize(&mut self, w: f32, h: f32, dpr: f32) {
         let w = w.max(200.0); let h = h.max(200.0);
@@ -368,13 +519,13 @@ impl Game {
         let sx = (w - sw) * 0.5; let sy = (h - sh) * 0.5;
         let u = sw / 390.0;
         let hud_y = sy + 60.0 * u;
-        let ladder_y = sy + 112.0 * u;
-        let timer_y = sy + 128.0 * u;
-        let chute_top_px = sy + 140.0 * u;
+        let ladder_y = sy + 110.0 * u;
+        let timer_y = sy + 126.0 * u;
+        let chute_top_px = sy + 136.0 * u;
         let tools_y = sy + sh - 18.0 * u - 50.0 * u;
-        let caption_y = tools_y - 38.0 * u;
-        let y_bot = caption_y - 34.0 * u;
-        let ring_px = (0.44 * sw).min((y_bot - chute_top_px - 64.0 * u) * 0.5).max(60.0);
+        let caption_y = tools_y - 36.0 * u;
+        let y_bot = caption_y - 30.0 * u;
+        let ring_px = (0.478 * sw).min((y_bot - chute_top_px - 48.0 * u) * 0.5).max(60.0);
         let cy = y_bot - ring_px - 4.0 * u;
         self.lay = Layout { w, h, dpr, sx, sy, sw, sh, u, cx: sx + sw * 0.5, cy, ring_px, scale: ring_px, chute_top: 0.0, chute_top_px, hud_y, ladder_y, timer_y, caption_y, tools_y };
         self.update_scale();
@@ -385,7 +536,8 @@ impl Game {
     }
 
     pub fn gravity(&self, p: V2, in_chute: bool) -> V2 {
-        let gmul = self.opts.get(Opt::Gravity);
+        let mut gmul = self.opts.get(Opt::Gravity);
+        if self.mode == Mode::Trampoline { gmul *= 0.85; }
         let g = BASE_G * gmul;
         let flip = self.tools[Tool::Flip as usize].active > 0.0;
         if in_chute { return V2::new(0.0, g.max(2.0)); }
@@ -398,16 +550,21 @@ impl Game {
             V2::new(0.0, g).rot(-self.tilt)
         };
         if flip { a = -a * 0.9; }
+        if self.ev_left > 0.0 {
+            match self.ev_kind {
+                EV_ZEROG => { a = a * 0.18; }
+                EV_WIND => { a += V2::new(self.ev_dir * g * 0.55, 0.0); }
+                _ => {}
+            }
+        }
         a
     }
 
     // ───────────────────────────────────────────── input
     pub fn pointer(&mut self, kind: u32, x: f32, y: f32) {
         match kind {
-            0 => { // down
-                self.ptr = Pointer { down: true, x0: x, y0: y, x, y, t0: self.real, dragging: false };
-            }
-            1 => { // move
+            0 => { self.ptr = Pointer { down: true, x0: x, y0: y, x, y, t0: self.real, dragging: false }; }
+            1 => {
                 if !self.ptr.down { return; }
                 self.ptr.x = x; self.ptr.y = y;
                 let dx = x - self.ptr.x0; let dy = y - self.ptr.y0;
@@ -416,7 +573,7 @@ impl Game {
                     self.tilt_target = clamp(dx / (self.lay.sw * 0.45), -1.0, 1.0) * 0.62;
                 }
             }
-            _ => { // up / cancel
+            _ => {
                 if !self.ptr.down { return; }
                 let was_drag = self.ptr.dragging;
                 let dur = self.real - self.ptr.t0;
@@ -448,10 +605,7 @@ impl Game {
         if !self.started || self.paused || self.finished || self.over { return; }
         let w = self.to_world(x, y);
         if self.upgrade_armed {
-            if let Some(i) = self.pick(w) {
-                self.upgrade_body(i);
-                return;
-            }
+            if let Some(i) = self.pick(w) { self.upgrade_body(i); return; }
             self.upgrade_armed = false;
             self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
             return;
@@ -469,9 +623,7 @@ impl Game {
                     }
                 }
             }
-            _ => {
-                if self.tap_cd <= 0.0 && self.spawn_from_spout(true) { self.tap_cd = 0.14; }
-            }
+            _ => { if self.tap_cd <= 0.0 && self.spawn_from_spout(true) { self.tap_cd = 0.1; } }
         }
     }
 
@@ -501,13 +653,14 @@ impl Game {
         t.cd = if self.mode == Mode::Sandbox { 0.6 } else { info.cooldown };
         t.active = info.duration;
         match i {
-            0 => { // shake
+            0 => {
                 for b in self.bodies.iter_mut() {
                     if !b.alive { continue; }
-                    let k = 2.4 / (1.0 + b.r * 4.0);
-                    b.v += V2::new(self.rng.sym() * k, -self.rng.range(0.6, 1.4) * k);
+                    let k = 2.6 / (1.0 + b.r * 4.0);
+                    b.v += V2::new(self.rng.sym() * k, -self.rng.range(0.7, 1.5) * k);
                 }
                 self.shake = self.shake.max(0.5);
+                self.ring_wob = self.ring_wob.max(0.8);
                 self.sound(S_SHAKE, 0.9, 0.0);
                 self.haptic(40.0);
             }
@@ -530,11 +683,12 @@ impl Game {
         }
         for (p, r) in pts.iter() {
             self.burst(*p, 0xFFAA33, 24, 1.4);
+            self.smoke(*p, 6, 0x8A8A8A, *r * 2.0);
             self.wave(*p, *r * 2.5, 0xFFDD88);
             for b in self.bodies.iter_mut() {
                 if !b.alive || b.dying > 0.0 { continue; }
                 let d = b.p - *p; let l = d.len();
-                if l < 0.7 && l > 1e-4 { b.v += d * (1.6 * (0.7 - l) / (l * (1.0 + b.r * 3.0))); }
+                if l < 0.7 && l > 1e-4 { b.v += d * (1.8 * (0.7 - l) / (l * (1.0 + b.r * 3.0))); }
             }
         }
         self.shake = self.shake.max(0.9);
@@ -566,27 +720,28 @@ impl Game {
         let chaos = self.mode == Mode::Chaos;
         if chaos && self.rng.chance(0.22) && t + 1 < GOD { t += 1; }
         let r = self.radius_for(t);
-        // chaos portals: sometimes the car appears inside the ring
+        // chaos portals: sometimes the ride appears inside the ring
         if chaos && !manual && self.rng.chance(0.3) {
             for _ in 0..6 {
                 let a = self.rng.range(-PI * 0.85, -PI * 0.15);
                 let d = self.rng.range(0.25, 0.65) * self.ring_r;
                 let p = V2::new(cos(a) * d, sin(a) * d);
-                if self.free_at(p, r * 1.05) {
-                    if self.new_body(t, p, V2::new(0.0, 0.0)).is_some() {
-                        self.portal_fx(p, r);
-                        self.run_drops += 1; self.stats.drops += 1;
-                        return true;
-                    }
+                if self.free_at(p, r * 1.05) && self.new_body(t, p, V2::new(0.0, 0.0)).is_some() {
+                    self.portal_fx(p, r);
+                    self.run_drops += 1; self.stats.drops += 1;
+                    return true;
                 }
             }
         }
-        let jitter = self.rng.sym() * 0.012;
+        if self.mode == Mode::Mega && !manual && self.rng.chance(0.6) && self.rain() { return true; }
+        let room = (CHUTE_W - r).max(0.0);
+        let jitter = self.rng.sym() * room * 0.95;
         let p = V2::new(jitter, self.lay.chute_top + r + 0.02);
         if !self.free_at(p, r * 1.02) { return false; }
-        if self.new_body(t, p, V2::new(0.0, 0.9)).is_some() {
+        let vx = self.rng.sym() * 0.2;
+        if self.new_body(t, p, V2::new(vx, 2.0)).is_some() {
             self.run_drops += 1; self.stats.drops += 1;
-            if self.drop_snd_cd <= 0.0 { self.sound(S_DROP, 0.35, 0.0); self.drop_snd_cd = 0.07; }
+            if self.drop_snd_cd <= 0.0 { self.sound(S_DROP, 0.3, 0.0); self.drop_snd_cd = 0.09; }
             return true;
         }
         false
@@ -595,8 +750,9 @@ impl Game {
     fn free_at(&self, p: V2, r: f32) -> bool {
         for b in &self.bodies {
             if !b.alive { continue; }
-            let d = (b.p - p).len();
-            if d < b.r + r { return false; }
+            let d = b.p - p;
+            let m = b.r + r;
+            if d.len2() < m * m { return false; }
         }
         true
     }
@@ -605,28 +761,65 @@ impl Game {
     pub fn frame(&mut self, real_dt: f32) {
         let real_dt = clamp(real_dt, 0.0, 0.1);
         self.real += real_dt;
+        // hit-stop: the world almost freezes for a beat, then eases back
+        if self.hitstop > 0.0 {
+            self.hitstop -= real_dt;
+            self.ts = 0.06;
+        } else {
+            self.ts += (1.0 - self.ts) * approach(real_dt, 0.16);
+        }
         let mut speed = self.opts.get(Opt::Speed);
         if self.tools[Tool::SlowMo as usize].active > 0.0 { speed *= 0.25; }
         if self.finished { speed = speed.min(1.0) * if self.god_t < 2.2 { 0.35 + 0.65 * smooth(self.god_t / 2.2) } else { 1.0 }; }
+        speed *= self.ts;
         if self.paused || !self.started { speed = 0.0; }
         let dt = real_dt * speed;
+        let live = !self.paused && self.started;
         self.tap_cd -= dt;
         self.drop_snd_cd -= real_dt;
         self.pop_cd -= real_dt;
         self.sold_cd -= real_dt;
         self.voice_busy -= real_dt;
-        if self.started && !self.paused { self.stats.played += real_dt; }
-        // presentation decay (real time)
-        self.shake = (self.shake - real_dt * 1.8).max(0.0);
-        self.flash = (self.flash - real_dt * 1.6).max(0.0);
-        self.ring_pulse = (self.ring_pulse - real_dt * 1.3).max(0.0);
-        self.banner_t -= real_dt;
-        self.toast_t -= real_dt;
-        self.cat_mix = (self.cat_mix + real_dt * 0.5).min(1.0);
-        self.hue += real_dt * (0.08 + 0.25 * self.ring_pulse);
+        self.note_cd -= real_dt;
+        self.boing_cd -= real_dt;
+        if live { self.stats.played += real_dt; }
+        // presentation (real time, frozen while paused)
+        let pdt = if live { real_dt } else { 0.0 };
+        self.shake = (self.shake - pdt * 1.8).max(0.0);
+        self.flash = (self.flash - pdt * 1.6).max(0.0);
+        self.ring_pulse = (self.ring_pulse - pdt * 1.3).max(0.0);
+        self.ring_wob = (self.ring_wob - pdt * 1.6).max(0.0);
+        self.banner_t -= pdt;
+        self.era_t -= pdt;
+        self.sl_t -= pdt;
+        self.combo_show -= pdt;
+        self.toast_t -= pdt;
+        self.cat_mix = (self.cat_mix + pdt * 0.45).min(1.0);
+        self.hue += pdt * (0.08 + 0.3 * self.ring_pulse);
+        // camera spring
+        if pdt > 0.0 {
+            let sub = 4;
+            let h = pdt / sub as f32;
+            for _ in 0..sub {
+                let a = -70.0 * self.cam_k - 13.0 * self.cam_v;
+                self.cam_v += a * h;
+                self.cam_k += self.cam_v * h;
+            }
+            self.cam_k = clamp(self.cam_k, -0.05, 0.16);
+        }
+        let mut dead = Vec::new();
+        for (k, b) in self.bolts.iter_mut().enumerate() { b.t -= pdt; if b.t <= 0.0 { dead.push(k); } }
+        for k in dead.into_iter().rev() { self.bolts.swap_remove(k); }
         if self.dirty_save > 0.0 { self.dirty_save -= real_dt; if self.dirty_save <= 0.0 { self.ev(EV_SAVE, 0.0, 0.0, 0.0, 0.0); } }
-        if dt > 0.0 { self.step(dt); }
-        self.update_parts(real_dt, dt);
+        if dt > 0.0 {
+            // the same rules at every simulation speed: step in slices of at most 1/60 s
+            let dt = dt.min(16.0 / 60.0);
+            let chunks = ceil(dt * 60.0 - 1e-4).max(1.0) as usize;
+            let h = dt / chunks as f32;
+            for _ in 0..chunks { self.step(h); }
+        }
+        self.emit_note();
+        self.update_parts(pdt, dt);
         crate::render::build(self);
     }
 
@@ -644,6 +837,7 @@ impl Game {
             if t.cd > 0.0 { t.cd = (t.cd - dt).max(0.0); }
             if t.active > 0.0 { t.active = (t.active - dt).max(0.0); }
         }
+        self.combo_t -= dt;
         // tilt
         let mut target = self.tilt_target;
         if self.opts.on(Opt::DeviceTilt) && !self.ptr.dragging { target = self.device_tilt; }
@@ -656,45 +850,53 @@ impl Game {
             self.ta_left -= dt;
             if self.ta_left <= 0.0 { self.ta_left = 0.0; self.end_time_attack(); }
         }
+        self.update_events(dt);
         // spout
         if !self.finished && !self.over && self.mode != Mode::Sandbox {
             self.update_fill();
-            let mut interval = 0.42 / self.opts.get(Opt::DropRate);
+            let mut interval = self.drop_base / self.opts.get(Opt::DropRate);
+            if self.ev_burst > 0 { interval = interval.min(0.035); }
             if self.mode == Mode::Chaos { interval *= 0.5; }
-            if self.fill > 0.58 { interval *= 1.0 + (self.fill - 0.58) * 9.0; }
+            if self.mode == Mode::Mega { interval *= 0.45; }
+            if self.fill > 0.56 { interval *= 1.0 + (self.fill - 0.56) * 9.0; }
             self.drop_t -= dt;
             if self.drop_t <= 0.0 {
-                if self.fill < 0.74 && self.spawn_from_spout(false) { self.drop_t = interval; } else { self.drop_t = 0.12; }
+                if self.fill < 0.72 && self.spawn_from_spout(false) {
+                    self.drop_t = interval;
+                    if self.ev_burst > 0 { self.ev_burst -= 1; }
+                } else { self.drop_t = if self.ev_burst > 0 { 0.03 } else { 0.1 }; }
             }
             self.spout_cd -= dt;
             self.check_spout();
             self.check_jam(dt);
         }
-        // magnet + resting bookkeeping (once per frame)
-        self.magnet(dt);
+        // magnet (once per frame)
+        self.magnet();
         if self.finished { self.god_sequence(dt); }
         // physics substeps
-        let n = clamp(ceil(dt * SUB_HZ), 1.0, 40.0) as usize;
+        let n = clamp(ceil(dt * SUB_HZ), 1.0, 48.0) as usize;
         let h = dt / n as f32;
         for _ in 0..n { self.substep(h); }
         // per-body bookkeeping
-        let gap_spout = self.spout;
-        self.base += (gap_spout as f32 - self.base) * approach(dt, 0.45);
+        let spout = self.spout;
+        self.base += (spout as f32 - self.base) * approach(dt, 0.9);
         let mut dissolve: Vec<usize> = Vec::new();
         let mut tier_count = [0u8; N_TIERS];
         for b in &self.bodies { if b.alive && b.dying <= 0.0 { tier_count[b.tier as usize] = tier_count[b.tier as usize].saturating_add(1); } }
+        let sandbox = self.mode == Mode::Sandbox;
         for i in 0..self.bodies.len() {
-            let target_r = if self.finished && self.bodies[i].tier == GOD { 0.62 * self.ring_r } else { self.radius_for(self.bodies[i].tier) };
+            let target_r = if self.finished && self.bodies[i].tier == GOD { 0.62 * self.ring_r.min(1.0) } else { self.radius_for(self.bodies[i].tier) };
             let b = &mut self.bodies[i];
             if !b.alive { continue; }
             b.age += dt;
-            b.pop = (b.pop - dt * 2.6).max(0.0);
+            b.pop = (b.pop - dt * 2.4).max(0.0);
             b.flash = (b.flash - dt * 2.2).max(0.0);
             b.hl = (b.hl - dt * 2.0).max(0.0);
-            let k = if b.pop > 0.0 { approach(dt, 0.05) } else { approach(dt, 0.18) };
+            b.squash *= exp(-dt * 11.0);
+            let k = if b.pop > 0.0 { approach(dt, 0.06) } else { approach(dt, 0.25) };
             b.r += (target_r - b.r) * k;
             b.angle += b.spin * dt;
-            b.spin += (b.v.x / b.r.max(0.03) * 0.55 - b.spin) * approach(dt, 0.35);
+            b.spin += (b.v.x / b.r.max(0.03) * 0.5 - b.spin) * approach(dt, 0.3);
             if b.v.len2() < 0.04 { b.rest_t += dt; } else { b.rest_t = (b.rest_t - dt * 2.0).max(0.0); }
             b.trail = [b.p, b.trail[0], b.trail[1], b.trail[2]];
             if b.dying > 0.0 {
@@ -702,22 +904,80 @@ impl Game {
                 if b.dying <= 0.0 { b.alive = false; dissolve.push(i); }
                 continue;
             }
-            if b.tier < gap_spout && self.mode != Mode::Sandbox && !self.finished {
+            if b.tier < spout && !sandbox && !self.finished {
                 b.orphan_t += dt;
                 let alone = tier_count[b.tier as usize] < 2;
-                if (alone && b.orphan_t > 3.2) || b.orphan_t > 11.0 { b.dying = 0.45; }
+                if (alone && b.orphan_t > self.orphan_alone) || b.orphan_t > self.orphan_max { b.dying = 0.45; }
             } else { b.orphan_t = 0.0; }
         }
         for i in dissolve {
             let (p, c) = (self.bodies[i].p, tier(self.bodies[i].tier).color);
             if !self.finished {
-                self.coins(p, 6);
-                if self.sold_cd <= 0.0 { self.sound(S_SOLD, 0.45, p.x); self.sold_cd = 0.25; }
+                self.coins(p, 2);
+                if self.sold_cd <= 0.0 { self.sound(S_SOLD, 0.4, p.x); self.sold_cd = 0.3; }
             } else {
                 self.burst(p, c, 10, 0.8);
             }
         }
+        let before = self.bodies.len();
         self.bodies.retain(|b| b.alive);
+        if self.bodies.len() != before || self.order.len() != self.bodies.len() {
+            self.order.clear();
+            for i in 0..self.bodies.len() { self.order.push(i as u16); }
+        }
+    }
+
+    fn update_events(&mut self, dt: f32) {
+        if self.ev_left > 0.0 {
+            self.ev_left -= dt;
+            if self.ev_kind == EV_QUAKE && self.rng.chance(dt * 6.0) {
+                for b in self.bodies.iter_mut() {
+                    if !b.alive { continue; }
+                    let k = 1.4 / (1.0 + b.r * 4.0);
+                    b.v += V2::new(self.rng.sym() * k, -self.rng.range(0.3, 1.0) * k);
+                }
+                self.shake = self.shake.max(0.45);
+                self.ring_wob = self.ring_wob.max(0.9);
+            }
+            if self.ev_left <= 0.0 { self.ev_kind = EV_NONE; }
+        }
+        let on = self.opts.on(Opt::Events) && matches!(self.mode, Mode::Classic | Mode::Watch | Mode::Mega | Mode::Chaos | Mode::Trampoline);
+        if !on || self.finished || self.over { return; }
+        self.ev_next -= dt;
+        if self.ev_next > 0.0 { return; }
+        self.ev_next = self.rng.range(24.0, 40.0);
+        let kind = 1 + self.rng.below(5) as u8;
+        self.ev_kind = kind;
+        self.ev_dir = if self.rng.chance(0.5) { 1.0 } else { -1.0 };
+        match kind {
+            EV_RUSH => { self.ev_burst = 14; self.ev_left = 1.5; }
+            EV_QUAKE => { self.ev_left = 2.2; }
+            EV_WIND => { self.ev_left = 3.0; }
+            EV_ZEROG => { self.ev_left = 3.0; }
+            _ => { self.ev_left = 3.5; }
+        }
+        let (he, en, col) = EVENTS[kind as usize];
+        self.toast = (he, en); self.toast_t = 2.2; self.toast_col = col;
+        self.ring_pulse = 1.0;
+        self.sound(match kind { EV_QUAKE => S_SHAKE, EV_STORM => S_MAGNET, EV_ZEROG => S_SLOWMO, EV_WIND => S_WHOOSH, _ => S_SPOUT }, 0.8, 0.0);
+    }
+
+    /// Mega mode: rides also rain in from the top of the ring.
+    fn rain(&mut self) -> bool {
+        let t = self.spout;
+        let r = self.radius_for(t);
+        for _ in 0..4 {
+            let a = self.rng.range(-PI * 0.9, -PI * 0.1);
+            let d = self.rng.range(0.55, 0.92) * (self.ring_r - r);
+            let p = V2::new(cos(a) * d, sin(a) * d);
+            let vx = self.rng.sym() * 0.5;
+            if self.free_at(p, r * 1.05) && self.new_body(t, p, V2::new(vx, 0.6)).is_some() {
+                self.run_drops += 1; self.stats.drops += 1;
+                self.wave(p, r * 1.6, tier(t).color);
+                return true;
+            }
+        }
+        false
     }
 
     fn update_fill(&mut self) {
@@ -733,7 +993,7 @@ impl Game {
     }
 
     fn check_jam(&mut self, dt: f32) {
-        if self.blocked && self.fill > 0.62 { self.jam_t += dt; } else { self.jam_t = (self.jam_t - dt * 2.0).max(0.0); }
+        if self.blocked && self.fill > 0.6 { self.jam_t += dt; } else { self.jam_t = (self.jam_t - dt * 2.0).max(0.0); }
         if self.jam_t > 1.6 && self.jam_t - dt <= 1.6 { self.sound(S_JAM, 0.7, 0.0); }
         if self.opts.on(Opt::HardMode) && self.mode != Mode::Watch && self.jam_t > 3.5 {
             self.over = true;
@@ -748,9 +1008,10 @@ impl Game {
             self.jam_t = 0.0;
             for b in self.bodies.iter_mut() {
                 if !b.alive { continue; }
-                b.v += V2::new(self.rng.sym() * 1.2, -self.rng.range(0.4, 1.3)) * (1.0 / (1.0 + b.r * 3.0));
+                b.v += V2::new(self.rng.sym() * 1.3, -self.rng.range(0.5, 1.4)) * (1.0 / (1.0 + b.r * 3.0));
             }
             self.shake = self.shake.max(0.25);
+            self.ring_wob = self.ring_wob.max(0.6);
         }
     }
 
@@ -761,48 +1022,64 @@ impl Game {
         let gap = self.gap();
         if maxp >= self.spout + gap && self.spout + 1 + gap <= GOD {
             self.spout += 1;
-            self.spout_cd = 0.7;
-            self.sound(S_SPOUT, 0.55, 0.0);
+            self.spout_cd = 0.6;
+            self.sound(S_SPOUT, 0.45, 0.0);
             let p = V2::new(0.0, self.join_y());
-            self.burst(p, tier(self.spout).color, 14, 0.7);
+            self.burst(p, tier(self.spout).color, 12, 0.6);
         }
     }
 
-    fn magnet(&mut self, dt: f32) {
+    fn magnet(&mut self) {
         let assist = self.opts.get(Opt::Magnet);
-        let tool = self.tools[Tool::Magnet as usize].active > 0.0;
+        let tool = self.tools[Tool::Magnet as usize].active > 0.0 || (self.ev_kind == EV_STORM && self.ev_left > 0.0);
+        let assist = if self.mode == Mode::Mega { assist * 0.5 } else { assist };
         let k_base = assist * 0.55 + if tool { 3.2 } else { 0.0 } + if self.mode == Mode::Watch { 0.6 } else { 0.0 };
         let jy = self.join_y();
-        let n = self.bodies.len();
         for b in self.bodies.iter_mut() { b.acc = V2::default(); }
         if k_base <= 0.0 && self.spout == 0 { return; }
-        for i in 0..n {
-            let (ti, pi, ri, oi, resti) = { let b = &self.bodies[i]; (b.tier, b.p, b.r, b.orphan_t, b.rest_t) };
-            if !self.bodies[i].alive || self.bodies[i].dying > 0.0 || pi.y < jy || ti == GOD { continue; }
-            for j in (i + 1)..n {
-                let bj = &self.bodies[j];
-                if !bj.alive || bj.dying > 0.0 || bj.tier != ti || bj.p.y < jy { continue; }
-                let d = bj.p - pi; let l = d.len();
-                let reach = 0.55 + ri * 2.5 + if tool { 0.8 } else { 0.0 };
-                if l > reach || l < 1e-4 { continue; }
-                let orphan = oi > 0.0 || bj.orphan_t > 0.0;
-                let rest = clamp((resti + bj.rest_t) * 0.25, 0.0, 1.5);
-                let mut k = k_base * (1.0 + rest);
-                if orphan { k += 2.5; }
-                if k <= 0.0 { continue; }
-                let f = d * (k * (1.0 - l / reach) / l);
-                // lighter one moves more
-                let mi = ri * ri; let mj = bj.r * bj.r; let s = mi + mj;
-                let ai = f * (mj / s); let aj = f * (-mi / s);
-                self.bodies[i].acc += ai;
-                self.bodies[j].acc += aj;
+        // group by tier so only twins are compared
+        let n = self.bodies.len();
+        self.by_tier.clear();
+        for i in 0..n { self.by_tier.push(i as u16); }
+        let bodies = &self.bodies;
+        self.by_tier.sort_unstable_by_key(|&i| bodies[i as usize].tier);
+        let mut s = 0;
+        while s < n {
+            let t = self.bodies[self.by_tier[s] as usize].tier;
+            let mut e = s + 1;
+            while e < n && self.bodies[self.by_tier[e] as usize].tier == t { e += 1; }
+            if t != GOD && e - s >= 2 {
+                for a in s..e {
+                    let i = self.by_tier[a] as usize;
+                    let (pi, ri, oi, resti, ok_i) = { let b = &self.bodies[i]; (b.p, b.r, b.orphan_t, b.rest_t, b.alive && b.dying <= 0.0 && b.p.y >= jy) };
+                    if !ok_i { continue; }
+                    for c in (a + 1)..e {
+                        let j = self.by_tier[c] as usize;
+                        let bj = &self.bodies[j];
+                        if !bj.alive || bj.dying > 0.0 || bj.p.y < jy { continue; }
+                        let d = bj.p - pi; let l = d.len();
+                        let reach = 0.5 + ri * 3.0 + if tool { 0.8 } else { 0.0 };
+                        if l > reach || l < 1e-4 { continue; }
+                        let orphan = oi > 0.0 || bj.orphan_t > 0.0;
+                        let rest = clamp((resti + bj.rest_t) * 0.25, 0.0, 1.5);
+                        let mut k = k_base * (1.0 + rest);
+                        if orphan { k += 2.5; }
+                        if k <= 0.0 { continue; }
+                        let f = d * (k * (1.0 - l / reach) / l);
+                        let mi = ri * ri; let mj = bj.r * bj.r; let ss = mi + mj;
+                        let ai = f * (mj / ss); let aj = f * (-mi / ss);
+                        self.bodies[i].acc += ai;
+                        self.bodies[j].acc += aj;
+                    }
+                }
             }
+            s = e;
         }
-        let _ = dt;
     }
 
     fn substep(&mut self, h: f32) {
-        let e = self.opts.get(Opt::Bounce);
+        let tramp = self.mode == Mode::Trampoline;
+        let e = if tramp { 0.96 } else { self.opts.get(Opt::Bounce) };
         let jy = self.join_y();
         let spin = self.opts.get(Opt::RingSpin) * 1.6;
         let rr = self.ring_r;
@@ -819,16 +1096,33 @@ impl Game {
             let mut a = g + b.acc;
             if dying > 0.0 { a = a * 0.3; }
             b.v += a * h;
-            b.v = b.v * (1.0 - 0.08 * h);
-            let sp = b.v.len();
-            if sp > 7.0 { b.v = b.v * (7.0 / sp); }
+            b.v = b.v * (1.0 - 0.025 * h);
+            let sp2 = b.v.len2();
+            if sp2 > 81.0 { b.v = b.v * (9.0 / sqrt(sp2)); }
             b.p += b.v * h;
         }
-        // pairs
+        // broad phase: sweep along x (insertion sort keeps the nearly-sorted order cheap)
+        if self.order.len() != n { self.order.clear(); for i in 0..n { self.order.push(i as u16); } }
+        for a in 1..n {
+            let mut j = a;
+            while j > 0 {
+                let (x0, x1) = { let b0 = &self.bodies[self.order[j - 1] as usize]; let b1 = &self.bodies[self.order[j] as usize]; (b0.p.x - b0.r, b1.p.x - b1.r) };
+                if x0 <= x1 { break; }
+                self.order.swap(j - 1, j);
+                j -= 1;
+            }
+        }
         let mut merges: Vec<(usize, usize)> = Vec::new();
-        for i in 0..n {
+        let mut hit_v = 0.0f32; let mut hit_x = 0.0f32;
+        // Mega keeps every ball around a little longer, so the ring stays packed
+        let age_min = self.merge_age * if self.mode == Mode::Mega { 1.85 } else { 1.0 };
+        for a in 0..n {
+            let i = self.order[a] as usize;
             if !self.bodies[i].alive { continue; }
-            for j in (i + 1)..n {
+            let right = self.bodies[i].p.x + self.bodies[i].r;
+            for c in (a + 1)..n {
+                let j = self.order[c] as usize;
+                if self.bodies[j].p.x - self.bodies[j].r > right { break; }
                 if !self.bodies[j].alive { continue; }
                 let (pi, pj, ri, rj) = (self.bodies[i].p, self.bodies[j].p, self.bodies[i].r, self.bodies[j].r);
                 let d = pj - pi;
@@ -839,7 +1133,7 @@ impl Game {
                 let nrm = d * (1.0 / l);
                 let (ti, tj) = (self.bodies[i].tier, self.bodies[j].tier);
                 let can_merge = ti == tj && ti != GOD && !self.finished && self.bodies[i].dying <= 0.0 && self.bodies[j].dying <= 0.0
-                    && !self.bodies[i].merged && !self.bodies[j].merged && self.bodies[i].age > 0.02 && self.bodies[j].age > 0.02;
+                    && !self.bodies[i].merged && !self.bodies[j].merged && self.bodies[i].age > age_min && self.bodies[j].age > age_min;
                 if can_merge {
                     self.bodies[i].merged = true; self.bodies[j].merged = true;
                     merges.push((i, j));
@@ -853,25 +1147,31 @@ impl Game {
                 let rv = self.bodies[j].v - self.bodies[i].v;
                 let vn = rv.dot(nrm);
                 if vn < 0.0 {
-                    let ee = if -vn > 0.25 { e } else { 0.0 };
+                    // bouncy unless it's a resting contact
+                    let ee = if -vn > 0.09 { e } else { 0.0 };
                     let jn = -(1.0 + ee) * vn / ws;
                     let imp = nrm * jn;
-                    // a little tangential friction
                     let t = V2::new(-nrm.y, nrm.x);
                     let vt = rv.dot(t);
-                    let jt = clamp(-vt / ws * 0.12, -abs(jn) * 0.5, abs(jn) * 0.5);
+                    let jt = clamp(-vt / ws * 0.1, -abs(jn) * 0.4, abs(jn) * 0.4);
                     let impt = t * jt;
                     self.bodies[i].v -= (imp + impt) * wi;
                     self.bodies[j].v += (imp + impt) * wj;
+                    if -vn > 0.5 {
+                        let s = clamp(-vn * 0.045, 0.0, 0.22);
+                        let ang = atan2(nrm.y, nrm.x);
+                        for &k in &[i, j] { let b = &mut self.bodies[k]; if s > b.squash { b.squash = s; b.squash_a = ang; } }
+                        if -vn > hit_v { hit_v = -vn; hit_x = (pi.x + pj.x) * 0.5; }
+                    }
                 }
             }
         }
         // boundaries
         let corners = [V2::new(-CHUTE_W, jy), V2::new(CHUTE_W, jy)];
+        let chute_top = self.lay.chute_top;
         for b in self.bodies.iter_mut() {
             if !b.alive { continue; }
             let r = b.r;
-            // chute walls (centre above the join line)
             if b.p.y < jy {
                 if r < CHUTE_W {
                     if b.p.x - r < -CHUTE_W { b.p.x = -CHUTE_W + r; if b.v.x < 0.0 { b.v.x = -b.v.x * e * 0.5; } }
@@ -879,8 +1179,7 @@ impl Game {
                 } else if abs(b.p.x) < CHUTE_W + r {
                     b.p.y = jy + 0.001; if b.v.y < 0.0 { b.v.y = 0.0; }
                 }
-                let top = self.lay.chute_top;
-                if b.p.y - r < top - 0.4 { b.p.y = top - 0.4 + r; if b.v.y < 0.0 { b.v.y = 0.0; } }
+                if b.p.y - r < chute_top - 0.4 { b.p.y = chute_top - 0.4 + r; if b.v.y < 0.0 { b.v.y = 0.0; } }
             }
             // ring arc (the gap above is open)
             let d = b.p.len();
@@ -892,13 +1191,23 @@ impl Game {
                     b.p = u * lim;
                     let vn = b.v.dot(u);
                     if vn > 0.0 {
-                        let ee = if vn > 0.3 { e } else { 0.0 };
+                        let ee = if vn > 0.12 { e } else { 0.0 };
                         b.v -= u * ((1.0 + ee) * vn);
+                        if tramp && vn > 0.25 {
+                            // the trampoline wall kicks back
+                            let out = -b.v.dot(u);
+                            if out < 1.7 { b.v -= u * (1.7 - out); }
+                        }
+                        if vn > 0.45 {
+                            let s = clamp(vn * 0.06, 0.0, 0.3);
+                            if s > b.squash { b.squash = s; b.squash_a = atan2(u.y, u.x); }
+                            if vn > hit_v { hit_v = vn; hit_x = b.p.x; }
+                        }
                     }
                     let t = V2::new(-u.y, u.x);
                     let vt = b.v.dot(t);
                     let wall = spin * rr;
-                    let fr = if spin != 0.0 { 0.25 } else { 0.035 };
+                    let fr = if spin != 0.0 { 0.25 } else { 0.03 };
                     b.v += t * ((wall - vt) * fr);
                 }
             }
@@ -912,6 +1221,7 @@ impl Game {
                 }
             }
         }
+        if hit_v > self.note_req { self.note_req = hit_v; self.note_x = hit_x; }
         // merges
         for (i, j) in merges {
             if !self.bodies[i].alive || !self.bodies[j].alive { continue; }
@@ -919,25 +1229,89 @@ impl Game {
         }
     }
 
+    /// One note of the era's tune per hard bounce (rate-limited).
+    fn emit_note(&mut self) {
+        let v = self.note_req;
+        self.note_req = 0.0;
+        if v < 1.0 || self.note_cd > 0.0 || !self.started || self.paused { return; }
+        if self.opts.on(Opt::Notes) {
+            let era = self.cat;
+            let midi = crate::audio::music::melody_note(era, self.note_i);
+            self.note_i = self.note_i.wrapping_add(1);
+            let gain = clamp(0.25 + (v - 1.0) * 0.25, 0.25, 0.9);
+            let pan = clamp(self.note_x / self.ring_r, -1.0, 1.0) * 0.6;
+            self.ev(EV_NOTE, crate::audio::music::note_timbre(era) as f32, midi, gain, pan);
+            self.note_cd = 0.085;
+        } else if v > 2.2 && self.boing_cd <= 0.0 {
+            self.sound(S_BOING, 0.25, 0.0);
+            self.boing_cd = 0.25;
+        }
+    }
+
     fn merge(&mut self, i: usize, j: usize) {
         let (a, b) = (self.bodies[i], self.bodies[j]);
         let ma = a.r * a.r; let mb = b.r * b.r;
         let p = (a.p * ma + b.p * mb) * (1.0 / (ma + mb));
-        let v = (a.v * ma + b.v * mb) * (0.6 / (ma + mb));
+        let mut v = (a.v * ma + b.v * mb) * (0.5 / (ma + mb));
         self.bodies[i].alive = false;
         self.bodies[j].alive = false;
         let t = a.tier + 1;
+        let lvl = t as f32 / GOD as f32;
         let start_r = a.r.max(b.r);
+        // the new ride jumps out of the merge
+        if t != GOD { v += V2::new(self.rng.sym() * 0.4, -(0.9 + 0.9 * lvl)); }
+        // a chain reaction continues when a freshly merged ball merges again
+        // a cascade: a ball made by a merge lands on a twin that was already
+        // waiting, right after its cooldown — each step of that climbs the chain
+        let window = self.merge_age * if self.mode == Mode::Mega { 1.85 } else { 1.0 } + 0.35;
+        let fresh = |x: &Body| x.chain > 0 && x.age < window;
+        let chain = match (fresh(&a), fresh(&b)) {
+            (true, false) => a.chain + 1,
+            (false, true) => b.chain + 1,
+            (true, true) => a.chain.max(b.chain),
+            _ => 1,
+        };
         if let Some(k) = self.new_body_ex(t, p, v, true) {
             let nb = &mut self.bodies[k];
-            nb.r = start_r * 1.05;
+            nb.r = start_r * 1.02;
             nb.pop = 1.0;
             nb.flash = 1.0;
             nb.merged = true;
             nb.angle = a.angle;
+            nb.chain = chain;
+        }
+        // shove the neighbours away
+        let reach = (a.r + b.r) * 3.2;
+        let push = 1.1 + 1.2 * lvl;
+        for q in self.bodies.iter_mut() {
+            if !q.alive || q.merged || q.dying > 0.0 { continue; }
+            let d = q.p - p; let l = d.len();
+            if l < reach && l > 1e-4 {
+                q.v += d * (push * (1.0 - l / reach) / (l * (1.0 + q.r * 4.0)));
+            }
         }
         self.run_merges += 1;
         self.stats.merges += 1;
+        // chain-reaction combos
+        if self.opts.on(Opt::Combo) && chain >= 2 {
+            let n = chain as u32;
+            self.combo_n = n;
+            if n > self.stats.best_combo { self.stats.best_combo = n; }
+            if n >= self.combo_shown || self.combo_show <= 0.0 {
+                self.combo_show = 1.3;
+                self.combo_shown = n;
+                self.combo_p = p;
+            }
+            let rate = 1.0 + 0.09 * (n.min(16) as f32);
+            self.sound_rate(S_COMBO, 0.55, clamp(p.x / self.ring_r, -1.0, 1.0) * 0.3, rate);
+            if n >= 3 {
+                let m = n.min(8) as f32;
+                self.ring_pulse = self.ring_pulse.max(0.6 + 0.05 * m);
+                self.add_flash(0xFFE27A, 0.05 * m);
+                self.shake = self.shake.max(0.08 * m);
+                self.wave(p, (a.r + b.r) * (1.2 + 0.15 * m), 0xFFE27A);
+            }
+        }
         self.merge_fx(t, p, start_r);
         self.on_new_tier(t, p);
     }
@@ -946,55 +1320,94 @@ impl Game {
         let tt = tier(t);
         let lvl = t as f32 / GOD as f32;
         let parts = self.opts.get(Opt::Particles);
-        let n = ((10.0 + 60.0 * lvl * lvl) * parts) as usize;
-        self.burst(p, tt.color, n, 0.7 + 1.6 * lvl);
-        self.wave(p, r * (2.0 + 3.0 * lvl), tt.color);
-        if t >= 10 && self.pop_cd <= 0.0 { self.wave(p, r * (3.5 + 4.0 * lvl), 0xFFFFFF); }
-        if tt.cat == Cat::Myth || tt.cat == Cat::Holy { self.flames(p, (6.0 + 20.0 * lvl) as usize, tt.color); }
-        if self.opts.on(Opt::ScreenShake) { self.shake = self.shake.max(0.08 + 0.9 * lvl * lvl); }
-        if t >= 5 { self.add_flash(tt.color, 0.06 + 0.4 * lvl * lvl); }
-        self.ring_pulse = self.ring_pulse.max(0.3 + 0.7 * lvl);
+        let n = ((8.0 + 46.0 * lvl) * parts) as usize;
+        self.burst(p, tt.color, n, 0.6 + 1.4 * lvl);
+        self.wave(p, r * (1.5 + 1.0 * lvl), tt.color);
+        match tt.cat {
+            Cat::Foot => self.confetti(p, (6.0 * parts) as usize, true),
+            Cat::Motors | Cat::Cars | Cat::Monsters => self.smoke(p, (3.0 * parts) as usize + 1, 0x9A9AA6, r * 1.4),
+            Cat::Premium | Cat::Super | Cat::Hyper => { self.coins(p, (1.0 + 2.0 * parts) as usize); }
+            Cat::Rails => self.smoke(p, (4.0 * parts) as usize + 1, 0xF2F2F2, r * 1.6),
+            Cat::Seas => self.droplets(p, (10.0 * parts) as usize, 0x7FD8FF),
+            Cat::Skies => self.smoke(p, (4.0 * parts) as usize + 1, 0xFFFFFF, r * 1.8),
+            Cat::Space | Cat::SciFi => self.sparkle(p, (8.0 * parts) as usize, tt.color),
+            Cat::Myth | Cat::Holy | Cat::God => { self.flames(p, (6.0 + 18.0 * lvl) as usize, tt.color); self.sparkle(p, (6.0 * parts) as usize, 0xFFF2C8); }
+        }
+        if self.run_seen & bit(t) == 0 { self.wave(p, r * (2.4 + 1.6 * lvl), 0xFFFFFF); }
+        if self.opts.on(Opt::ScreenShake) { self.shake = self.shake.max(0.06 + 0.7 * lvl * lvl); }
+        if t >= 6 && self.run_seen & bit(t) == 0 { self.add_flash(tt.color, 0.08 + 0.3 * lvl * lvl); }
+        self.ring_pulse = self.ring_pulse.max(0.25 + 0.6 * lvl);
+        self.ring_wob = self.ring_wob.max(0.15 + 0.5 * lvl);
         self.ring_col = tt.color;
-        // sound: tier OMG, unless a bigger one is still ringing
+        if (tt.cat == Cat::Myth || tt.cat == Cat::Holy) && self.drama() > 0.0 && self.bolts.len() < 6 {
+            // lightning from the ring to the merge
+            let a = self.rng.range(0.0, TAU);
+            let from = V2::new(cos(a), sin(a)) * self.ring_r;
+            self.bolts.push(Bolt { a: from, b: p, t: 0.35, max: 0.35, col: tt.color, seed: self.rng.next_u32() });
+        }
+        // sound: the tier's OMG, unless a bigger one is still ringing
         let busy = self.voice_busy > 0.0 && (t as i32) < self.voice_tier;
-        let low_spam = t <= 2 && self.pop_cd > 0.0;
+        let low_spam = t <= 6 && self.pop_cd > 0.0;
         if !busy && !low_spam {
             self.sound(t as u32, 1.0, clamp(p.x / self.ring_r, -1.0, 1.0) * 0.4);
             self.voice_busy = voice_len(t);
             self.voice_tier = t as i32;
             self.stats.omgs += 1;
-            if t > 3 { self.ev(EV_DUCK, t as f32, 0.0, 0.0, 0.0); }
-            self.pop_cd = 0.18;
+            if t > 8 { self.ev(EV_DUCK, t as f32, 0.0, 0.0, 0.0); }
+            self.pop_cd = 0.16;
         } else if self.pop_cd <= 0.0 {
-            self.sound(S_POP, 0.5, p.x);
-            self.pop_cd = 0.06;
+            let rate = 0.8 + 0.6 * self.rng.f();
+            self.sound_rate(S_POP, 0.45, p.x, rate);
+            self.pop_cd = 0.05;
         }
-        self.haptic(if t > 20 { 60.0 } else if t > 8 { 30.0 } else { 12.0 });
+        self.haptic(if t > 80 { 60.0 } else if t > 30 { 30.0 } else { 12.0 });
     }
 
     fn on_new_tier(&mut self, t: u8, p: V2) {
-        let first_in_run = self.run_seen & (1u64 << t) == 0;
-        self.run_seen |= 1u64 << t;
+        let first_in_run = self.run_seen & bit(t) == 0;
+        self.run_seen |= bit(t);
         if t > self.run_max { self.run_max = t; }
-        if self.unlocked & (1u64 << t) == 0 {
-            self.unlocked |= 1u64 << t;
+        let first_ever = self.unlocked & bit(t) == 0;
+        if first_ever {
+            self.unlocked |= bit(t);
             self.ev(EV_UNLOCK, t as f32, 0.0, 0.0, 0.0);
             self.dirty_save = 0.3;
         }
         if t > self.stats.top_tier { self.stats.top_tier = t; }
         if first_in_run && t > 0 {
+            let lvl = t as f32 / GOD as f32;
+            let dr = self.drama();
             self.banner_tier = t as i32;
-            self.banner_t = if t == GOD { 9.0 } else { 2.6 };
+            self.banner_t = if t == GOD { 9.0 } else { 2.4 };
+            self.banner_new = first_ever;
             self.ev(EV_BANNER, t as f32, 0.0, 0.0, 0.0);
-            let c = tier(t).cat as u8;
-            if c != self.cat {
+            let c = cat_of(t);
+            let new_era = c != self.cat;
+            if dr > 0.0 {
+                // slow-motion beat + camera punch + speed lines
+                let sp = self.opts.get(Opt::Speed).max(1.0);
+                let mut hs = (0.12 + 0.2 * lvl) * if dr > 1.5 { 1.5 } else { 1.0 };
+                if new_era { hs = 0.5 * if dr > 1.5 { 1.4 } else { 1.0 }; }
+                if t == GOD { hs = 0.9; }
+                self.hitstop = self.hitstop.max(hs / sqrt(sp));
+                let kick = (0.9 + 0.9 * lvl) * if dr > 1.5 { 1.35 } else { 1.0 } * if new_era { 1.4 } else { 1.0 } / sqrt(sp);
+                if self.cam_k < 0.02 { self.cam_f = p; }
+                self.cam_v = self.cam_v.max(kick);
+                self.sl_t = 0.6; self.sl_p = p; self.sl_col = tier(t).color;
+                self.sound(S_HIT, 0.55 + 0.4 * lvl, clamp(p.x / self.ring_r, -1.0, 1.0) * 0.3);
+            }
+            if new_era {
                 self.prev_cat = self.cat;
                 self.cat = c;
                 self.cat_mix = 0.0;
-                let ci = &CATS[c as usize];
-                if !ci.toast_he.is_empty() { self.toast = (ci.toast_he, ci.toast_en); self.toast_t = 2.8; }
+                self.era_card = c;
+                self.era_t = if dr > 0.0 && t != GOD { 2.6 } else { 0.0 };
+                self.add_flash(CATS[c as usize].accent, 0.45);
+                self.ring_pulse = 1.0;
+                if t != GOD { self.sound(S_ERA, 0.9, 0.0); }
                 self.ev(EV_CATEGORY, c as f32, 0.0, 0.0, 0.0);
                 self.ev(EV_MUSIC, c as f32, 0.0, 0.0, 0.0);
+                self.shockwave(p, tier(t).color);
             }
         }
         if t == GOD && !self.finished {
@@ -1003,12 +1416,11 @@ impl Game {
             self.god_id = self.next_id - 1;
             self.stats.gods += 1;
             let m = self.mode as usize;
-            if self.mode != Mode::Sandbox && self.mode != Mode::TimeAttack {
-                if self.stats.best[m] <= 0.0 || self.time < self.stats.best[m] { self.stats.best[m] = self.time; }
+            if self.mode != Mode::Sandbox && self.mode != Mode::TimeAttack && (self.stats.best[m] <= 0.0 || self.time < self.stats.best[m]) {
+                self.stats.best[m] = self.time;
             }
             self.add_flash(0xFFFFFF, 1.0);
             self.shake = 1.2;
-            let _ = p;
             self.dirty_save = 0.2;
         }
     }
@@ -1025,13 +1437,11 @@ impl Game {
         let before = self.god_t;
         self.god_t += dt;
         let gt = self.god_t;
-        // everything else is drawn into the light
         let mut god_p = V2::default();
         for b in &self.bodies { if b.alive && b.tier == GOD { god_p = b.p; } }
         for b in self.bodies.iter_mut() {
             if !b.alive { continue; }
             if b.tier == GOD {
-                // critically damped spring to the centre of the ring
                 b.acc = (V2::default() - b.p) * 9.0 - b.v * 6.0;
                 continue;
             }
@@ -1041,9 +1451,7 @@ impl Game {
             if gt > 1.2 + (b.id % 17) as f32 * 0.09 { b.dying = 0.6; }
         }
         if before < 0.05 && gt >= 0.05 { self.ring_pulse = 1.0; }
-        if before < 3.6 && gt >= 3.6 {
-            self.sound(S_IAM, 1.0, 0.0);
-        }
+        if before < 3.6 && gt >= 3.6 { self.sound(S_IAM, 1.0, 0.0); }
         if before < 6.8 && gt >= 6.8 {
             self.ev(EV_END, self.time, self.run_merges as f32, self.run_drops as f32, self.mode as u32 as f32);
         }
@@ -1061,42 +1469,73 @@ impl Game {
         if k <= 0.0 { return; }
         if a * k > self.flash { self.flash = a * k; self.flash_col = col; }
     }
-    fn cap(&self) -> usize { (1500.0 * clamp(self.opts.get(Opt::Particles), 0.3, 2.0) / 1.8) as usize }
+    fn cap(&self) -> usize { (2200.0 * clamp(self.opts.get(Opt::Particles), 0.3, 2.0) / 1.8) as usize }
+    fn push_part(&mut self, q: Particle) { if self.parts.len() < self.cap() { self.parts.push(q); } }
     pub fn burst(&mut self, p: V2, col: u32, n: usize, power: f32) {
-        let cap = self.cap();
         for k in 0..n {
-            if self.parts.len() >= cap { break; }
             let a = self.rng.range(0.0, TAU);
             let s = self.rng.range(0.3, 1.0) * power * 1.6;
             let streak = k % 3 != 0;
             let white = self.rng.chance(0.25);
-            self.parts.push(Particle {
-                kind: if streak { 1 } else { 0 }, p, v: V2::new(cos(a) * s, sin(a) * s),
-                life: self.rng.range(0.35, 0.9) * (0.7 + power * 0.3), max: 0.0,
-                size: self.rng.range(1.2, 3.2) * (0.8 + power * 0.25),
-                color: if white { 0xFFFFFF } else { col }, drag: 2.2, grav: 1.2, angle: 0.0, spin: 0.0,
+            let life = self.rng.range(0.35, 0.9) * (0.7 + power * 0.3);
+            let size = self.rng.range(1.2, 3.2) * (0.8 + power * 0.25);
+            self.push_part(Particle {
+                kind: if streak { 1 } else { 0 }, p, v: V2::new(cos(a) * s, sin(a) * s), life, max: life,
+                size, color: if white { 0xFFFFFF } else { col }, drag: 2.2, grav: 1.2, angle: 0.0, spin: 0.0,
             });
-            let l = self.parts.len() - 1; self.parts[l].max = self.parts[l].life;
         }
     }
     pub fn wave(&mut self, p: V2, r: f32, col: u32) {
-        if self.parts.len() >= self.cap() { return; }
-        self.parts.push(Particle { kind: 2, p, v: V2::default(), life: 0.55, max: 0.55, size: r, color: col, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
+        self.push_part(Particle { kind: 2, p, v: V2::default(), life: 0.55, max: 0.55, size: r, color: col, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
+    }
+    fn shockwave(&mut self, p: V2, col: u32) {
+        self.push_part(Particle { kind: 9, p, v: V2::default(), life: 0.75, max: 0.75, size: self.ring_r * 1.5, color: col, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
+        self.push_part(Particle { kind: 9, p, v: V2::default(), life: 0.6, max: 0.6, size: self.ring_r * 1.0, color: 0xFFFFFF, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
     }
     fn flames(&mut self, p: V2, n: usize, col: u32) {
-        let cap = self.cap();
         for _ in 0..n {
-            if self.parts.len() >= cap { break; }
             let life = self.rng.range(0.5, 1.2);
-            self.parts.push(Particle { kind: 4, p: p + V2::new(self.rng.sym() * 0.1, self.rng.sym() * 0.05), v: V2::new(self.rng.sym() * 0.3, -self.rng.range(0.4, 1.3)), life, max: life, size: self.rng.range(3.0, 7.0), color: col, drag: 1.0, grav: -0.6, angle: 0.0, spin: 0.0 });
+            let q = Particle { kind: 4, p: p + V2::new(self.rng.sym() * 0.1, self.rng.sym() * 0.05), v: V2::new(self.rng.sym() * 0.3, -self.rng.range(0.4, 1.3)), life, max: life, size: self.rng.range(3.0, 7.0), color: col, drag: 1.0, grav: -0.6, angle: 0.0, spin: 0.0 };
+            self.push_part(q);
         }
     }
     fn coins(&mut self, p: V2, n: usize) {
-        let cap = self.cap();
         for _ in 0..n {
-            if self.parts.len() >= cap { break; }
             let life = self.rng.range(0.6, 1.0);
-            self.parts.push(Particle { kind: 3, p, v: V2::new(self.rng.sym() * 0.7, -self.rng.range(0.6, 1.4)), life, max: life, size: self.rng.range(4.0, 6.5), color: 0xFFD54F, drag: 0.6, grav: 3.0, angle: self.rng.range(0.0, TAU), spin: self.rng.range(-12.0, 12.0) });
+            let q = Particle { kind: 3, p, v: V2::new(self.rng.sym() * 0.8, -self.rng.range(0.7, 1.6)), life, max: life, size: self.rng.range(3.5, 6.0), color: 0xFFD54F, drag: 0.6, grav: 3.2, angle: self.rng.range(0.0, TAU), spin: self.rng.range(-12.0, 12.0) };
+            self.push_part(q);
+        }
+    }
+    fn confetti(&mut self, p: V2, n: usize, pastel: bool) {
+        const PAL: [u32; 6] = [0xFF7AA8, 0xFFD45A, 0x7AE0FF, 0x9DFF8A, 0xC59CFF, 0xFFFFFF];
+        for _ in 0..n {
+            let life = self.rng.range(0.8, 1.4);
+            let c = PAL[self.rng.below(6) as usize];
+            let q = Particle { kind: 6, p, v: V2::new(self.rng.sym() * 1.1, -self.rng.range(0.8, 1.8)), life, max: life, size: self.rng.range(3.0, 5.5), color: if pastel { c } else { 0xFFD54F }, drag: 1.4, grav: 2.0, angle: self.rng.range(0.0, TAU), spin: self.rng.range(-14.0, 14.0) };
+            self.push_part(q);
+        }
+    }
+    fn smoke(&mut self, p: V2, n: usize, col: u32, r: f32) {
+        for _ in 0..n {
+            let life = self.rng.range(0.7, 1.3);
+            let a = self.rng.range(0.0, TAU);
+            let q = Particle { kind: 7, p: p + V2::new(cos(a), sin(a)) * (r * 0.4), v: V2::new(cos(a) * 0.25, sin(a) * 0.25 - 0.15), life, max: life, size: r * self.rng.range(0.6, 1.1), color: col, drag: 1.5, grav: -0.15, angle: 0.0, spin: 0.0 };
+            self.push_part(q);
+        }
+    }
+    fn droplets(&mut self, p: V2, n: usize, col: u32) {
+        for _ in 0..n {
+            let life = self.rng.range(0.5, 0.9);
+            let q = Particle { kind: 8, p, v: V2::new(self.rng.sym() * 1.2, -self.rng.range(0.8, 2.0)), life, max: life, size: self.rng.range(2.0, 3.6), color: col, drag: 0.4, grav: 4.0, angle: 0.0, spin: 0.0 };
+            self.push_part(q);
+        }
+    }
+    fn sparkle(&mut self, p: V2, n: usize, col: u32) {
+        for _ in 0..n {
+            let life = self.rng.range(0.5, 1.1);
+            let a = self.rng.range(0.0, TAU); let s = self.rng.range(0.4, 1.4);
+            let q = Particle { kind: 0, p, v: V2::new(cos(a) * s, sin(a) * s), life, max: life, size: self.rng.range(1.5, 3.0), color: col, drag: 1.8, grav: 0.0, angle: 0.0, spin: 0.0 };
+            self.push_part(q);
         }
     }
     fn portal_fx(&mut self, p: V2, r: f32) {
@@ -1124,19 +1563,26 @@ impl Game {
 /// Rough length of each tier's sound (seconds) — used to keep small OMGs from
 /// talking over big ones.
 pub fn voice_len(t: u8) -> f32 {
-    if t == GOD { 11.0 } else if t >= 34 { 5.5 } else if t >= 27 { 4.0 } else if t >= 21 { 3.2 } else if t >= 16 { 2.8 } else if t >= 8 { 2.2 } else if t >= 4 { 1.4 } else { 0.7 }
+    if t == GOD { return 11.0; }
+    match tier(t).cat {
+        Cat::Foot => 0.6, Cat::Motors => 0.9, Cat::Cars => 1.1, Cat::Premium => 1.3, Cat::Super => 1.5, Cat::Hyper => 1.8,
+        Cat::Monsters => 2.0, Cat::Rails => 2.1, Cat::Seas => 2.2, Cat::Skies => 2.3, Cat::Space => 2.7, Cat::SciFi => 2.9,
+        Cat::Myth => 3.5, Cat::Holy => 4.6, Cat::God => 11.0,
+    }
 }
 
 #[cfg(test)]
 mod sim {
     use super::*;
-    pub fn run(mode: Mode, gap: f32, speed: f32, max_game_s: f32, seed: u32, verbose: bool) -> (bool, f32, u8, usize, u32, u32) {
+    pub struct R { pub god: bool, pub time: f32, pub top: u8, pub max_b: usize, pub frames: u32, pub jams: u32, pub avg_b: f32 }
+    pub fn run(mode: Mode, gap: f32, speed: f32, max_game_s: f32, seed: u32, verbose: bool) -> R {
         let mut g = Game::new(seed);
         g.resize(390.0, 844.0, 3.0);
         g.opts.set(Opt::Gap as usize, gap);
         g.opts.set(Opt::Speed as usize, speed);
+        g.opts.set(Opt::Drama as usize, 0.0);
         g.start(mode);
-        let mut max_b = 0usize;
+        let mut max_b = 0usize; let mut sum_b = 0usize;
         let mut last = g.run_max;
         let mut frames = 0u32;
         let mut jams = 0u32;
@@ -1145,6 +1591,7 @@ mod sim {
             g.events.clear();
             frames += 1;
             let alive = g.bodies.iter().filter(|b| b.alive).count();
+            sum_b += alive;
             if alive > max_b { max_b = alive; }
             for b in &g.bodies {
                 assert!(b.p.x.is_finite() && b.p.y.is_finite() && b.v.x.is_finite() && b.r.is_finite(), "NaN body");
@@ -1153,45 +1600,119 @@ mod sim {
             if g.jam_t > 2.5 { jams += 1; }
             if g.run_max != last {
                 last = g.run_max;
-                if verbose { println!("  t={:7.1}s tier {:2} {:28} spout {:2} bodies {:3} fill {:.2}", g.time, last + 1, tier(last).en, g.spout, alive, g.fill); }
+                if verbose && (last % 8 == 0 || last > GOD - 3) { println!("  t={:7.1}s tier {:3} {:30} spout {:3} bodies {:3} fill {:.2}", g.time, last + 1, tier(last).en, g.spout, alive, g.fill); }
             }
-            assert!(frames < 2_000_000);
+            assert!(frames < 4_000_000);
         }
-        (g.finished, g.time, g.run_max, max_b, frames, jams)
+        R { god: g.finished, time: g.time, top: g.run_max, max_b, frames, jams, avg_b: sum_b as f32 / frames.max(1) as f32 }
+    }
+
+    #[test]
+    #[ignore]
+    fn tune() {
+        let env = |k: &str, d: f32| std::env::var(k).ok().and_then(|v| v.parse().ok()).unwrap_or(d);
+        let mode = Mode::from(env("OMG_MODE", 0.0) as u32);
+        let mut g = Game::new(env("OMG_SEED", 1.0) as u32);
+        g.resize(390.0, 844.0, 3.0);
+        g.opts.set(Opt::Gap as usize, env("OMG_GAP", 4.0));
+        g.opts.set(Opt::DropRate as usize, env("OMG_DR", 1.0));
+        g.opts.set(Opt::Magnet as usize, env("OMG_MAG", 1.0));
+        g.opts.set(Opt::Bounce as usize, env("OMG_E", 0.8));
+        g.opts.set(Opt::Speed as usize, 8.0);
+        g.opts.set(Opt::Drama as usize, 0.0);
+        g.merge_age = env("OMG_AGE", g.merge_age);
+        g.drop_base = env("OMG_DB", g.drop_base);
+        g.orphan_alone = env("OMG_OA", g.orphan_alone);
+        g.orphan_max = env("OMG_OM", g.orphan_max);
+        g.start(mode);
+        let (mut sum, mut frames, mut maxb) = (0usize, 0usize, 0usize);
+        let mut marks = Vec::new();
+        while g.time < 3600.0 && !(g.finished && g.god_t > 1.0) && !g.over {
+            g.frame(1.0 / 60.0); g.events.clear(); frames += 1;
+            let n = g.bodies.len(); sum += n; maxb = maxb.max(n);
+            if marks.len() < 6 && g.run_max as usize >= (marks.len() + 1) * 20 { marks.push((g.run_max, g.time, n, g.fill)); }
+        }
+        println!("age {} db {} | mode {:?} gap {} dr {} mag {} e {}: god={} t={:.0}s avg_bodies={:.1} max={} drops={} | {:?}", g.merge_age, g.drop_base, mode as u8, g.gap(), g.opts.get(Opt::DropRate), g.opts.get(Opt::Magnet), g.opts.get(Opt::Bounce), g.finished, g.time, sum as f32 / frames as f32, maxb, g.run_drops, marks.iter().map(|m| (m.0, m.1 as i32, m.2, (m.3 * 100.0) as i32)).collect::<Vec<_>>());
     }
 
     #[test]
     fn classic_reaches_god() {
-        for seed in [1u32, 2, 3] {
-            let r = run(Mode::Classic, 4.0, 8.0, 3600.0, seed, seed == 1);
-            println!("classic seed {seed}: god={} time={:.0}s top={} max_bodies={} jams={}", r.0, r.1, r.2 + 1, r.3, r.5);
-            assert!(r.0, "did not reach God");
+        for seed in [1u32, 2] {
+            let r = run(Mode::Classic, 3.0, 8.0, 7200.0, seed, seed == 1);
+            println!("classic seed {seed}: god={} time={:.0}s top={} max_bodies={} avg_bodies={:.0} jams={}", r.god, r.time, r.top + 1, r.max_b, r.avg_b, r.jams);
+            assert!(r.god, "did not reach God");
         }
     }
 
     #[test]
     fn other_modes_progress() {
-        for (m, name) in [(Mode::Watch, "watch"), (Mode::Chaos, "chaos"), (Mode::BlackHole, "blackhole")] {
-            let r = run(m, 4.0, 8.0, 3600.0, 7, false);
-            println!("{name}: god={} time={:.0}s top={} max_bodies={} jams={}", r.0, r.1, r.2 + 1, r.3, r.5);
-            assert!(r.0, "{name} did not reach God");
+        for (m, name) in [(Mode::Watch, "watch"), (Mode::Chaos, "chaos"), (Mode::Mega, "mega"), (Mode::Trampoline, "trampoline"), (Mode::BlackHole, "blackhole")] {
+            let r = run(m, 3.0, 8.0, 7200.0, 7, false);
+            println!("{name}: god={} time={:.0}s top={} max_bodies={} avg_bodies={:.0} jams={}", r.god, r.time, r.top + 1, r.max_b, r.avg_b, r.jams);
+            assert!(r.god, "{name} did not reach God");
         }
     }
 
     #[test]
     fn short_and_epic() {
-        for gap in [3.0f32, 6.0] {
-            let r = run(Mode::Classic, gap, 8.0, 7200.0, 11, false);
-            println!("gap {gap}: god={} time={:.0}s top={} max_bodies={}", r.0, r.1, r.2 + 1, r.3);
-            assert!(r.0);
+        for gap in [2.0f32, 5.0] {
+            let r = run(Mode::Classic, gap, 8.0, 14400.0, 11, false);
+            println!("gap {gap}: god={} time={:.0}s top={} max_bodies={} avg_bodies={:.0}", r.god, r.time, r.top + 1, r.max_b, r.avg_b);
+            assert!(r.god);
         }
+    }
+
+    #[test]
+    fn runs_start_at_the_bottom() {
+        let mut g = Game::new(3);
+        g.resize(390.0, 844.0, 2.0);
+        g.unlocked = u128::MAX;
+        g.start(Mode::Classic);
+        assert_eq!(g.spout, 0);
+        for _ in 0..20 { g.frame(1.0 / 60.0); }
+        assert!(!g.bodies.is_empty() && g.bodies.iter().all(|b| b.tier == 0), "only babies at the start");
+        for _ in 0..100 { g.frame(1.0 / 60.0); }
+        assert_eq!(g.spout, 0);
+        // bigger tiers get bigger balls, wherever the spout is
+        for base in [0.0f32, 40.0, 90.0, 119.0] {
+            g.base = base;
+            for t in (base as u8)..((base as u8 + 8).min(GOD - 1)) { assert!(g.radius_for(t + 1) > g.radius_for(t), "base {base} tier {t}"); }
+            // and the spout's own ball keeps growing along the journey
+            if base > 0.0 { let b0 = g.base; g.base = base - 1.0; let lo = g.radius_for(base as u8 - 1); g.base = b0; assert!(g.radius_for(base as u8) > lo); }
+        }
+        g.base = (GOD - 5) as f32;
+        assert!(g.radius_for(GOD) > g.radius_for(GOD - 1));
+    }
+
+    #[test]
+    fn balls_really_bounce() {
+        // one ball dropped from high up in an empty ring must bounce several times
+        let mut g = Game::new(5);
+        g.resize(390.0, 844.0, 2.0);
+        g.opts.set(Opt::Drama as usize, 0.0);
+        g.unlocked = u128::MAX;
+        g.sandbox_tier = 20;
+        g.start(Mode::Sandbox);
+        g.new_body_ex(20, V2::new(0.0, -0.6), V2::default(), true);
+        let (mut bounces, mut was_down, mut peaks) = (0, true, Vec::new());
+        let mut top = f32::MAX;
+        for _ in 0..600 {
+            g.frame(1.0 / 60.0);
+            g.events.clear();
+            let b = g.bodies[0];
+            if b.v.y < 0.0 && was_down { bounces += 1; was_down = false; top = b.p.y; }
+            if b.v.y < 0.0 { top = top.min(b.p.y); }
+            if b.v.y > 0.0 && !was_down { was_down = true; peaks.push(top); }
+        }
+        println!("bounces {bounces}, peaks {:?}", peaks.iter().take(6).collect::<Vec<_>>());
+        assert!(bounces >= 4, "only {bounces} bounces");
     }
 
     #[test]
     fn schema_is_json_like() {
         let s = crate::ui::schema();
         assert!(s.starts_with('{') && s.ends_with('}'));
-        assert!(s.contains("\"picanto\""));
+        assert!(s.contains("\"crawl\""));
         let save = crate::save::save(&Game::new(1));
         let mut g2 = Game::new(2);
         crate::save::load(&mut g2, &save);

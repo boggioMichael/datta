@@ -32,24 +32,31 @@ fn s() -> &'static mut Snd {
 pub fn render_id(snd: &mut Snd, id: u32) -> St {
     let sr = snd.sr;
     let seed = 1000 + id * 7919;
+    let m = |mut s: St, lufs: f32, glue: f32| { master(&mut s, lufs, db(-1.0), glue, sr); s };
     match id {
-        0..=36 => { let mut r = omg::recipe(id as u8); omg::apply_style(&mut r, snd.style); omg::render(snd, &r, seed) }
-        40 => { let mut s = St::from_mono(&sfx::tick(sr), 0.0); master(&mut s, -24.0, db(-1.0), 0.0, sr); s }
-        41 => { let mut s = St::from_mono(&sfx::pop(sr), 0.0); master(&mut s, -22.0, db(-1.0), 0.0, sr); s }
-        42 => { let mut s = sfx::coins(sr); master(&mut s, -22.0, db(-1.0), 0.0, sr); s }
-        43 => { let mut s = sfx::rumble(sr, 0.9, seed); master(&mut s, -18.0, db(-1.0), 0.1, sr); s }
-        44 => { let mut s = sfx::magnet(sr); master(&mut s, -20.0, db(-1.0), 0.0, sr); s }
-        45 => { let mut s = sfx::explosion(sr, seed); master(&mut s, -14.0, db(-1.0), 0.2, sr); s }
-        46 => { let mut s = sfx::tape_down(sr); master(&mut s, -20.0, db(-1.0), 0.0, sr); s }
-        47 => { let mut s = St::from_mono(&sfx::whoosh(sr, 0.7, 2500.0, 300.0, seed), 0.0); master(&mut s, -20.0, db(-1.0), 0.0, sr); s }
-        48 => { let mut s = sfx::arp_up(sr, &[72.0, 76.0, 79.0, 84.0, 88.0], 0.06); master(&mut s, -19.0, db(-1.0), 0.0, sr); s }
-        49 => { let mut s = St::from_mono(&sfx::whoosh(sr, 0.6, 400.0, 3000.0, seed), 0.0); master(&mut s, -22.0, db(-1.0), 0.0, sr); s }
-        50 => { let mut s = sfx::arp_up(sr, &[67.0, 72.0, 79.0], 0.08); master(&mut s, -22.0, db(-1.0), 0.0, sr); s }
-        51 => { let mut r = omg::iam(); omg::apply_style(&mut r, if snd.style == 3 { 0 } else { snd.style }); omg::render(snd, &r, seed) }
-        52 => { let mut s = sfx::honk(sr); master(&mut s, -18.0, db(-1.0), 0.0, sr); s }
-        53 => { let mut s = St::from_mono(&sfx::click(sr), 0.0); master(&mut s, -24.0, db(-1.0), 0.0, sr); s }
-        54 => { let mut s = St::from_mono(&sfx::buzzer(sr), 0.0); master(&mut s, -16.0, db(-1.0), 0.0, sr); s }
-        60..=66 => music::render(sr, (id - 60) as u8),
+        0..=122 => { let mut r = omg::recipe(id as u8); omg::apply_style(&mut r, snd.style); omg::render(snd, &r, seed) }
+        123 => { let mut r = omg::recipe(123); omg::apply_style(&mut r, if snd.style == 3 { 0 } else { snd.style }); omg::render(snd, &r, seed) }
+        200 => m(St::from_mono(&sfx::tick(sr), 0.0), -26.0, 0.0),
+        201 => m(St::from_mono(&sfx::pop(sr), 0.0), -22.0, 0.0),
+        202 => m(sfx::coins(sr), -22.0, 0.0),
+        203 => m(sfx::rumble(sr, 0.9, seed), -18.0, 0.1),
+        204 => m(sfx::magnet(sr), -20.0, 0.0),
+        205 => m(sfx::explosion(sr, seed), -14.0, 0.2),
+        206 => m(sfx::tape_down(sr), -20.0, 0.0),
+        207 => m(St::from_mono(&sfx::whoosh(sr, 0.7, 2500.0, 300.0, seed), 0.0), -20.0, 0.0),
+        208 => m(sfx::arp_up(sr, &[72.0, 76.0, 79.0, 84.0, 88.0], 0.06), -19.0, 0.0),
+        209 => m(St::from_mono(&sfx::whoosh(sr, 0.6, 400.0, 3000.0, seed), 0.0), -22.0, 0.0),
+        210 => m(sfx::arp_up(sr, &[67.0, 72.0, 79.0], 0.08), -23.0, 0.0),
+        211 => { let mut r = omg::iam(); omg::apply_style(&mut r, if snd.style == 3 { 0 } else { snd.style }); omg::render(snd, &r, seed) }
+        212 => m(sfx::honk(sr), -18.0, 0.0),
+        213 => m(St::from_mono(&sfx::click(sr), 0.0), -24.0, 0.0),
+        214 => m(St::from_mono(&sfx::buzzer(sr), 0.0), -16.0, 0.0),
+        215 => m(sfx::era_stinger(sr, seed), -14.0, 0.2),
+        216 => m(sfx::impact(sr, seed), -15.0, 0.2),
+        217 => m(sfx::blip(sr), -21.0, 0.0),
+        218 => m(sfx::boing(sr), -22.0, 0.0),
+        230..=234 => m(sfx::mallet(sr, (id - 230) as u8), -20.0, 0.0),
+        240..=254 => music::render(sr, (id - 240) as u8),
         _ => St::new(1),
     }
 }
@@ -160,7 +167,7 @@ mod tests {
         let out = std::env::var("OMG_RENDER_DIR").unwrap_or_else(|_| "target/render".into());
         std::fs::create_dir_all(&out).unwrap();
         let only: Option<Vec<u32>> = std::env::var("OMG_IDS").ok().map(|v| v.split(',').filter_map(|x| x.parse().ok()).collect());
-        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=36).chain(40..=54).chain(60..=66).collect());
+        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=123).chain(200..=218).chain(230..=234).chain(240..=254).collect());
         for id in ids {
             let t = std::time::Instant::now();
             let snd = s();

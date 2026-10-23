@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="252" cy="394" rx="182" ry="14" fill="#000" opacity="0.18" stroke="none"/>
+<circle cx="141" cy="316" r="68" fill="none" stroke-width="16" stroke-linecap="butt" stroke-dasharray="13 17.52"/>
+<circle cx="357" cy="316" r="68" fill="none" stroke-width="16" stroke-linecap="butt" stroke-dasharray="13 17.52"/>
+<circle cx="141" cy="316" r="60" fill="#23232F"/>
+<circle cx="357" cy="316" r="60" fill="#23232F"/>
+<circle cx="141" cy="316" r="32" fill="#CFD4DE"/>
+<circle cx="357" cy="316" r="32" fill="#CFD4DE"/>
+<circle cx="141" cy="316" r="11" fill="#7D8496"/>
+<circle cx="357" cy="316" r="11" fill="#7D8496"/>
+<path fill="#9AA2B4" d="M213 274 L287 274 L291 332 Q289 346 273 346 L231 346 Q213 346 211 330 Z"/>
+<path fill="none" stroke-width="6" d="M229 296 L273 296 M229 314 L273 314"/>
+<path fill="#FF8A1F" d="M49 290 Q47 208 99 206 L415 206 Q451 210 451 260 L449 290 L437 290 A84 84 0 0 0 277 290 L221 290 A84 84 0 0 0 61 290 Z"/>
+<path fill="none" stroke="#D9650A" stroke-width="8" d="M58 268 A96 96 0 0 1 224 268 M274 268 A96 96 0 0 1 440 268"/>
+<path fill="#FFFFFF" opacity="0.45" stroke="none" d="M99 214 L411 214 Q435 216 441 230 Q429 222 411 221 L99 221 Z"/>
+<path fill="none" stroke-width="18" d="M447 244 L461 252 L457 296"/>
+<path fill="none" stroke="#2E3140" stroke-width="8" d="M447 244 L461 252 L457 296"/>
+<circle cx="437" cy="238" r="10" fill="#FFF3A6" stroke-width="7"/>
+<path fill="none" stroke-width="16" d="M343 196 L431 196 M363 196 L361 206 M415 196 L417 206 M57 196 L141 196 M73 196 L73 206 M125 196 L125 206"/>
+<path fill="none" stroke="#9AA2B4" stroke-width="7" d="M343 196 L431 196 M363 196 L361 206 M415 196 L417 206 M57 196 L141 196 M73 196 L73 206 M125 196 L125 206"/>
+<path fill="#FF8A1F" d="M287 210 Q291 180 321 178 Q345 180 349 210 Z"/>
+<path fill="#2E3140" d="M147 210 Q145 186 171 184 L281 182 Q303 184 303 208 Z"/>
+<path fill="#FFFFFF" opacity="0.3" stroke="none" d="M159 196 Q163 190 173 190 L279 188 L279 194 L159 198 Z"/>
+<path fill="none" stroke-width="22" d="M323 186 L329 152 L295 148"/>
+<path fill="none" stroke="#7D8496" stroke-width="11" d="M323 186 L329 152 L295 148"/>
+<path fill="none" stroke-width="26" d="M301 148 L281 146"/>
+<path fill="none" stroke="#2E3140" stroke-width="15" d="M301 148 L281 146"/>
+</g>
+</svg>

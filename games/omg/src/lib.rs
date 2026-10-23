@@ -1,8 +1,8 @@
-//! OH MY GOD — a merge game from a Kia Picanto to the God of Israel.
+//! OH MY GOD — a merge game from a crawling baby to the God of Israel.
 //!
 //! Everything that decides what happens lives here: physics, merge rules, the
-//! 37-tier ladder, modes, tools, options, progression, the draw list and the
-//! sound engine. The browser shell only paints the draw list, plays the PCM this
+//! 124-tier ladder, modes, tools, options, progression, the draw list (scenery
+//! included) and the sound engine. The browser shell only paints the draw list, plays the PCM this
 //! crate renders and forwards input.
 #![cfg_attr(target_arch = "wasm32", no_std)]
 
@@ -13,6 +13,7 @@ pub mod tiers;
 pub mod opts;
 pub mod game;
 pub mod render;
+pub mod scenery;
 pub mod ui;
 pub mod save;
 pub mod audio;
@@ -90,6 +91,10 @@ pub extern "C" fn omg_draw_ptr() -> *const f32 { g().draw.as_ptr() }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_draw_len() -> usize { g().draw.len() }
 #[unsafe(no_mangle)]
+pub extern "C" fn omg_paths_ptr() -> *const f32 { g().paths.as_ptr() }
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_paths_len() -> usize { g().paths.len() }
+#[unsafe(no_mangle)]
 pub extern "C" fn omg_text_ptr() -> *const u8 { g().text.as_ptr() }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_text_len() -> usize { g().text.len() }
@@ -159,18 +164,21 @@ pub extern "C" fn omg_set_caption(p: *const u8, n: usize) {
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_set_sandbox_tier(t: u32) {
     let gm = g(); let t = (t as u8).min(tiers::GOD - 1);
-    if gm.unlocked & (1u64 << t) != 0 { gm.sandbox_tier = t; if gm.mode == opts::Mode::Sandbox { gm.spout = t; } }
+    if gm.unlocked & game::bit(t) != 0 {
+        gm.sandbox_tier = t;
+        if gm.mode == opts::Mode::Sandbox { gm.spout = t; gm.base = t as f32; gm.cat = tiers::cat_of(t); }
+    }
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_device_tilt(rad: f32) { if rad.is_finite() { g().device_tilt = m::clamp(rad, -0.65, 0.65); } }
 #[unsafe(no_mangle)]
-pub extern "C" fn omg_unlocked(t: u32) -> u32 { if t < 64 && g().unlocked & (1u64 << t) != 0 { 1 } else { 0 } }
+pub extern "C" fn omg_unlocked(t: u32) -> u32 { if (t as usize) < tiers::N_TIERS && g().unlocked & game::bit(t as u8) != 0 { 1 } else { 0 } }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_reset_progress() {
     let gm = g();
     gm.unlocked = 1; gm.stats = game::Stats::default(); gm.dirty_save = 0.1;
 }
-/// 0 started, 1 paused, 2 finished, 3 over, 4 mode, 5 run_max, 6 time, 7 spout, 8 merges(run), 9 drops(run), 10 ta_left, 11 god_t, 12 voice busy
+/// 0 started, 1 paused, 2 finished, 3 over, 4 mode, 5 run_max, 6 time, 7 spout, 8 merges(run), 9 drops(run), 10 ta_left, 11 god_t, 12 voice busy, 13 bodies, 14 era
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_info(f: u32) -> f32 {
     let gm = g();
@@ -178,17 +186,18 @@ pub extern "C" fn omg_info(f: u32) -> f32 {
         0 => gm.started as u32 as f32, 1 => gm.paused as u32 as f32, 2 => gm.finished as u32 as f32, 3 => gm.over as u32 as f32,
         4 => gm.mode as u32 as f32, 5 => gm.run_max as f32, 6 => gm.time, 7 => gm.spout as f32,
         8 => gm.run_merges as f32, 9 => gm.run_drops as f32, 10 => gm.ta_left, 11 => gm.god_t, 12 => gm.voice_playing() as u32 as f32,
+        13 => gm.bodies.len() as f32, 14 => gm.cat as f32,
         _ => 0.0,
     }
 }
-/// 0 runs, 1 merges, 2 omgs, 3 drops, 4 gods, 5 played, 6 top tier, 7 time-attack best tier, 10+m best time for mode m
+/// 0 runs, 1 merges, 2 omgs, 3 drops, 4 gods, 5 played, 6 top tier, 7 time-attack best tier, 8 best combo, 10+m best time for mode m
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_stat(f: u32) -> f32 {
     let s = &g().stats;
     match f {
         0 => s.runs as f32, 1 => s.merges as f32, 2 => s.omgs as f32, 3 => s.drops as f32, 4 => s.gods as f32,
-        5 => s.played, 6 => s.top_tier as f32, 7 => s.best_tier_ta as f32,
-        10..=15 => s.best[(f - 10) as usize],
+        5 => s.played, 6 => s.top_tier as f32, 7 => s.best_tier_ta as f32, 8 => s.best_combo as f32,
+        10..=17 => s.best[(f - 10) as usize],
         _ => 0.0,
     }
 }

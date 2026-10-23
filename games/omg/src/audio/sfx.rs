@@ -62,19 +62,36 @@ pub fn whoosh(sr: f32, dur: f32, f0: f32, f1: f32, seed: u32) -> Vec<f32> {
     out
 }
 
-/// Engines. kind: 0 tiny 3-cyl, 1 V6 off-road, 2 electric, 3 V8 sport, 4 V12 scream, 5 big-block V8, 6 W16 + turbos, 7 V12 howl
+/// Engine presets: (idle Hz, peak Hz, end Hz, grit, brightness, rumble, turbo whistle, crackle pops)
+/// 0 tiny 3-cyl, 1 V6 off-road, 2 electric, 3 V8 sport, 4 V12 scream, 5 big-block V8, 6 W16 + turbos, 7 V12 howl,
+/// 8 tiny twin, 9 rally boxer + turbo, 10 V-twin cruiser, 11 superbike, 12 supercharged hyperbike, 13 F1 scream,
+/// 14 ATV single, 15 mining diesel, 16 outboard, 17 inline-6 turbo
+pub fn engine_preset(kind: u8) -> (f32, f32, f32, f32, f32, f32, f32, bool) {
+    match kind {
+        0 => (28.0, 85.0, 40.0, 0.35, 0.35, 0.2, 0.0, false),
+        1 => (26.0, 105.0, 34.0, 0.6, 0.45, 0.6, 0.0, false),
+        3 => (34.0, 170.0, 48.0, 0.5, 0.6, 0.5, 0.0, true),
+        4 => (55.0, 330.0, 90.0, 0.35, 1.0, 0.25, 0.0, false),
+        5 => (24.0, 135.0, 32.0, 0.75, 0.5, 1.0, 0.0, true),
+        6 => (40.0, 230.0, 60.0, 0.45, 0.8, 0.6, 1.0, false),
+        7 => (60.0, 360.0, 110.0, 0.3, 1.0, 0.3, 0.0, false),
+        8 => (32.0, 110.0, 45.0, 0.5, 0.4, 0.15, 0.0, false),
+        9 => (30.0, 160.0, 44.0, 0.6, 0.55, 0.6, 0.7, true),
+        10 => (18.0, 68.0, 24.0, 0.85, 0.3, 1.0, 0.0, true),
+        11 => (60.0, 360.0, 90.0, 0.4, 0.9, 0.15, 0.0, true),
+        12 => (70.0, 420.0, 110.0, 0.35, 1.0, 0.15, 1.2, false),
+        13 => (110.0, 540.0, 170.0, 0.3, 1.0, 0.1, 0.0, true),
+        14 => (35.0, 120.0, 45.0, 0.7, 0.5, 0.3, 0.0, false),
+        15 => (16.0, 48.0, 20.0, 0.9, 0.2, 1.0, 0.3, false),
+        16 => (30.0, 150.0, 40.0, 0.55, 0.6, 0.4, 0.0, false),
+        17 => (38.0, 210.0, 55.0, 0.45, 0.75, 0.4, 0.8, true),
+        _ => (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),
+    }
+}
+
 pub fn engine(sr: f32, kind: u8, dur: f32, seed: u32) -> St {
     let n = n_of(sr, dur);
-    let (idle, peak, endf, grit, bright, rumble): (f32, f32, f32, f32, f32, f32) = match kind {
-        0 => (28.0, 85.0, 40.0, 0.35, 0.35, 0.2),
-        1 => (26.0, 105.0, 34.0, 0.6, 0.45, 0.6),
-        3 => (34.0, 170.0, 48.0, 0.5, 0.6, 0.5),
-        4 => (55.0, 330.0, 90.0, 0.35, 1.0, 0.25),
-        5 => (24.0, 135.0, 32.0, 0.75, 0.5, 1.0),
-        6 => (40.0, 230.0, 60.0, 0.45, 0.8, 0.6),
-        7 => (60.0, 360.0, 110.0, 0.3, 1.0, 0.3),
-        _ => (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-    };
+    let (idle, peak, endf, grit, bright, rumble, turbo, crackle) = engine_preset(kind);
     let mut out = St::new(n);
     let mut nz = Noise::new(seed);
     if kind == 2 {
@@ -104,7 +121,7 @@ pub fn engine(sr: f32, kind: u8, dur: f32, seed: u32) -> St {
         let comb = nz.white() * grit * (0.4 + 0.6 * (0.5 + 0.5 * sin(o1.ph * TAU)));
         if i % 96 == 0 { lpf.coef(Bq::lp(sr, 250.0 + f * (3.0 + bright * 9.0), 1.0 + bright * 0.8)); }
         let mut v = lpf.run(s + comb * 0.35) * lope;
-        if kind == 3 && k > 0.62 && nz.white() > 0.9993 { pops = 1.0; }
+        if crackle && k > 0.62 && nz.white() > 0.9993 { pops = 1.0; }
         if pops > 0.0 { v += nz.white() * pops * 0.9; pops *= 0.993; if pops < 0.01 { pops = 0.0; } }
         let a = smooth(k * 12.0) * (1.0 - smooth((k - 0.85) * 6.6));
         x[i] = v * a;
@@ -112,15 +129,15 @@ pub fn engine(sr: f32, kind: u8, dur: f32, seed: u32) -> St {
     saturate(&mut x, 0.35 + grit * 0.5);
     hp(&mut x, sr, 32.0);
     out.add_mono(&x, 0, 0.9, 0.0);
-    if kind == 6 {
+    if turbo > 0.0 {
         // turbos: whistle + blow-off
         let mut w = Osc::default(); let mut bo = Bq::hp(sr, 2200.0, 0.7);
         let mut y = vec![0.0f32; n];
         for i in 0..n {
             let k = i as f32 / n as f32;
             let f = 1200.0 + 3200.0 * smooth(k / 0.55);
-            y[i] = w.sine(f, sr) * 0.12 * smooth(k * 5.0) * (1.0 - smooth((k - 0.55) * 20.0));
-            if k > 0.58 && k < 0.75 { y[i] += bo.run(nz.white()) * 0.35 * (1.0 - (k - 0.58) / 0.17); }
+            y[i] = w.sine(f, sr) * 0.12 * turbo * smooth(k * 5.0) * (1.0 - smooth((k - 0.55) * 20.0));
+            if k > 0.58 && k < 0.75 { y[i] += bo.run(nz.white()) * 0.35 * turbo.min(1.0) * (1.0 - (k - 0.58) / 0.17); }
         }
         out.add_mono(&y, 0, 1.0, 0.2);
     }
@@ -683,4 +700,364 @@ pub fn arp_up(sr: f32, notes: &[f32], step: f32) -> St {
         s.add_mono(&x, n_of(sr, k as f32 * step), 1.0, -0.5 + k as f32 / notes.len() as f32);
     }
     reverb(&s, 1.4, 0.8, 0.8, 0.0, 0.35, 1.0, sr)
+}
+
+
+// ───────────────────────── new for the 124-tier ladder
+
+/// Bicycle bell: "ring-ring".
+pub fn bike_bell(sr: f32) -> St {
+    let mut s = St::new(n_of(sr, 1.4));
+    for (k, at) in [0.0f32, 0.16].iter().enumerate() {
+        let n = n_of(sr, 1.1);
+        let f0 = 2850.0;
+        let parts = [(1.0f32, 1.0f32, 5.0f32), (1.51, 0.6, 7.0), (2.13, 0.35, 9.0), (2.93, 0.2, 12.0), (0.5, 0.2, 4.0)];
+        let mut x = vec![0.0f32; n];
+        for (r, a, d) in parts.iter() {
+            let mut o = Osc::default();
+            for i in 0..n { let t = i as f32 / sr; x[i] += o.sine(f0 * r * (1.0 + 0.004 * sin(TAU * 13.0 * t)), sr) * a * exp(-t * d) * 0.25; }
+        }
+        let mut nz = Noise::new(900 + k as u32); let mut hf = Bq::hp(sr, 4000.0, 0.7);
+        for i in 0..n_of(sr, 0.01) { x[i] += hf.run(nz.white()) * 0.4 * (1.0 - i as f32 / n_of(sr, 0.01) as f32); }
+        s.add_mono(&x, n_of(sr, *at), 1.0, if k == 0 { -0.2 } else { 0.2 });
+    }
+    s
+}
+
+/// Footsteps (soft for a crawl, heavy for a stomp).
+pub fn steps(sr: f32, count: usize, interval: f32, heavy: f32, seed: u32) -> St {
+    let mut s = St::new(n_of(sr, count as f32 * interval + 0.4));
+    for k in 0..count {
+        let n = n_of(sr, 0.14);
+        let mut o = Osc::default(); let mut nz = Noise::new(seed + k as u32 * 3);
+        let mut f = Bq::bp(sr, 900.0 + 600.0 * (1.0 - heavy), 1.2);
+        let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; o.sine((80.0 + 60.0 * (1.0 - heavy)) - 200.0 * t, sr) * exp(-t * 30.0) * (0.3 + 0.7 * heavy) + f.run(nz.white()) * exp(-t * 70.0) * 0.6 }).collect();
+        s.add_mono(&x, n_of(sr, k as f32 * interval), 1.0 - 0.04 * k as f32, if k % 2 == 0 { -0.3 } else { 0.3 });
+    }
+    s
+}
+
+/// A squeaky rubber toy.
+pub fn squeak(sr: f32) -> St {
+    let mut s = St::new(n_of(sr, 0.8));
+    for (at, f0, f1) in [(0.0f32, 1700.0f32, 2300.0f32), (0.3, 2200.0, 1500.0)] {
+        let n = n_of(sr, 0.22);
+        let mut o = Osc::default(); let mut o2 = Osc::default();
+        let x: Vec<f32> = (0..n).map(|i| { let k = i as f32 / n as f32; let t = i as f32 / sr; let f = (f0 + (f1 - f0) * k) * (1.0 + 0.04 * sin(TAU * 38.0 * t)); (o.sine(f, sr) * 0.6 + o2.square(f, sr, 0.3) * 0.12) * sin(PI * k) }).collect();
+        s.add_mono(&x, n_of(sr, at), 0.8, 0.0);
+    }
+    s
+}
+
+/// Electric motor whine (e-scooters, e-bikes, maglevs).
+pub fn whine(sr: f32, dur: f32, f0: f32, f1: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut a = Osc::default(); let mut b = Osc::default(); let mut c = Osc::default(); let mut nz = Noise::new(seed);
+    let mut tyre = Bq::bp(sr, 300.0, 0.8);
+    let x: Vec<f32> = (0..n).map(|i| {
+        let k = i as f32 / n as f32;
+        let f = f0 + (f1 - f0) * smooth(k * 1.3);
+        let env = smooth(k * 6.0) * (1.0 - smooth((k - 0.78) * 4.5));
+        (a.sine(f, sr) * 0.5 + b.sine(f * 2.0, sr) * 0.15 + c.sine(f * 3.01, sr) * 0.08 + tyre.run(nz.white()) * 0.35 * k) * env
+    }).collect();
+    St::from_mono(&x, 0.0)
+}
+
+/// Two-stroke buzz (mopeds, scooters, tuk-tuks, jet skis).
+pub fn twostroke(sr: f32, dur: f32, f_lo: f32, f_hi: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut o = Osc::default(); let mut nz = Noise::new(seed);
+    let mut bp = Bq::bp(sr, 1400.0, 0.9); let mut lo = Bq::lp(sr, 3500.0, 0.7);
+    let mut x = vec![0.0f32; n];
+    let mut jit = 0.0f32;
+    for i in 0..n {
+        let k = i as f32 / n as f32;
+        if i % 200 == 0 { jit = nz.white() * 0.03; }
+        let f = (f_lo + (f_hi - f_lo) * smooth(k / 0.6)) * (1.0 + jit);
+        let src = o.square(f, sr, 0.18) + nz.white() * 0.2;
+        x[i] = lo.run(bp.run(src) * 1.6 + src * 0.15) * smooth(k * 8.0) * (1.0 - smooth((k - 0.8) * 5.0));
+    }
+    saturate(&mut x, 0.5);
+    normalize(&mut x, 0.8);
+    let mut s = St::from_mono(&x, 0.0);
+    let d = n_of(sr, 0.009); let mut r = vec![0.0f32; n]; for i in d..n { r[i] = s.r[i - d]; } s.r = r;
+    s
+}
+
+/// Multi-tone horn: a train's chime horn or (low notes) a ship's foghorn.
+pub fn big_horn(sr: f32, dur: f32, notes: &[f32], blasts: usize) -> St {
+    let mut s = St::new(n_of(sr, dur * blasts as f32 + 2.0));
+    for bl in 0..blasts {
+        let n = n_of(sr, dur * if bl + 1 == blasts { 1.0 } else { 0.55 });
+        let mut x = vec![0.0f32; n];
+        for (j, m) in notes.iter().enumerate() {
+            let f0 = midi(*m);
+            let mut o = Osc::default(); let mut o2 = Osc::default();
+            let mut f1 = Bq::bp(sr, (f0 * 3.0).min(1800.0), 1.2);
+            for i in 0..n {
+                let t = i as f32 / sr; let k = i as f32 / n as f32;
+                let f = f0 * (0.97 + 0.03 * smooth(t / 0.15)) * (1.0 + 0.002 * sin(TAU * (3.0 + j as f32) * t));
+                let src = o.saw(f, sr) * 0.6 + o2.square(f * 1.003, sr, 0.5) * 0.4;
+                x[i] += (f1.run(src) * 1.2 + src * 0.25) * smooth(t / 0.06) * (1.0 - smooth((k - 0.88) / 0.12)) / notes.len() as f32;
+            }
+        }
+        lp(&mut x, sr, 3200.0);
+        s.add_mono(&x, n_of(sr, bl as f32 * dur * 0.75), 1.0, 0.0);
+    }
+    let p = s.peak(); if p > 0.0 { s.gain(0.85 / p); }
+    reverb(&s, 2.6, 1.6, 0.35, 0.03, 0.4, 1.0, sr)
+}
+
+/// Steam whistle.
+pub fn whistle(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut nz = Noise::new(seed);
+    let mut a = Osc::default(); let mut b = Osc::default();
+    let mut bp = Bq::bp(sr, 1150.0, 6.0); let mut hiss = Bq::hp(sr, 3000.0, 0.7);
+    let x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr; let k = i as f32 / n as f32;
+        let f = 1150.0 * (0.92 + 0.08 * smooth(t / 0.2));
+        let tone = a.sine(f, sr) * 0.5 + b.sine(f * 1.26, sr) * 0.3 + bp.run(nz.white()) * 1.4;
+        (tone + hiss.run(nz.white()) * 0.15) * smooth(t / 0.05) * (1.0 - smooth((k - 0.85) / 0.15))
+    }).collect();
+    reverb(&St::from_mono(&x, 0.1), 1.8, 1.2, 0.6, 0.02, 0.35, 1.0, sr)
+}
+
+/// Steam locomotive chuffs, speeding up.
+pub fn chug(sr: f32, count: usize, interval: f32, seed: u32) -> St {
+    let mut s = St::new(n_of(sr, count as f32 * interval + 0.5));
+    let mut at = 0.0f32; let mut iv = interval;
+    for k in 0..count {
+        let n = n_of(sr, 0.22);
+        let mut nz = Noise::new(seed + k as u32);
+        let mut f = Bq::bp(sr, 500.0 + 200.0 * (k % 2) as f32, 0.8);
+        let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; f.run(nz.white()) * exp(-t * 18.0) * (1.0 - exp(-t * 400.0)) * 1.6 }).collect();
+        s.add_mono(&x, n_of(sr, at), 1.0, if k % 2 == 0 { -0.25 } else { 0.25 });
+        at += iv; iv *= 0.93;
+    }
+    s
+}
+
+/// Sea swell.
+pub fn waves(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut nz = Noise::new(seed); let mut nz2 = Noise::new(seed + 1);
+    let mut lo = Bq::lp(sr, 900.0, 0.6); let mut lo2 = Bq::lp(sr, 1400.0, 0.6);
+    let mut s = St::new(n);
+    for i in 0..n {
+        let k = i as f32 / n as f32; let t = i as f32 / sr;
+        let sw = 0.35 + 0.65 * pow(0.5 + 0.5 * sin(TAU * 0.45 * t - 1.2), 2.0);
+        let env = smooth(k * 4.0) * (1.0 - smooth((k - 0.75) * 4.0));
+        s.l[i] = lo.run(nz.white()) * sw * env * 1.2;
+        s.r[i] = lo2.run(nz2.white()) * sw * env * 1.2;
+    }
+    s
+}
+
+/// A splash of water.
+pub fn splash(sr: f32, seed: u32) -> St {
+    let n = n_of(sr, 0.9);
+    let mut nz = Noise::new(seed);
+    let mut hf = Bq::bp(sr, 2500.0, 0.6); let mut lf = Bq::lp(sr, 500.0, 0.7);
+    let mut drop = 0.0f32;
+    let x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr;
+        if nz.white() > 0.996 { drop = 1.0; }
+        let d = drop * sin(TAU * (1200.0 + 1800.0 * drop) * t); drop *= 0.995;
+        hf.run(nz.white()) * exp(-t * 5.0) * 1.3 + lf.run(nz.white()) * exp(-t * 12.0) * 1.5 + d * 0.15 * exp(-t * 2.0)
+    }).collect();
+    St::from_mono(&x, 0.0)
+}
+
+/// Submarine sonar ping with bubbles.
+pub fn sonar(sr: f32, pings: usize, seed: u32) -> St {
+    let mut s = St::new(n_of(sr, pings as f32 * 0.9 + 2.0));
+    for k in 0..pings {
+        let n = n_of(sr, 1.2);
+        let mut o = Osc::default();
+        let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; o.sine(1450.0 - 40.0 * t, sr) * exp(-t * 3.0) * (1.0 - exp(-t * 300.0)) * 0.5 }).collect();
+        s.add_mono(&x, n_of(sr, k as f32 * 0.9), 1.0 - 0.25 * k as f32, 0.0);
+    }
+    let n = s.len();
+    let mut nz = Noise::new(seed);
+    let mut bub = vec![0.0f32; n];
+    let mut ph = 0.0f32; let mut f = 0.0f32; let mut a = 0.0f32;
+    for i in 0..n { if nz.white() > 0.9993 { f = 300.0 + 500.0 * abs(nz.white()); a = 0.4; } ph += f / sr; f *= 1.0002; bub[i] = sin(TAU * ph) * a; a *= 0.9985; }
+    s.add_mono(&bub, 0, 0.6, 0.3);
+    reverb(&s, 3.5, 1.6, 0.3, 0.05, 0.6, 1.0, sr)
+}
+
+/// Helicopter: chopped noise and blade slap.
+pub fn chopper(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut nz = Noise::new(seed);
+    let mut lo = Bq::lp(sr, 700.0, 0.8); let mut tail = Osc::default();
+    let x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr; let k = i as f32 / n as f32;
+        let rate = 17.0 + 3.0 * k;
+        let slap = pow(0.5 + 0.5 * sin(TAU * rate * t), 6.0);
+        (lo.run(nz.white()) * (0.25 + 1.6 * slap) + tail.saw(95.0, sr) * 0.05) * sin(PI * k)
+    }).collect();
+    let mut s = St::from_mono(&x, 0.0);
+    for i in 0..n { let k = i as f32 / n as f32; let a = (-0.7 + 1.4 * k + 1.0) * PI * 0.25; let v = s.l[i]; s.l[i] = v * cos(a) * 1.3; s.r[i] = v * sin(a) * 1.3; }
+    s
+}
+
+/// Hot-air balloon burner.
+pub fn burner(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut nz = Noise::new(seed);
+    let mut bp = Bq::bp(sr, 420.0, 0.7); let mut lo = Bq::lp(sr, 2400.0, 0.7);
+    let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; let k = i as f32 / n as f32; lo.run(bp.run(nz.white()) * 2.0 + nz.white() * 0.2) * smooth(t / 0.04) * (1.0 - smooth((k - 0.7) / 0.3)) }).collect();
+    St::from_mono(&x, 0.0)
+}
+
+/// Giant-robot stomps with servo whirs.
+pub fn stomp(sr: f32, count: usize, interval: f32, seed: u32) -> St {
+    let mut s = St::new(n_of(sr, count as f32 * interval + 1.0));
+    for k in 0..count {
+        let n = n_of(sr, 0.6);
+        let mut o = Osc::default(); let mut nz = Noise::new(seed + k as u32); let mut cl = Bq::bp(sr, 2400.0, 3.0);
+        let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; o.sine(55.0 - 25.0 * t, sr) * exp(-t * 7.0) * 1.2 + cl.run(nz.white()) * exp(-t * 25.0) * 0.8 }).collect();
+        s.add_mono(&x, n_of(sr, k as f32 * interval), 1.0, if k % 2 == 0 { -0.3 } else { 0.3 });
+        let m = n_of(sr, interval * 0.5);
+        let mut w = Osc::default();
+        let y: Vec<f32> = (0..m).map(|i| { let kk = i as f32 / m as f32; w.saw(400.0 + 900.0 * kk, sr) * sin(PI * kk) * 0.06 }).collect();
+        s.add_mono(&y, n_of(sr, k as f32 * interval + interval * 0.3), 1.0, 0.0);
+    }
+    s
+}
+
+/// A stadium crowd cheering.
+pub fn crowd(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut s = St::new(n);
+    let mut rng = Rng::new(seed as u64);
+    for v in 0..14 {
+        let mut nz = Noise::new(seed + v);
+        let fc = rng.range(500.0, 2600.0);
+        let mut f = Bq::bp(sr, fc, 3.0);
+        let rate = rng.range(2.0, 7.0); let ph = rng.range(0.0, TAU);
+        let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; let k = i as f32 / n as f32; f.run(nz.white()) * (0.6 + 0.4 * sin(TAU * rate * t + ph)) * smooth(k * 3.0) * (1.0 - smooth((k - 0.7) / 0.3)) }).collect();
+        s.add_mono(&x, 0, 0.5, rng.range(-0.9, 0.9));
+    }
+    reverb(&s, 1.6, 1.4, 0.5, 0.01, 0.3, 1.0, sr)
+}
+
+/// Elephant trumpet (Airavata).
+pub fn trumpet(sr: f32, seed: u32) -> St {
+    let n = n_of(sr, 1.6);
+    let mut o = Osc::default(); let mut nz = Noise::new(seed);
+    let mut f1 = Bq::bp(sr, 900.0, 2.0); let mut f2 = Bq::bp(sr, 2400.0, 3.0);
+    let x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr; let k = i as f32 / n as f32;
+        let f = (420.0 + 260.0 * sin(PI * clamp(k * 1.6, 0.0, 1.0))) * (1.0 + 0.025 * sin(TAU * 9.0 * t));
+        let src = o.saw(f, sr) + nz.white() * 0.25;
+        (f1.run(src) * 1.4 + f2.run(src) * 0.8) * smooth(t / 0.05) * (1.0 - smooth((k - 0.7) / 0.3))
+    }).collect();
+    let mut x = x; saturate(&mut x, 0.4); normalize(&mut x, 0.85);
+    reverb(&St::from_mono(&x, 0.0), 2.4, 1.4, 0.5, 0.02, 0.4, 1.0, sr)
+}
+
+/// Whale song (Jonah's great fish).
+pub fn whale(sr: f32, seed: u32) -> St {
+    let n = n_of(sr, 3.2);
+    let mut o = Osc::default(); let mut o2 = Osc::default(); let mut nz = Noise::new(seed);
+    let x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr; let k = i as f32 / n as f32;
+        let f = 180.0 + 220.0 * sin(PI * k) * (0.6 + 0.4 * sin(TAU * 0.9 * t)) - 60.0 * k;
+        (o.sine(f, sr) * 0.6 + o2.sine(f * 2.02, sr) * 0.2 + nz.pink() * 0.02) * sin(PI * k)
+    }).collect();
+    reverb(&St::from_mono(&x, 0.0), 5.0, 1.8, 0.3, 0.06, 0.65, 1.0, sr)
+}
+
+/// Rushing wind.
+pub fn wind(sr: f32, dur: f32, seed: u32) -> St {
+    let n = n_of(sr, dur);
+    let mut nz = Noise::new(seed);
+    let mut f = Bq::bp(sr, 600.0, 1.2);
+    let mut s = St::new(n);
+    for i in 0..n {
+        let k = i as f32 / n as f32; let t = i as f32 / sr;
+        if i % 64 == 0 { f.coef(Bq::bp(sr, 400.0 + 900.0 * (0.5 + 0.5 * sin(TAU * 0.6 * t)), 1.6)); }
+        let v = f.run(nz.white()) * sin(PI * k) * 1.4;
+        let a = (sin(TAU * 0.3 * t) + 1.0) * PI * 0.25;
+        s.l[i] = v * cos(a); s.r[i] = v * sin(a);
+    }
+    s
+}
+
+/// Deep cinematic impact for a brand-new tier.
+pub fn impact(sr: f32, seed: u32) -> St {
+    let n = n_of(sr, 1.4);
+    let mut o = Osc::default(); let mut nz = Noise::new(seed);
+    let mut cr = Bq::hp(sr, 1800.0, 0.7); let mut body = Bq::lp(sr, 400.0, 0.8);
+    let mut x: Vec<f32> = (0..n).map(|i| {
+        let t = i as f32 / sr;
+        o.sine(38.0 + 110.0 * exp(-t * 14.0), sr) * exp(-t * 3.5) * 1.1 + cr.run(nz.white()) * exp(-t * 40.0) * 0.7 + body.run(nz.white()) * exp(-t * 9.0) * 0.6
+    }).collect();
+    saturate(&mut x, 0.5);
+    normalize(&mut x, 0.95);
+    reverb(&St::from_mono(&x, 0.0), 1.8, 1.4, 0.3, 0.0, 0.3, 1.0, sr)
+}
+
+/// Era stinger: a reverse-cymbal swell into a boom and a brass stab.
+pub fn era_stinger(sr: f32, seed: u32) -> St {
+    let rise = 0.7f32;
+    let mut s = St::new(n_of(sr, rise + 3.2));
+    let n = n_of(sr, rise);
+    let mut nz = Noise::new(seed); let mut hf = Bq::hp(sr, 3500.0, 0.7);
+    let x: Vec<f32> = (0..n).map(|i| { let k = i as f32 / n as f32; hf.run(nz.white()) * pow(k, 3.0) * 1.2 }).collect();
+    s.add_mono(&x, 0, 1.0, 0.0);
+    let b = boom(sr, false, seed + 3);
+    s.add(&b, n, 0.9);
+    let m = n_of(sr, 1.6);
+    let mut y = vec![0.0f32; m];
+    for note in [50.0f32, 57.0, 62.0, 66.0, 69.0] {
+        let f = midi(note);
+        let mut o = Osc::default(); let mut o2 = Osc::default();
+        let mut lpf = Bq::lp(sr, 2400.0, 0.9);
+        for i in 0..m { let t = i as f32 / sr; y[i] += lpf.run(o.saw(f, sr) + o2.saw(f * 1.006, sr)) * (1.0 - exp(-t * 60.0)) * exp(-t * 2.2) * 0.14; }
+    }
+    s.add_mono(&y, n, 1.0, 0.0);
+    reverb(&s, 2.4, 1.5, 0.5, 0.01, 0.35, 1.0, sr)
+}
+
+/// Combo blip (the browser pitches it up as the combo grows).
+pub fn blip(sr: f32) -> St {
+    let n = n_of(sr, 0.35);
+    let mut o = Osc::default(); let mut o2 = Osc::default();
+    let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; (o.sine(1046.5, sr) + 0.4 * o2.sine(3139.5, sr)) * exp(-t * 12.0) * (1.0 - exp(-t * 2000.0)) * 0.5 }).collect();
+    reverb(&St::from_mono(&x, 0.0), 0.9, 0.7, 0.9, 0.0, 0.25, 1.0, sr)
+}
+
+/// Spring boing.
+pub fn boing(sr: f32) -> St {
+    let n = n_of(sr, 0.5);
+    let mut o = Osc::default();
+    let x: Vec<f32> = (0..n).map(|i| { let t = i as f32 / sr; let f = 180.0 * (1.0 + 0.6 * exp(-t * 6.0) * sin(TAU * 14.0 * t)); o.sine(f, sr) * exp(-t * 6.0) * 0.6 }).collect();
+    St::from_mono(&x, 0.0)
+}
+
+/// Note samples for the bounce melody, all at MIDI 72 (the browser repitches).
+/// timbre: 0 toy xylophone, 1 synth pluck, 2 glass bell, 3 harp, 4 celesta
+pub fn mallet(sr: f32, timbre: u8) -> St {
+    let f = midi(72.0);
+    let n = n_of(sr, if timbre == 2 || timbre == 4 { 2.0 } else { 1.2 });
+    let mut x = vec![0.0f32; n];
+    match timbre {
+        0 => { let mut a = Osc::default(); let mut b = Osc::default(); for i in 0..n { let t = i as f32 / sr; x[i] = (a.sine(f, sr) * exp(-t * 7.0) + b.sine(f * 3.93, sr) * 0.35 * exp(-t * 22.0)) * (1.0 - exp(-t * 1500.0)) * 0.6; } }
+        1 => { let mut a = Osc::default(); let mut b = Osc::default(); let mut l = Bq::lp(sr, 3000.0, 1.5); for i in 0..n { let t = i as f32 / sr; if i % 64 == 0 { l.coef(Bq::lp(sr, 300.0 + 4000.0 * exp(-t * 9.0), 1.5)); } x[i] = l.run(a.saw(f, sr) + b.saw(f * 1.005, sr) * 0.7) * exp(-t * 5.0) * 0.4; } }
+        2 => { let mut c = Osc::default(); let mut m = Osc::default(); for i in 0..n { let t = i as f32 / sr; let mi = 3.0 * exp(-t * 4.0); let mm = m.sine(f * 3.5, sr) * mi; c.ph += mm * 0.0015; x[i] = c.sine(f, sr) * exp(-t * 2.6) * 0.5; } }
+        3 => {
+            let p = ((sr / f) as usize).max(2);
+            let mut buf: Vec<f32> = { let mut nz = Noise::new(77); (0..p).map(|_| nz.white() * 0.6).collect() };
+            let mut idx = 0;
+            for i in 0..n { let a = buf[idx]; let b = buf[(idx + 1) % p]; let v = 0.5 * (a + b) * 0.997; buf[idx] = v; idx = (idx + 1) % p; x[i] = a; }
+            lp(&mut x, sr, 6000.0);
+        }
+        _ => { let mut a = Osc::default(); let mut b = Osc::default(); let mut c = Osc::default(); for i in 0..n { let t = i as f32 / sr; x[i] = (a.sine(f * 2.0, sr) + b.sine(f * 4.0, sr) * 0.3 * exp(-t * 6.0) + c.sine(f * 6.0, sr) * 0.1 * exp(-t * 12.0)) * exp(-t * 3.2) * (1.0 - exp(-t * 800.0)) * 0.45; } }
+    }
+    normalize(&mut x, 0.8);
+    reverb(&St::from_mono(&x, 0.0), 1.2, 0.9, 0.7, 0.0, 0.22, 1.0, sr)
 }

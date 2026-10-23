@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="258" cy="352" rx="204" ry="15" fill="#000" opacity="0.18" stroke="none"/>
+<path fill="#5A3A2E" d="M202 228 L204 194 Q206 182 220 182 Q234 182 236 194 L238 228 Z"/>
+<path fill="#2455D6" d="M62 326 Q44 324 44 300 C44 264 56 236 86 226 C112 214 150 206 182 218 Q198 226 216 226 L300 226 C334 214 378 206 410 216 C446 228 470 250 470 278 C470 306 460 324 440 326 Z"/>
+<path fill="#1A3FA8" stroke="none" d="M48 298 L467 298 C464 314 456 321 440 321 L62 321 Q49 319 48 298 Z"/>
+<path fill="#6F93F2" stroke="none" d="M198 272 Q268 250 342 264 Q270 270 198 272 Z"/>
+<path fill="none" stroke="#FFFFFF" d="M304 238 C334 226 376 218 406 228 C426 234 438 242 444 250 M304 252 C334 240 376 232 402 242 C418 248 428 256 432 262 M196 236 C176 228 150 220 120 224 C96 228 78 238 70 250 M196 250 C176 242 150 234 122 238 C102 241 88 250 80 260"/>
+<path fill="#9ED8FF" stroke-width="8" d="M266 226 L246 182 L262 180 L300 226 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M262 214 L254 192 L260 192 L272 214 Z"/>
+<path fill="#FFF3A6" stroke-width="8" d="M448 244 Q462 246 464 262 Q452 266 444 258 Z"/>
+<path fill="#FF5B5B" stroke-width="7" d="M48 262 L60 260 L60 278 L46 280 Z"/>
+<path fill="#CFD4DE" stroke-width="8" d="M200 296 L326 296 Q336 296 336 306 Q336 316 326 316 L200 316 Q190 316 190 306 Q190 296 200 296 Z"/>
+<path fill="none" stroke="#FFFFFF" stroke-width="5" opacity="0.7" d="M206 302 L318 302"/>
+<circle cx="140" cy="312" r="46" fill="#23232F"/>
+<circle cx="140" cy="312" r="30" fill="#CFD4DE"/>
+<path fill="none" stroke="#7D8496" stroke-width="5" d="M140 286 L140 338 M114 312 L166 312 M122 294 L158 330 M158 294 L122 330"/>
+<circle cx="140" cy="312" r="10" fill="#7D8496" stroke-width="6"/>
+<circle cx="376" cy="312" r="46" fill="#23232F"/>
+<circle cx="376" cy="312" r="30" fill="#CFD4DE"/>
+<path fill="none" stroke="#7D8496" stroke-width="5" d="M376 286 L376 338 M350 312 L402 312 M358 294 L394 330 M394 294 L358 330"/>
+<circle cx="376" cy="312" r="10" fill="#7D8496" stroke-width="6"/>
+</g>
+</svg>

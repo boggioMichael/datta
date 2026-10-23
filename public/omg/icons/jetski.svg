@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#CFEFFF" d="M172 332 C152 300 142 258 140 218 Q140 196 126 170 Q118 196 104 200 Q96 182 80 172 Q86 200 76 214 Q62 210 48 214 Q62 230 58 246 Q48 252 40 266 Q60 268 70 286 C92 314 130 330 172 332 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.6" d="M150 318 C134 292 126 262 124 230 L112 236 C116 266 126 296 140 320 Z"/>
+<path fill="#94CDF5" stroke="none" d="M164 326 C130 324 100 312 82 294 Q120 300 150 296 Z"/>
+<path fill="#CFEFFF" stroke-width="6" d="M104 140 a7 7 0 1 0 0.1 0 Z M60 180 a6 6 0 1 0 0.1 0 Z"/>
+<g transform="rotate(-6 290 290)">
+<path fill="#FF4747" d="M150 286 L148 258 Q148 250 158 250 L198 250 L210 238 L338 238 L356 210 Q362 202 376 202 Q428 204 452 228 Q468 244 474 262 Z"/>
+<path fill="#C92E36" stroke="none" d="M156 274 L340 266 Q420 262 462 250 L470 260 L156 284 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.45" d="M414 214 Q446 222 460 244 L450 246 Q436 230 410 222 Z"/>
+<path fill="#9ED8FF" d="M358 210 Q370 186 394 190 L412 214 Z"/>
+<path fill="#2B2D42" d="M208 242 Q206 218 232 216 L318 212 Q346 212 346 240 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.4" d="M232 222 L316 218 Q332 218 336 226 L230 230 Z"/>
+<path fill="none" stroke-width="18" d="M354 212 L338 174 L316 172"/>
+<path fill="none" stroke="#6B7186" stroke-width="7" d="M354 212 L338 174 L316 172"/>
+<path fill="#FFFFFF" d="M150 284 L154 306 Q156 314 168 314 L340 314 Q426 312 472 262 Z"/>
+<path fill="#C9D4E5" stroke="none" d="M160 300 L340 302 Q410 300 450 278 L460 276 Q424 310 340 309 L170 309 Q161 308 159 302 Z"/>
+</g>
+<path fill="#3DA5FF" d="M72 326 Q95 312 118 326 T164 326 T210 326 T256 326 T302 326 T348 326 T394 326 T440 326 Q452 328 448 342 Q440 368 412 370 L100 370 Q72 368 64 342 Q60 328 72 326 Z"/>
+<path fill="#2A86E0" stroke="none" d="M75 354 L437 354 Q430 365 412 365 L100 365 Q82 365 75 354 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.45" d="M130 338 L176 338 Q182 342 176 346 L130 346 Q124 342 130 338 Z M300 338 L346 338 Q352 342 346 346 L300 346 Q294 342 300 338 Z"/>
+</g>
+</svg>

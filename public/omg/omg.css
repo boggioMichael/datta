@@ -75,8 +75,8 @@ a { color: inherit; }
 .logo span:nth-child(3) { background-image: linear-gradient(180deg, #fff 30%, #fff3cf 70%, #ffd76a 100%); filter: drop-shadow(0 0 22px rgba(255,240,200,.55)); }
 .sub { margin: 0; font-size: 21px; font-weight: 700; color: #fff; }
 .tag { margin: 0; color: var(--fg-2); font-size: 15px; line-height: 1.45; max-width: 34ch; }
-#ladder-preview { display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; max-width: 360px; opacity: .95; direction: ltr; }
-#ladder-preview canvas { width: 22px; height: 22px; }
+#ladder-preview { display: flex; gap: 1px; justify-content: center; flex-wrap: wrap; max-width: 372px; opacity: .95; direction: ltr; }
+#ladder-preview canvas { width: 17px; height: 17px; }
 #ladder-preview canvas.locked { opacity: .22; filter: grayscale(1); }
 .cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 220px; padding: 15px 28px; border-radius: 999px; font-weight: 800; font-size: 20px; color: #120a00; background: linear-gradient(180deg, #ffe58a, #ffb627); box-shadow: 0 8px 30px rgba(255,182,39,.35), inset 0 1px 0 rgba(255,255,255,.7); text-decoration: none; transition: transform .12s; }
 .cta:active { transform: scale(.96); }

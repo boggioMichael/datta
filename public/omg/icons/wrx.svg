@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<ellipse cx="264" cy="368" rx="200" ry="14" fill="#000" opacity="0.18" stroke="none"/>
+<path fill="#2A62E0" d="M78 312 Q62 312 62 296 L62 244 Q62 228 78 226 L132 222 L194 180 Q202 174 216 174 L284 174 Q298 174 306 182 L348 230 L444 246 Q464 250 466 270 L468 300 Q468 312 456 312 L441 312 A56 56 0 0 0 331 312 L199 312 A56 56 0 0 0 89 312 Z"/>
+<path fill="#1A44A8" stroke="none" d="M63 288 L467 288 L468 300 Q468 311 456 311 L78 311 Q63 311 63 296 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.4" d="M72 236 L134 232 L348 240 L444 256 L452 264 L348 250 L134 242 L72 246 Z"/>
+<path fill="none" d="M78 312 Q62 312 62 296 L62 244 Q62 228 78 226 L132 222 L194 180 Q202 174 216 174 L284 174 Q298 174 306 182 L348 230 L444 246 Q464 250 466 270 L468 300 Q468 312 456 312 L441 312 A56 56 0 0 0 331 312 L199 312 A56 56 0 0 0 89 312 Z"/>
+<path fill="#23232F" stroke="none" d="M336 312 A51 51 0 0 1 436 312 Z M94 312 A51 51 0 0 1 194 312 Z"/>
+<path fill="#2A62E0" d="M358 233 L368 220 L404 223 L414 241 Z"/>
+<path fill="#9ED8FF" d="M203 190 L244 190 L244 226 L150 226 Z"/>
+<path fill="#9ED8FF" d="M258 190 L291 190 L323 226 L258 226 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M216 196 L230 196 L212 220 L198 220 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M268 196 L288 196 L272 220 L268 220 Z"/>
+<path fill="none" stroke-width="8" d="M251 232 L251 306"/>
+<path fill="none" stroke-width="8" d="M264 244 L284 244"/>
+<path fill="#FFF3A6" d="M440 254 L463 260 L464 272 L434 264 Z"/>
+<path fill="#FF5B5B" stroke-width="8" d="M62 234 L84 232 L84 248 L62 250 Z"/>
+<path fill="#2A62E0" stroke-width="8" d="M86 226 L92 192 L102 192 L98 226 Z M114 224 L118 190 L128 190 L126 224 Z"/>
+<path fill="#2A62E0" d="M54 182 L138 176 Q146 176 146 184 L146 190 L60 196 Q52 196 52 188 Z"/>
+<path fill="#A8743F" stroke-width="6" d="M50 350 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 Z M42 328 a6.5 6.5 0 1 0 13 0 a6.5 6.5 0 1 0 -13 0 Z M62 314 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z"/>
+<path fill="#F2F4F8" stroke-width="8" d="M82 312 L96 312 L94 350 L78 352 Z"/>
+<path fill="#F2F4F8" stroke-width="8" d="M324 312 L338 312 L336 348 L320 350 Z"/>
+<circle cx="144" cy="330" r="44" fill="#23232F"/>
+<circle cx="144" cy="330" r="28" fill="#F0BE3A"/>
+<circle cx="144" cy="330" r="10" fill="#B8861E"/>
+<circle cx="386" cy="330" r="44" fill="#23232F"/>
+<circle cx="386" cy="330" r="28" fill="#F0BE3A"/>
+<circle cx="386" cy="330" r="10" fill="#B8861E"/>
+</g>
+</svg>
