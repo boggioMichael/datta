@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>OH MY GOD — מפיקנטו עד אלוהים · DATTA</title>
+<meta name="description" content="משחק מיזוג: שתי מכוניות זהות מתמזגות לרכב יוקרתי יותר — מקיה פיקנטו, דרך מטוסים, חלליות ומרכבות האלים, עד אלוהי ישראל. וכל מיזוג צועק OH MY GOD חזק יותר. נכתב ב-Rust.">
+<meta property="og:title" content="OH MY GOD — מפיקנטו עד אלוהים">
+<meta property="og:description" content="Merge two identical rides into something fancier — from a Kia Picanto to the God of Israel. Every merge screams OMG louder. Written in Rust.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://boggiomichael.github.io/datta/omg/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="omg.css">
+</head>
+<body>
+<canvas id="game" aria-label="OH MY GOD"></canvas>
+
+<div id="stage">
+  <div class="topbar">
+    <button class="ib" id="btn-menu" aria-label="תפריט"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="spacer"></div>
+    <button class="ib" id="btn-rec" aria-label="הקלט"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" class="fill"/></svg></button>
+    <button class="ib" id="btn-sound" aria-label="סאונד"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l4 4V6L8 10H5z" class="fill"/><path d="M15.5 9a4 4 0 010 6M18 6.5a8 8 0 010 11" class="wave"/><path d="M16 9l5 6M21 9l-5 6" class="x"/></svg></button>
+    <button class="ib" id="btn-pause" aria-label="השהה"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+  </div>
+  <div id="sandbox-pick" hidden></div>
+  <div id="tools"></div>
+  <div id="rec-badge" hidden><i></i><span></span></div>
+</div>
+
+<section id="start" class="screen">
+  <div class="start-inner">
+    <p class="eyebrow">DATTA · GAME</p>
+    <h1 class="logo"><span>OH</span> <span>MY</span> <span>GOD</span></h1>
+    <p class="sub" data-ui="subtitle"></p>
+    <p class="tag" data-ui="tagline"></p>
+    <div id="ladder-preview" aria-hidden="true"></div>
+    <button class="cta" id="btn-play"><span data-ui="play"></span></button>
+    <div id="mode-list" class="modes"></div>
+    <div class="start-foot">
+      <button class="link" id="btn-lang" data-ui="lang"></button>
+      <span class="dot">·</span>
+      <button class="link" id="btn-start-settings" data-ui="settings"></button>
+      <span class="dot">·</span>
+      <a class="link" id="lnk-site" href="../he/"><span data-ui="site"></span></a>
+    </div>
+    <p class="note" data-ui="sound_note"></p>
+  </div>
+  <p class="loading" id="loading" data-ui="loading"></p>
+</section>
+
+<section id="menu" class="sheet" hidden>
+  <div class="sheet-inner">
+    <header class="sheet-head">
+      <nav class="tabs" id="tabs"></nav>
+      <button class="ib close" id="btn-close" aria-label="סגור"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </header>
+    <div class="sheet-body" id="sheet-body"></div>
+    <footer class="sheet-foot">
+      <button class="cta small" id="btn-resume" data-ui="resume"></button>
+      <button class="ghost" id="btn-restart" data-ui="restart"></button>
+      <button class="ghost" id="btn-home" data-ui="modes"></button>
+    </footer>
+  </div>
+</section>
+
+<section id="end" class="screen glass" hidden>
+  <div class="end-inner">
+    <h2 id="end-title"></h2>
+    <p id="end-sub" class="sub"></p>
+    <dl id="end-stats"></dl>
+    <p id="end-record" class="record" hidden></p>
+    <div class="end-btns">
+      <button class="cta" id="btn-again" data-ui="again"></button>
+      <button class="ghost" id="btn-stay" data-ui="keep_watching"></button>
+      <button class="ghost" id="btn-end-rec" data-ui="record"></button>
+    </div>
+  </div>
+</section>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="video-ready" class="screen glass" hidden>
+  <div class="end-inner">
+    <h2 data-ui="record_ready"></h2>
+    <video id="video-preview" playsinline controls></video>
+    <div class="end-btns">
+      <a class="cta" id="video-save" download="oh-my-god.mp4"><span data-ui="record_save"></span></a>
+      <button class="ghost" id="video-close" data-ui="close"></button>
+    </div>
+  </div>
+</div>
+
+<noscript>JavaScript and WebAssembly are needed to play. · יש להפעיל JavaScript כדי לשחק.</noscript>
+<script src="host.js" defer></script>
+</body>
+</html>

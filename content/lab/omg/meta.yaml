@@ -1,0 +1,26 @@
+title: { en: "OH MY GOD", he: "OH MY GOD" }
+subtitle: { en: "A merge game from a Kia Picanto to the God of Israel — written in Rust.", he: "משחק מיזוג מקיה פיקנטו עד אלוהי ישראל — כתוב ב-Rust." }
+summary:
+  en: "Two identical rides touching merge into the next one up a 37-step ladder: cars, planes, real spacecraft, science fiction, the vehicles of the gods, Elijah's chariot, the Messiah's donkey and, last, God. Every merge screams “oh my god” — deeper, bigger and louder at each step. Physics, rules and the whole sound engine are Rust compiled to WebAssembly."
+  he: "שתי מכוניות זהות שנוגעות מתמזגות לשלב הבא בסולם של 37: מכוניות, מטוסים, חלליות אמיתיות, מדע בדיוני, הרכבים של האלים, מרכבת האש של אליהו, חמורו של המשיח ולבסוף — אלוהים. כל מיזוג צועק ״oh my god״ — עמוק, גדול ורועש יותר בכל שלב. הפיזיקה, החוקים ומנוע הסאונד כולו כתובים ב-Rust ומקומפלים ל-WebAssembly."
+category: { en: "Game · Rust + WebAssembly", he: "משחק · Rust + WebAssembly" }
+status: live
+started: "2026-10"
+updated: "2026-10-23"
+order: 0
+accent: "#FFB627"
+demo: https://boggiomichael.github.io/datta/omg/
+languages: ["Rust", "WebAssembly", "JavaScript"]
+milestone: { en: "Version 1 playable at /omg — six modes, six tools, 29 settings", he: "גרסה 1 זמינה ב-/omg — שישה מצבים, שישה כלים, 29 הגדרות" }
+builtLevels:
+  built:
+    en:
+      - "Engine in Rust with no dependencies: ring-and-chute physics at 480 Hz sub-steps, merge rules, the 37-tier ladder, spout upgrades, six modes, six tools, saves and stats"
+      - "Sound engine in Rust, running in a Web Worker: pitch-shift and time-stretch, vocoder choirs, reverb, side-chained effects and per-stage music — every sound rendered live from 33 short voice clips"
+      - "Reel recorder: captures the game as a 9:16 video with its sound"
+    he:
+      - "מנוע ב-Rust בלי תלויות: פיזיקה של טבעת ופיה ב-480 צעדים לשנייה, חוקי מיזוג, סולם של 37 דרגות, שדרוגי פיה, שישה מצבים, שישה כלים, שמירה וסטטיסטיקה"
+      - "מנוע סאונד ב-Rust שרץ ב-Web Worker: שינוי גובה ומהירות, מקהלות ווקודר, ריוורב, אפקטים עם סייד-צ׳יין ומוזיקה לכל שלב — כל צליל מרונדר בזמן אמת מ-33 קטעי קול קצרים"
+      - "מקליט רילז: מקליט את המשחק כסרטון 9:16 עם הסאונד"
+related:
+  - lab/datta-site

@@ -11,3 +11,4 @@ screenshots/
 .wrangler/
 .sites-runtime/
 *.tsbuildinfo
+games/omg/target/

@@ -188,6 +188,7 @@ function Footer() {
         </nav>
         <div className="footer-social">
           <a href={href(localePath(locale, "/play/"))}>{locale === "he" ? "פרטימנטו · לנגן" : "Partimento · Play"}</a>
+          <a href={href("/omg/")}>{locale === "he" ? "OH MY GOD · משחק" : "OH MY GOD · Game"}</a>
           <a href={href("/admin/")}>{locale === "he" ? "סטודיו" : "Studio"}</a>
           <a href={site.founder.github} rel="noopener me" target="_blank">
             GitHub

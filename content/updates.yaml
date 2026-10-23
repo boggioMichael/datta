@@ -1,5 +1,13 @@
 # Build log. One entry per real event. Newest can go anywhere — the build sorts by date.
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
+- date: 2026-10-23
+  project: lab/omg
+  title: { en: "OH MY GOD: a merge game from a Kia Picanto to the God of Israel, written in Rust", he: "OH MY GOD: משחק מיזוג מקיה פיקנטו עד אלוהי ישראל, כתוב ב-Rust" }
+  text:
+    en: "37 tiers, six modes, six tools and 29 settings. Physics, rules and the sound engine are Rust compiled to WebAssembly; every “oh my god” is rendered live and gets deeper and louder with each tier."
+    he: "‏37 דרגות, שישה מצבים, שישה כלים ו-29 הגדרות. הפיזיקה, החוקים ומנוע הסאונד כתובים ב-Rust ומקומפלים ל-WebAssembly; כל ״oh my god״ מרונדר בזמן אמת ונעשה עמוק ורועש יותר בכל דרגה."
+  link: https://boggiomichael.github.io/datta/omg/
+
 - date: 2026-10-16
   project: projects/computer-lessons
   title: { en: "The Online College for Computer Science: page and practice app live", he: "המכללה הפתוחה למדעי המחשב: הדף ואפליקציית התרגול באוויר" }

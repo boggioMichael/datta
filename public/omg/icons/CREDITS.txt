@@ -1,0 +1,14 @@
+Icons used in OH MY GOD
+
+From game-icons.net, licensed CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/):
+  city-car, jeep, jet-fighter, stealth-bomber, space-shuttle, ufo, commercial-airplane  — by Delapouite
+  satellite, transportation-rings, vortex, time-trap, fluffy-cloud, eagle-emblem, rocket — by Lorc
+  race-car, f1-car, airplane, pegasus, donkey, goat — by Skoll
+  chariot — by Cathelineau
+  starfighter, sailboat, horse-head — by Delapouite
+Colours are applied in the game; the shapes are unchanged except for removing the black background square.
+
+Drawn for this game (original): sedan-electric, sedan-sport, supercar, hypercar, hypercar-wing, bizjet,
+jumbo-747, superjumbo-a380, concorde, blackbird-sr71, soyuz, saturn-v, starship, flying-car,
+lightspeed-ship, sun-barque, sun-chariot, fire-chariot, goat-chariot, sleipnir.
+No company logos are used anywhere in the game.
