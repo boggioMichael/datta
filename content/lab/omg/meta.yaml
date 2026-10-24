@@ -11,13 +11,14 @@ order: 0
 accent: "#FFB627"
 demo: https://boggiomichael.github.io/datta/omg/
 languages: ["Rust", "WebAssembly", "JavaScript"]
-milestone: { en: "Version 3 at /omg — a living bubble, 155 tiers in 19 eras, a world that zooms out to the edge of the universe, and an interactive Genesis 1 read by God", he: "גרסה 3 ב-/omg — בועת חיים, 155 דרגות ב-19 עידנים, עולם שמתרחק עד קצה היקום ובראשית א׳ אינטראקטיבי בקולו של אלוהים" }
+milestone: { en: "Version 3 at /omg — a living bubble, 155 tiers in 19 eras with a moment of evolution at each, a world that zooms out to the edge of the universe, and an interactive Genesis 1 read by God", he: "גרסה 3 ב-/omg — בועת חיים, 155 דרגות ב-19 עידנים עם רגע של אבולוציה בכל אחד, עולם שמתרחק עד קצה היקום ובראשית א׳ אינטראקטיבי בקולו של אלוהים" }
 builtLevels:
   built:
     en:
       - "Engine in Rust with no dependencies: bouncy bubble-and-stem physics at 480 Hz with a sweep-and-prune broad phase, merge rules, chain reactions, random events, the 155-tier ladder, absolute sizes with a zooming world, eight modes, six tools, saves and stats"
       - "A living world for every era, painted in layers that fade into the haze and pull back with the camera, with drifting dust, lights, bubbles and stars, and the next tiers' giants out of focus in the deep — all built as draw commands in Rust"
       - "The bubble of life: a wobbling membrane you can poke, a fluid you can stir, living cells that breathe and splash when they fuse, a stem that pours the babies in, and a burst of light when God is born"
+      - "Evolution: every new era pulls the camera back onto a road of all 19 eras from the baby to God, every new tier is born in a double helix of light that follows it, and the end screen shows when you reached each era"
       - "An interactive Genesis 1:1–2:3 read by God in Hebrew (the Masoretic text) or English (JPS 1917): the story waits at eight moments of creation for a touch, a swipe or a long press, and every touch in between adds a tree, a star, a fish, a bird or a beast"
       - "Sound engine in Rust, running in a Web Worker: 155 OMGs and their effects, a loop for every era, a bounce melody, the held breath of creation — every sound rendered live from 33 short voice clips — and the whole Genesis soundtrack mixed by the same engine"
       - "168 illustrations drawn for the game, with no logos, and a reel recorder that captures the game as a 9:16 video with its sound"
@@ -25,6 +26,7 @@ builtLevels:
       - "מנוע ב-Rust בלי תלויות: פיזיקה קופצנית של בועה וגבעול ב-480 צעדים לשנייה עם sweep-and-prune, חוקי מיזוג, תגובות שרשרת, אירועים אקראיים, סולם של 155 דרגות, גדלים אמיתיים ועולם שמתרחק, שמונה מצבים, שישה כלים, שמירה וסטטיסטיקה"
       - "עולם חי לכל עידן, מצויר בשכבות שנבלעות באובך ומתרחקות עם המצלמה, עם אבק, אורות, בועות וכוכבים שנסחפים, והענקים של הדרגות הבאות מחוץ לפוקוס במעמקים — כולם נבנים כפקודות ציור ב-Rust"
       - "בועת החיים: קרום שמתנודד ואפשר לדחוף, נוזל שאפשר לערבב באצבע, תאים חיים שנושמים ומתיזים כשהם מתמזגים, גבעול ששופך את התינוקות, ופיצוץ של אור כשאלוהים נוצר"
+      - "אבולוציה: כל עידן חדש מושך את המצלמה אחורה אל מסלול של כל 19 העידנים מהתינוק ועד אלוהים, כל דרגה חדשה נולדת בסליל DNA של אור שהולך איתה, ומסך הסיום מראה מתי הגעת לכל עידן"
       - "בראשית א׳ א׳ עד ב׳ ג׳ אינטראקטיבי בקולו של אלוהים, בעברית (נוסח המסורה) או באנגלית (JPS 1917): הסיפור מחכה בשמונה רגעים של בריאה לנגיעה, להחלקה או ללחיצה ארוכה, וכל נגיעה בין לבין מוסיפה עץ, כוכב, דג, ציפור או חיה"
       - "מנוע סאונד ב-Rust שרץ ב-Web Worker: ‏155 צעקות OMG והאפקטים שלהן, לופ לכל עידן, מנגינת קפיצות ונשימה עצורה של הבריאה — כל צליל מרונדר בזמן אמת מ-33 קטעי קול קצרים — וכל פסקול בראשית עורבב באותו מנוע"
       - "‏168 איורים שצוירו במיוחד למשחק, בלי לוגואים, ומקליט רילז שמקליט את המשחק כסרטון 9:16 עם הסאונד"

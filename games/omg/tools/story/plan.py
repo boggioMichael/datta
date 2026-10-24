@@ -70,9 +70,16 @@ def cues(p):
           ('people', V[26]['t0']), ('good', ph(30, 1)['t0']), ('rest', V[31]['t0']), ('candles', V[33]['t0']), ('blessed', V[33]['t0'] + 0.5)]
     return c
 def write_txt(p, path):
+    # a phrase read by another voice can carry its own pitch shift: <recordings>/shift.json {"v02p0.wav": 1.4}
+    shifts = {}
+    for ph in p['phrases']:
+        d = os.path.dirname(ph['file'])
+        if d not in shifts: shifts[d] = json.load(open(os.path.join(d, 'shift.json'))) if os.path.exists(os.path.join(d, 'shift.json')) else {}
     with open(path, 'w', encoding='utf-8') as f:
         for k, v in cues(p): f.write(f'cue {k} {v:.3f}\n')
-        for ph in p['phrases']: f.write(f"phrase {ph['t0']:.3f} {ph['file']}\n")
+        for ph in p['phrases']:
+            ds = shifts[os.path.dirname(ph['file'])].get(os.path.basename(ph['file']))
+            f.write(f"phrase {ph['t0']:.3f} {ph['file']}" + (f' {ds}' if ds else '') + '\n')
 if __name__ == '__main__':
     tracks = []
     for lang, name in (('en', 'EN'), ('he', 'HE')):

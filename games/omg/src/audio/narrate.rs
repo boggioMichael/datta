@@ -119,7 +119,8 @@ fn swell(rise: f32) -> St {
 
 fn level(s: &mut St, lufs: f32) { let l = loudness(s, SR); if l > -69.0 { s.gain(db(lufs - l)); } }
 
-struct Plan { len: f32, cues: Vec<(String, f32)>, phrases: Vec<(f32, String)> }
+/// A phrase: where it starts, its recording, and an extra pitch shift (semitones) for a phrase read by another voice.
+struct Plan { len: f32, cues: Vec<(String, f32)>, phrases: Vec<(f32, String, f32)> }
 fn parse(path: &str) -> Plan {
     let txt = std::fs::read_to_string(path).unwrap();
     let mut p = Plan { len: 0.0, cues: Vec::new(), phrases: Vec::new() };
@@ -127,7 +128,12 @@ fn parse(path: &str) -> Plan {
         let mut it = line.splitn(3, ' ');
         match (it.next(), it.next(), it.next()) {
             (Some("cue"), Some(k), Some(v)) => { let v: f32 = v.trim().parse().unwrap(); if k == "len" { p.len = v; } p.cues.push((k.into(), v)); }
-            (Some("phrase"), Some(t), Some(f)) => p.phrases.push((t.parse().unwrap(), f.trim().into())),
+            (Some("phrase"), Some(t), Some(rest)) => {
+                let mut r = rest.split_whitespace();
+                let f = r.next().unwrap_or("");
+                let ds: f32 = r.next().and_then(|v| v.parse().ok()).unwrap_or(0.0);
+                p.phrases.push((t.parse().unwrap(), f.into(), ds));
+            }
             _ => {}
         }
     }
@@ -141,10 +147,10 @@ pub fn render(plan_path: &str, out_path: &str, semis: f32) {
     let total = n_of(p.len + 1.0);
     // ── the voice
     let mut voice = St::new(total);
-    for (t0, file) in &p.phrases {
+    for (t0, file, ds) in &p.phrases {
         let (x, sr) = read_wav(file);
         let x = resample(&x, sr, SR);
-        let v = god_voice(&x, semis);
+        let v = god_voice(&x, semis + ds);
         let mut st = St::from_mono(&v, 0.0);
         level(&mut st, -19.0);
         voice.add(&st, n_of(*t0), 1.0);

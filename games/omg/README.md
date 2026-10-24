@@ -19,7 +19,8 @@ from the schema the engine exports, plays the PCM that a second instance of the 
 - `src/game.rs` — bodies, the bubble-and-stem physics (480 Hz sub-steps, sweep-and-prune), merges and chain
   reactions, absolute sizes and the world zoom, the spout and its funnel, poking and stirring, random events,
   tools, hit-stop and camera, the birth of God and the bubble bursting, and the story's clock and gestures
-- `src/render.rs` — 16-float draw commands + a UTF-8 text buffer + a polygon buffer; the HUD and its helix ladder
+- `src/render.rs` — 16-float draw commands + a UTF-8 text buffer + a polygon buffer; the HUD and its helix ladder,
+  the evolution card (the road of every era from the baby to God) and the double helix that winds around every new ride
 - `src/world.rs` — the living world: a place for every era in hazy layers that pull back with the camera,
   drifting motes, and the next tiers' giants out of focus behind the bubble
 - `src/vessel.rs` — the bubble of life: its fluid, its wobbling membrane, the stem and the seed pod

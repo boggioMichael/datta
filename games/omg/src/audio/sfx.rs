@@ -213,6 +213,7 @@ pub fn boom(sr: f32, double: bool, seed: u32) -> St {
     for i in 0..n { let t = i as f32 / sr; x[i] += rumble.run(nz.brown()) * 1.4 * exp(-t * 1.6) * (1.0 - exp(-t * 60.0)); }
     let mut sub = Osc::default();
     for i in 0..n { let t = i as f32 / sr; x[i] += sub.sine(48.0 - 18.0 * t, sr) * 0.7 * exp(-t * 3.0); }
+    fade(&mut x, 0, n_of(sr, 0.35));
     normalize(&mut x, 0.95);
     let mut s = St::from_mono(&x, 0.0);
     s = reverb(&s, 1.8, 1.3, 0.2, 0.01, 0.35, 1.0, sr);
@@ -1019,7 +1020,22 @@ pub fn era_stinger(sr: f32, seed: u32) -> St {
         let mut lpf = Bq::lp(sr, 2400.0, 0.9);
         for i in 0..m { let t = i as f32 / sr; y[i] += lpf.run(o.saw(f, sr) + o2.saw(f * 1.006, sr)) * (1.0 - exp(-t * 60.0)) * exp(-t * 2.2) * 0.14; }
     }
+    fade(&mut y, 0, n_of(sr, 0.25));
     s.add_mono(&y, n, 1.0, 0.0);
+    // it evolved: a run of bells climbing out of the chord
+    let m2 = n_of(sr, 3.0);
+    let mut z = vec![0.0f32; m2];
+    for (k, note) in [62.0f32, 66.0, 69.0, 74.0, 78.0, 81.0, 86.0, 90.0].iter().enumerate() {
+        let f = midi(*note);
+        let at = n_of(sr, 0.12 + 0.075 * k as f32);
+        let mut o = Osc::default(); let mut o2 = Osc::default();
+        for (i, v) in z.iter_mut().enumerate().skip(at) {
+            let t = (i - at) as f32 / sr;
+            *v += (o.sine(f, sr) + 0.35 * o2.sine(f * 2.76, sr) * exp(-t * 6.0)) * (1.0 - exp(-t * 900.0)) * exp(-t * 2.6) * 0.075;
+        }
+    }
+    fade(&mut z, 0, n_of(sr, 0.3));
+    s.add_mono(&z, n, 1.0, 0.0);
     reverb(&s, 2.4, 1.5, 0.5, 0.01, 0.35, 1.0, sr)
 }
 

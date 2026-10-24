@@ -552,9 +552,11 @@ pub fn build(g: &mut Game) {
         cmd(g, OP_GLOW, &[x, y, lay.sw * 0.7, acc_.0, acc_.1, acc_.2, 0.22 * a]);
         let mut buf = alloc::string::String::new();
         if he { let _ = write!(buf, "אבולוציה · עידן {} מתוך {}", c + 1, N_CATS - 1); } else { let _ = write!(buf, "EVOLUTION · ERA {} OF {}", c + 1, N_CATS - 1); }
-        text(g, &buf, x - slide * 0.4, y - 40.0 * s, 12.0 * s, 0.0, F_MONO, ci.accent, a, 0.0, 0.0, dir);
+        // the era's colour, lifted toward white so it reads over its own world
+        let lift = |k: f32| -> u32 { let c = mix_rgb(acc_, (1.0, 1.0, 1.0), k); ((c.0 * 255.0) as u32) << 16 | ((c.1 * 255.0) as u32) << 8 | (c.2 * 255.0) as u32 };
+        text(g, &buf, x - slide * 0.4, y - 40.0 * s, 12.0 * s, 0.0, F_MONO, lift(0.3), a, 0.0, 0.0, dir);
         text(g, if he { ci.he } else { ci.en }, x + slide, y, 44.0 * s, 0.0, F_SANS, 0xFFFFFF, a, 1.0, lay.sw * 0.92, dir);
-        text(g, if he { ci.sub_he } else { ci.sub_en }, x - slide * 0.6, y + 40.0 * s, 15.0 * s, 0.0, F_LIGHT, ci.accent, a * 0.95, 0.3, lay.sw * 0.9, dir);
+        text(g, if he { ci.sub_he } else { ci.sub_en }, x - slide * 0.6, y + 40.0 * s, 15.0 * s, 0.0, F_LIGHT, lift(0.5), a * 0.95, 0.5, lay.sw * 0.9, dir);
         // the track: every era a node; the path lights up to the new one
         let ty = y + 86.0 * s;
         let n = N_CATS;
