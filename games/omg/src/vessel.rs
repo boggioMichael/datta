@@ -28,12 +28,19 @@ fn wobble(g: &Game) -> f32 {
     w
 }
 
+/// A new run: the bubble blooms out of nothing with a little elastic overshoot.
+pub fn birth(g: &Game) -> f32 {
+    if !g.started || g.finished { return 1.0; }
+    let k = clamp(g.time / 1.1, 0.0, 1.0);
+    if k >= 1.0 { 1.0 } else { (1.0 - exp(-5.0 * k) * cos(9.0 * k) * (1.0 - k)).max(0.02) }
+}
+
 /// The membrane: layer 0 is the fluid behind the pile, layer 1 the wall in front of it.
 pub fn membrane(g: &mut Game, to: &dyn Fn(V2) -> (f32, f32), sc: f32, white: f32, layer: f32) {
     if g.burst_t >= 0.0 { return; }
     let l = look(g);
     let (cx, cy) = to(V2::default());
-    let r = g.ring_r * sc;
+    let r = g.ring_r * sc * birth(g);
     let th = (0.032 * sc).max(4.0 * g.lay.u);
     let pore = asin(CHUTE_W / g.ring_r) * 1.04;
     let pulse = g.ring_pulse.max(if g.finished { smooth((g.god_t - 2.0) / 3.0) } else { 0.0 });

@@ -862,7 +862,7 @@
       for (let k = 0; k < 5; k++) this.ensure(S.sounds.note0 + k);
       const lo = Math.max(0, maxTier - 1), hi = Math.min(S.god, maxTier + 5);
       for (let k = lo; k <= hi; k++) this.ensure(k);
-      if (maxTier >= S.god - 10) { this.ensure(S.god); this.ensure(S.sounds.iam); this.ensure(s0 + 23); this.ensure(s0 + 24); }
+      if (maxTier >= S.god - 10) { this.ensure(S.god); this.ensure(S.sounds.iam); this.ensure(s0 + 23); this.ensure(s0 + 24); this.ensure(s0 + 25); }
       // the narration of the ending, well before it's needed
       if (maxTier >= S.god - 24) story.preload(he);
     },
@@ -1100,9 +1100,10 @@
   // ───────────────────────── main loop
   let last = 0;
   let toolsTick = 0;
-  const perf = { sim: 0, draw: 0, n: 0 };
+  const perf = { sim: 0, draw: 0, n: 0, fixed: 0 };
   function loop(ts) {
-    const dt = last ? Math.min(0.1, (ts - last) / 1000) : 1 / 60;
+    // perf.fixed (debug): advance a fixed step per frame, so slow captures still see every moment
+    const dt = perf.fixed > 0 ? perf.fixed : last ? Math.min(0.1, (ts - last) / 1000) : 1 / 60;
     last = ts;
     const p0 = performance.now();
     story.tick();
@@ -1313,11 +1314,33 @@
   }
   function fmtTime(s) { const m = Math.floor(s / 60); const r = s - m * 60; return `${m}:${String(Math.floor(r)).padStart(2, '0')}.${Math.floor((r % 1) * 10)}`; }
 
-  const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
-  function fmtPow(log10) {
+  // a big number for the menus (HTML): 12, 3.4K … 1.2T, then 10 with a raised exponent, always left to right
+  function fmtPow(log10, prefix = '') {
     if (!(log10 >= 0)) return '0';
-    if (log10 < 15) { const x = Math.pow(10, log10); return x < 1e3 ? String(Math.round(x)) : x < 1e6 ? (x / 1e3).toFixed(1) + 'K' : x < 1e9 ? (x / 1e6).toFixed(1) + 'M' : x < 1e12 ? (x / 1e9).toFixed(1) + 'B' : (x / 1e12).toFixed(1) + 'T'; }
-    return '10' + String(Math.floor(log10)).split('').map((d) => SUP[+d]).join('');
+    let v;
+    if (log10 < 15) { const x = Math.pow(10, log10); v = x < 1e3 ? String(Math.round(x)) : x < 1e6 ? (x / 1e3).toFixed(1) + 'K' : x < 1e9 ? (x / 1e6).toFixed(1) + 'M' : x < 1e12 ? (x / 1e9).toFixed(1) + 'B' : (x / 1e12).toFixed(1) + 'T'; }
+    else v = `10<sup>${Math.floor(log10)}</sup>`;
+    return `<span dir="ltr" class="num">${prefix}${v}</span>`;
+  }
+  // the road this run took: every era it reached, with its first ride and the time it got there
+  function evolutionUI() {
+    let box = $('#end-evo');
+    if (!box) { box = document.createElement('div'); box.id = 'end-evo'; $('#end-stats').after(box); }
+    box.innerHTML = '';
+    const head = document.createElement('div'); head.className = 'evo-h'; head.textContent = t('evolution');
+    const row = document.createElement('div'); row.className = 'evo-row';
+    const n = S.ncats || 20;
+    for (let c = 0; c < n; c++) {
+      const at = X.omg_era_time(c);
+      const first = S.tiers.findIndex((T) => T.cat === c);
+      const it = document.createElement('div'); it.className = 'evo-it' + (at >= 0 ? '' : ' off');
+      const cv = document.createElement('canvas'); cv.width = cv.height = 64;
+      if (at >= 0 && first >= 0) cv.getContext('2d').drawImage(sprite(first), -16, -16, 96, 96);
+      const lb = document.createElement('span'); lb.textContent = at >= 0 ? fmtTime(at).replace(/\.\d$/, '') : '';
+      it.title = `${S.cats[c][he ? 'he' : 'en']}${at >= 0 ? ' · ' + fmtTime(at) : ''}`;
+      it.append(cv, lb); row.appendChild(it);
+    }
+    box.append(head, row);
   }
   function showEnd(time, merges, drops, m) {
     const el = $('#end'); el.classList.add('god');
@@ -1326,7 +1349,8 @@
     const best = X.omg_stat(10 + m);
     const st = $('#end-stats'); st.classList.add('five');
     st.innerHTML = `<div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${merges | 0}</dd></div><div><dt>${t('end_drops')}</dt><dd>${drops | 0}</dd></div>`
-      + `<div><dt>👶 ${t('end_babies')}</dt><dd>${fmtPow(X.omg_info(15))}</dd></div><div><dt>🔍 ${t('end_zoom')}</dt><dd>×${fmtPow(X.omg_info(16))}</dd></div>`;
+      + `<div><dt>👶 ${t('end_babies')}</dt><dd>${fmtPow(X.omg_info(15))}</dd></div><div><dt>🔍 ${t('end_zoom')}</dt><dd>${fmtPow(X.omg_info(16), '×')}</dd></div>`;
+    evolutionUI();
     const rec = $('#end-record');
     rec.hidden = !(best > 0 && Math.abs(best - time) < 0.05 && [0, 2, 3, 4, 5].includes(m));
     rec.textContent = t('end_record');
@@ -1340,6 +1364,7 @@
     $('#end-title').textContent = reason === 1 ? t('over_time') : t('over_jam');
     $('#end-sub').textContent = `${t('over_reached')}: ${tierName(top)}`;
     $('#end-stats').innerHTML = `<div><dt>${t('tier')}</dt><dd>${top + 1}/${S.n}</dd></div><div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${X.omg_info(8) | 0}</dd></div>`;
+    evolutionUI();
     $('#end-record').hidden = true;
     $('#btn-stay').hidden = true;
     el.hidden = false;
@@ -1469,7 +1494,7 @@
       const cv = document.createElement('canvas'); cv.width = cv.height = 112;
       const g = cv.getContext('2d'); if (!open) g.filter = 'grayscale(1) brightness(.5)'; g.drawImage(sprite(k, true), -28, -28, 168, 168);
       const info = document.createElement('div');
-      const wide = k > 0 && k < S.god ? ` · 👶×${fmtPow(k * Math.log10(opt('sizegrow')))}` : '';
+      const wide = k > 0 && k < S.god ? ` · 👶${fmtPow(k * Math.log10(opt('sizegrow')), '×')}` : '';
       info.innerHTML = `<div class="n">${t('tier')} ${k + 1}${open ? wide : ''}</div><div class="t">${open ? T[he ? 'he' : 'en'] : '???'}</div><div class="b">${open ? T[he ? 'bhe' : 'ben'] : t('locked')}</div>`;
       c.append(cv, info);
       if (open) c.addEventListener('click', () => { audio.unlock(); audio.play(k, 1, 0); });

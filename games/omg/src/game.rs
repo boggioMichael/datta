@@ -42,6 +42,10 @@ pub const SANDBOX_LIFT: f32 = 2.0;
 pub const STORY_AT: f32 = 8.4;
 /// …and when the bubble of life, strained by the light, bursts.
 pub const BURST_AT: f32 = 5.6;
+/// How long an evolution (a new era's card and track) stays on screen.
+pub const ERA_CARD: f32 = 3.4;
+/// How long a new ride's helix of light lasts.
+pub const EVO_T: f32 = 1.9;
 
 // sound ids: 0..=GOD are the tiers' OMGs
 pub const S_DROP: u32 = 200;
@@ -69,6 +73,7 @@ pub const S_BURST: u32 = 221;
 pub const S_POKE: u32 = 222;
 pub const S_DRONE: u32 = 223;
 pub const S_CREATE: u32 = 224;
+pub const S_STRAIN: u32 = 225;
 pub const S_NOTE0: u32 = 230; // + timbre (0..=4)
 pub const S_MUSIC0: u32 = 240; // + era (0..=19)
 
@@ -150,7 +155,7 @@ pub struct Body {
 
 #[derive(Clone, Copy, Default)]
 pub struct Particle {
-    /// 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti, 7 smoke, 8 droplet, 9 shock, 10 goo
+    /// 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti, 7 smoke, 8 droplet, 9 shock, 10 goo, 11 helix
     pub kind: u8,
     pub p: V2,
     pub v: V2,
@@ -198,6 +203,8 @@ pub struct Game {
     order: Vec<u16>,
     by_tier: Vec<u16>,
     pub parts: Vec<Particle>,
+    /// rides that just evolved: (body id, time left, phase) — each gets a double helix of light
+    pub evo: Vec<(u32, f32, f32)>,
     pub stars: Vec<Particle>,
     pub bolts: Vec<Bolt>,
     pub next_id: u32,
@@ -295,6 +302,8 @@ pub struct Game {
     pub banner_new: bool,
     pub era_t: f32,
     pub era_card: u8,
+    /// when this run reached each era (game seconds; < 0: not yet)
+    pub era_time: [f32; N_CATS],
     pub hitstop: f32,
     pub ts: f32,
     pub cam_k: f32,
@@ -371,6 +380,7 @@ impl Game {
             order: Vec::with_capacity(MAX_BODIES_MEGA + 8),
             by_tier: Vec::with_capacity(MAX_BODIES_MEGA + 8),
             parts: Vec::with_capacity(2400),
+            evo: Vec::new(),
             stars: Vec::with_capacity(200),
             bolts: Vec::with_capacity(16),
             next_id: 1,
@@ -451,6 +461,7 @@ impl Game {
             banner_new: false,
             era_t: 0.0,
             era_card: 0,
+            era_time: [-1.0; N_CATS],
             hitstop: 0.0,
             ts: 1.0,
             cam_k: 0.0,
@@ -535,6 +546,7 @@ impl Game {
         self.bodies.clear();
         self.order.clear();
         self.parts.clear();
+        self.evo.clear();
         self.bolts.clear();
         self.ring_r = 1.0;
         // every run starts from the very bottom of the ladder, zoomed in on the first baby
@@ -557,7 +569,8 @@ impl Game {
         self.burst_t = -1.0;
         self.stir_k = 0.0;
         self.time = 0.0;
-        self.drop_t = 0.25;
+        // the bubble blooms first, then the first baby drops
+        self.drop_t = if mode == Mode::Sandbox { 0.25 } else { 0.95 };
         self.spout_cd = 0.0;
         self.tilt = 0.0;
         self.tilt_target = 0.0;
@@ -595,6 +608,7 @@ impl Game {
         self.ev_kind = EV_NONE; self.ev_left = 0.0; self.ev_burst = 0;
         self.toast_t = 0.0;
         self.stats.runs += 1;
+        self.era_time = [-1.0; N_CATS];
         if mode == Mode::Sandbox {
             let st = self.sandbox_tier.min(GOD - 1);
             let st = if self.unlocked.has(st) { st } else { 0 };
@@ -606,10 +620,12 @@ impl Game {
         } else {
             // title card for the first era
             self.era_card = 0;
-            self.era_t = if self.drama() > 0.0 { 2.4 } else { 0.0 };
+            self.era_t = if self.drama() > 0.0 { ERA_CARD } else { 0.0 };
         }
+        self.era_time[self.cat as usize] = 0.0;
         self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
         self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+        self.sound_rate(S_FUNNEL, 0.6, 0.0, 0.5);
         self.dirty_save = 0.5;
     }
 
@@ -963,7 +979,8 @@ impl Game {
         self.burst(p, 0xFFE27A, 26, 1.1);
         self.wave(p, 0.4, 0xFFF0B0);
         self.sound(S_UPGRADE, 0.9, p.x);
-        self.on_new_tier(t + 1, p);
+        let id = self.bodies[i].id;
+        self.on_new_tier(t + 1, p, id);
         self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
     }
 
@@ -1060,6 +1077,8 @@ impl Game {
         self.ring_wob = (self.ring_wob - pdt * 1.6).max(0.0);
         self.banner_t -= pdt;
         self.era_t -= pdt;
+        for e in self.evo.iter_mut() { e.1 -= pdt; }
+        self.evo.retain(|e| e.1 > 0.0);
         self.sl_t -= pdt;
         self.combo_show -= pdt;
         self.toast_t -= pdt;
@@ -1252,7 +1271,7 @@ impl Game {
         }
         for q in self.parts.iter_mut() {
             q.p = sc(q.p); q.v = q.v * f;
-            if matches!(q.kind, 2 | 7 | 9 | 10) { q.size *= f; }
+            if matches!(q.kind, 2 | 7 | 9 | 10 | 11) { q.size *= f; }
         }
         for bo in self.bolts.iter_mut() { bo.a = sc(bo.a); bo.b = sc(bo.b); }
         self.combo_p = sc(self.combo_p);
@@ -1607,6 +1626,7 @@ impl Game {
             (true, true) => a.chain.max(b.chain),
             _ => 1,
         };
+        let mut nid = 0;
         if let Some(k) = self.new_body_ex(t, p, v, true) {
             let nb = &mut self.bodies[k];
             nb.r = start_r * 1.02;
@@ -1615,6 +1635,7 @@ impl Game {
             nb.merged = true;
             nb.angle = a.angle;
             nb.chain = chain;
+            nid = nb.id;
         }
         // shove the neighbours away
         let reach = (a.r + b.r) * 3.2;
@@ -1649,7 +1670,7 @@ impl Game {
             }
         }
         self.merge_fx(t, p, start_r);
-        self.on_new_tier(t, p);
+        self.on_new_tier(t, p, nid);
     }
 
     fn merge_fx(&mut self, t: u8, p: V2, r: f32) {
@@ -1702,7 +1723,7 @@ impl Game {
         self.haptic(if t > 80 { 60.0 } else if t > 30 { 30.0 } else { 12.0 });
     }
 
-    fn on_new_tier(&mut self, t: u8, p: V2) {
+    fn on_new_tier(&mut self, t: u8, p: V2, id: u32) {
         let first_in_run = !self.run_seen.has(t);
         self.run_seen.set(t);
         if t > self.run_max { self.run_max = t; }
@@ -1713,6 +1734,10 @@ impl Game {
             self.dirty_save = 0.3;
         }
         if t > self.stats.top_tier { self.stats.top_tier = t; }
+        if first_in_run && t > 0 && t != GOD && crate::vessel::on(self) {
+            // it evolved: a double helix of light winds up around it
+            self.helix(id);
+        }
         if first_in_run && t > 0 {
             let lvl = t as f32 / GOD as f32;
             let dr = self.drama();
@@ -1722,6 +1747,11 @@ impl Game {
             self.ev(EV_BANNER, t as f32, 0.0, 0.0, 0.0);
             let c = cat_of(t);
             let new_era = c != self.cat;
+            if !new_era && self.era_t > 0.0 {
+                // the evolution card bows out and this name waits for it
+                self.era_t = self.era_t.min(0.6);
+                self.banner_t += self.era_t;
+            }
             if dr > 0.0 {
                 // slow-motion beat + camera punch + speed lines
                 let sp = self.opts.get(Opt::Speed).max(1.0);
@@ -1740,7 +1770,8 @@ impl Game {
                 self.cat = c;
                 self.cat_mix = 0.0;
                 self.era_card = c;
-                self.era_t = if dr > 0.0 && t != GOD { 2.6 } else { 0.0 };
+                self.era_t = if dr > 0.0 && t != GOD { ERA_CARD } else { 0.0 };
+                if self.era_time[c as usize] < 0.0 { self.era_time[c as usize] = self.time; }
                 self.add_flash(CATS[c as usize].accent, 0.45);
                 self.ring_pulse = 1.0;
                 // the camera rushes back into the new world
@@ -1820,7 +1851,7 @@ impl Game {
         self.story_fx.clear();
         self.story_shake = 0.0;
         self.story_notes = 0;
-        self.bodies.clear(); self.order.clear(); self.parts.clear(); self.bolts.clear();
+        self.bodies.clear(); self.order.clear(); self.parts.clear(); self.bolts.clear(); self.evo.clear();
         self.ev(EV_STORY, 1.0, if self.lang_he { 1.0 } else { 0.0 }, self.story_t, 0.0);
         self.ev(EV_MUSIC, -1.0, 0.0, 0.0, 0.0);
     }
@@ -1996,6 +2027,7 @@ impl Game {
         }
         if before < 0.05 && gt >= 0.05 { self.ring_pulse = 1.0; }
         if before < 3.6 && gt >= 3.6 { self.sound(S_IAM, 1.0, 0.0); }
+        if before < BURST_AT - 2.6 && gt >= BURST_AT - 2.6 && crate::vessel::on(self) { self.sound(S_STRAIN, 0.75, 0.0); }
         // the bubble strains around the light, then bursts
         if gt > 2.6 && self.burst_t < 0.0 { self.ring_pulse = self.ring_pulse.max(smooth((gt - 2.6) / 2.4)); }
         if before < BURST_AT && gt >= BURST_AT && self.burst_t < 0.0 && crate::vessel::on(self) {
@@ -2106,6 +2138,12 @@ impl Game {
             let q = Particle { kind: 0, p, v: V2::new(cos(a) * s, sin(a) * s), life, max: life, size: self.rng.range(1.5, 3.0), color: col, drag: 1.8, grav: 0.0, angle: 0.0, spin: 0.0 };
             self.push_part(q);
         }
+    }
+    /// It evolved: a double helix of light winds up around the new ride (drawn by the renderer, following it).
+    fn helix(&mut self, id: u32) {
+        let ph = self.rng.range(0.0, TAU);
+        self.evo.push((id, EVO_T, ph));
+        if self.evo.len() > 4 { self.evo.remove(0); }
     }
     /// Droplets of membrane thrown out by a fusion.
     fn goo(&mut self, p: V2, r: f32, n: usize, col: u32) {

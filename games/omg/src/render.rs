@@ -290,6 +290,9 @@ pub fn build(g: &mut Game) {
         }
     }
 
+    // ── rides that just evolved: the far half of their helix, behind them
+    evo_pass(g, &to, sc, lay.u, false);
+
     // ── items (smaller first so big ones sit on top)
     let labels = g.opts.on(Opt::Labels);
     let style = g.opts.get(Opt::BallStyle);
@@ -313,6 +316,9 @@ pub fn build(g: &mut Game) {
         if bubble { rp *= 1.0 + 0.014 * sin(g.real * 1.7 + b.id as f32 * 1.3); }
         cmd(g, OP_ITEM, &[b.tier as f32, x, y, rp, tilt, b.flash, alpha, la, glow, b.orphan_t.min(1.0), hl, if he { 1.0 } else { 0.0 }, b.squash, b.squash_a, style]);
     }
+
+    // ── …and the near half in front
+    evo_pass(g, &to, sc, lay.u, true);
 
     // ── the bubble's wall, in front of what it holds
     if bubble { crate::vessel::membrane(g, &to, sc, white, 1.0); }
@@ -485,7 +491,7 @@ pub fn build(g: &mut Game) {
     }
 
     // ── banner for a new tier: the name slams in
-    if g.banner_t > 0.0 && g.banner_tier >= 0 && !(g.finished && g.banner_tier as u8 == GOD) && g.era_t <= 0.4 {
+    if g.banner_t > 0.0 && g.banner_tier >= 0 && !(g.finished && g.banner_tier as u8 == GOD) && g.era_t <= 0.0 {
         let t = g.banner_tier as u8;
         let tt = tier(t);
         let life = if t == GOD { 9.0 } else { 2.4 };
@@ -529,29 +535,76 @@ pub fn build(g: &mut Game) {
         }
     }
 
-    // ── era title card
+    // ── an evolution: the new era's name over the track of every era from the first baby to God
     if g.era_t > 0.0 && g.drama() > 0.0 {
-        let life = 2.6;
+        let life = ERA_CARD;
         let age = life - g.era_t;
-        let a = clamp(age / 0.2, 0.0, 1.0) * clamp(g.era_t / 0.5, 0.0, 1.0);
+        let a = clamp(age / 0.25, 0.0, 1.0) * clamp(g.era_t / 0.6, 0.0, 1.0);
         let c = g.era_card as usize;
         let ci = &CATS[c];
         let slide = (1.0 - ease_out(age / 0.45)) * lay.sw * 0.6 * if he { -1.0 } else { 1.0 };
-        let y = lay.cy - g.ring_r * lay.scale * 0.1;
-        // a soft band of shade and a glow of the new world's light
-        cmd(g, crate::story::OP_VGRAD, &[y - 95.0 * s, y, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5 * a, 0.0, lay.w]);
-        cmd(g, crate::story::OP_VGRAD, &[y, y + 95.0 * s, 0.0, 0.0, 0.0, 0.5 * a, 0.0, 0.0, 0.0, 0.0, 0.0, lay.w]);
-        let acc_ = rgb(ci.accent);
-        cmd(g, OP_GLOW, &[lay.sx + lay.sw * 0.5, y, lay.sw * 0.7, acc_.0, acc_.1, acc_.2, 0.22 * a]);
-        let lw_ = lay.sw * 0.6 * ease_out(age / 0.6);
-        rect(g, lay.sx + (lay.sw - lw_) * 0.5, y - 62.0 * s, lw_, 1.5 * s, (acc_.0, acc_.1, acc_.2, 0.8 * a), 0.0, true);
-        rect(g, lay.sx + (lay.sw - lw_) * 0.5, y + 64.0 * s, lw_, 1.5 * s, (acc_.0, acc_.1, acc_.2, 0.8 * a), 0.0, true);
-        let mut buf = alloc::string::String::new();
-        if he { let _ = write!(buf, "עידן {} מתוך {}", c + 1, N_CATS - 1); } else { let _ = write!(buf, "ERA {} OF {}", c + 1, N_CATS - 1); }
+        let y = lay.cy - g.ring_r * lay.scale * 0.16;
         let x = lay.sx + lay.sw * 0.5;
-        text(g, &buf, x - slide * 0.4, y - 38.0 * s, 12.0 * s, 0.0, F_MONO, ci.accent, a, 0.0, 0.0, dir);
-        text(g, if he { ci.he } else { ci.en }, x + slide, y + 2.0 * s, 44.0 * s, 0.0, F_SANS, 0xFFFFFF, a, 1.0, lay.sw * 0.92, dir);
-        text(g, if he { ci.sub_he } else { ci.sub_en }, x - slide * 0.6, y + 42.0 * s, 15.0 * s, 0.0, F_LIGHT, ci.accent, a * 0.95, 0.3, lay.sw * 0.9, dir);
+        // a soft band of shade and a glow of the new world's light
+        cmd(g, crate::story::OP_VGRAD, &[y - 100.0 * s, y, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.52 * a, 0.0, lay.w]);
+        cmd(g, crate::story::OP_VGRAD, &[y, y + 150.0 * s, 0.0, 0.0, 0.0, 0.52 * a, 0.0, 0.0, 0.0, 0.0, 0.0, lay.w]);
+        let acc_ = rgb(ci.accent);
+        cmd(g, OP_GLOW, &[x, y, lay.sw * 0.7, acc_.0, acc_.1, acc_.2, 0.22 * a]);
+        let mut buf = alloc::string::String::new();
+        if he { let _ = write!(buf, "אבולוציה · עידן {} מתוך {}", c + 1, N_CATS - 1); } else { let _ = write!(buf, "EVOLUTION · ERA {} OF {}", c + 1, N_CATS - 1); }
+        text(g, &buf, x - slide * 0.4, y - 40.0 * s, 12.0 * s, 0.0, F_MONO, ci.accent, a, 0.0, 0.0, dir);
+        text(g, if he { ci.he } else { ci.en }, x + slide, y, 44.0 * s, 0.0, F_SANS, 0xFFFFFF, a, 1.0, lay.sw * 0.92, dir);
+        text(g, if he { ci.sub_he } else { ci.sub_en }, x - slide * 0.6, y + 40.0 * s, 15.0 * s, 0.0, F_LIGHT, ci.accent, a * 0.95, 0.3, lay.sw * 0.9, dir);
+        // the track: every era a node; the path lights up to the new one
+        let ty = y + 86.0 * s;
+        let n = N_CATS;
+        let tw = lay.sw * 0.88;
+        let step = tw / (n - 1) as f32;
+        let node_x = |k: usize| -> f32 { let f = k as f32 * step; if he { x + tw * 0.5 - f } else { x - tw * 0.5 + f } };
+        let prev = g.prev_cat.min(c as u8) as usize;
+        let grow = smooth((age - 0.25) / 0.8);
+        let reach = lerp(node_x(prev), node_x(c), grow);
+        // a dark pill under the road so it reads over a busy bubble
+        let pad = 16.0 * s;
+        rect(g, x - tw * 0.5 - pad, ty - 13.0 * s, tw + pad * 2.0, 26.0 * s, (0.02, 0.03, 0.05, 0.42 * a), 13.0 * s, false);
+        rect(g, x - tw * 0.5, ty - 1.0 * s, tw, 2.0 * s, (1.0, 1.0, 1.0, 0.22 * a), 1.0 * s, false);
+        let (l0, l1) = if he { (reach, node_x(0)) } else { (node_x(0), reach) };
+        rect(g, l0, ty - 2.0 * s, (l1 - l0).max(0.0), 4.0 * s, (acc_.0, acc_.1, acc_.2, 0.95 * a), 2.0 * s, true);
+        if grow > 0.0 && grow < 1.0 {
+            // the spark running down the road
+            cmd(g, OP_GLOW, &[reach, ty, 16.0 * s, acc_.0, acc_.1, acc_.2, 0.8 * a]);
+            circle(g, reach, ty, 3.4 * s, (1.0, 1.0, 1.0, a), NONE, 0.0, true);
+        }
+        for k in 0..n {
+            let nx = node_x(k);
+            let kc = rgb(CATS[k].accent);
+            let reached = k < c || (k == c && grow >= 0.999) || g.era_time[k] >= 0.0 && k != c;
+            if k == c { continue; }
+            if k == n - 1 {
+                // God: a small light at the end of the road
+                cmd(g, OP_GLOW, &[nx, ty, 16.0 * s, 1.0, 0.95, 0.8, 0.6 * a]);
+                circle(g, nx, ty, 3.4 * s, (1.0, 0.98, 0.9, 0.95 * a), NONE, 0.0, true);
+            } else if reached {
+                circle(g, nx, ty, 4.2 * s, (kc.0, kc.1, kc.2, a), (1.0, 1.0, 1.0, 0.5 * a), 1.0 * s, false);
+            } else {
+                circle(g, nx, ty, 3.0 * s, NONE, (1.0, 1.0, 1.0, 0.42 * a), 1.3 * s, false);
+            }
+        }
+        // the two ends of the road
+        let (e0, e1) = if he { ("תינוק", "אלוהים") } else { ("baby", "God") };
+        text(g, e0, node_x(0), ty + 22.0 * s, 10.0 * s, 0.0, F_MONO, 0xFFFFFF, 0.6 * a, 0.0, 0.0, dir);
+        text(g, e1, node_x(n - 1), ty + 22.0 * s, 10.0 * s, 0.0, F_MONO, 0xFFF1C8, 0.75 * a, 0.0, 0.0, dir);
+        // the new era's node pops with its first ride
+        let pop = clamp((age - 0.9) / 0.35, 0.0, 1.0);
+        if pop > 0.0 {
+            let k = 1.0 + 0.35 * sin(pop * PI) ;
+            let nx = node_x(c);
+            let first = TIERS.iter().position(|t| t.cat as usize == c).unwrap_or(0);
+            cmd(g, OP_GLOW, &[nx, ty, 34.0 * s * k, acc_.0, acc_.1, acc_.2, 0.6 * a]);
+            circle(g, nx, ty, 15.0 * s * k, NONE, (acc_.0, acc_.1, acc_.2, a), 2.0 * s, false);
+            cmd(g, OP_ICON, &[first as f32, nx, ty, 12.0 * s * k, a]);
+            if pop < 1.0 { cmd(g, OP_WAVE, &[nx, ty, (15.0 + 30.0 * pop) * s, (3.0 - 2.0 * pop) * s, acc_.0, acc_.1, acc_.2, (1.0 - pop) * a]); }
+        }
     }
 
     // ── random-event toast
@@ -611,5 +664,71 @@ pub fn build(g: &mut Game) {
         let c = mix_rgb(rgb(g.flash_col), (1.0, 1.0, 1.0), 0.5);
         let k = clamp(g.flash, 0.0, 1.0);
         cmd(g, OP_FLASH, &[c.0, c.1, c.2, k * 0.75]);
+    }
+}
+
+/// Every ride that just evolved gets a double helix of light that winds up around it and follows it.
+fn evo_pass(g: &mut Game, to: &dyn Fn(V2) -> (f32, f32), sc: f32, u: f32, front: bool) {
+    for k in 0..g.evo.len() {
+        let (id, left, seed) = g.evo[k];
+        let Some(b) = g.bodies.iter().find(|b| b.alive && b.id == id).copied() else { continue };
+        let (x, y) = to(b.p);
+        evo_helix(g, x, y, b.r * sc, rgb(tier(b.tier).color), left, seed, u, front);
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn evo_helix(g: &mut Game, x: f32, y: f32, rr: f32, col: (f32, f32, f32), left: f32, seed: f32, u: f32, front: bool) {
+    const N: usize = 36;
+    let e = 1.0 - left / crate::game::EVO_T;
+    let fade = clamp(left / 0.5, 0.0, 1.0);
+    let rad = rr * 1.18;
+    let h = rr * 4.2;
+    let warm = (1.0, 0.97, 0.88);
+    let tint = mix_rgb(col, (1.0, 1.0, 1.0), 0.2);
+    let turn = seed + e * 6.5;
+    if front {
+        cmd(g, OP_GLOW, &[x, y, rr * 2.3, col.0, col.1, col.2, 0.3 * sin(clamp(e * 1.6, 0.0, 1.0) * PI) * fade]);
+    }
+    // the beads of both strands: x, y, depth (+1 nearest), how far it has wound up
+    let mut pts = [[(0.0f32, 0.0f32, 0.0f32, 0.0f32); N]; 2];
+    for i in 0..N {
+        let f = i as f32 / (N - 1) as f32;
+        let vis = clamp((e * 2.4 - f) * 5.0, 0.0, 1.0) * fade;
+        let yy = y + h * (0.5 - f);
+        let ph = turn + f * 13.8;
+        let (ca, sa) = (cos(ph), sin(ph));
+        pts[0][i] = (x + ca * rad, yy + sa * rad * 0.2, sa, vis);
+        pts[1][i] = (x - ca * rad, yy - sa * rad * 0.2, -sa, vis);
+    }
+    // the rungs, behind the ride so it hides their middle
+    if !front {
+        for i in (1..N).step_by(2) {
+            let (x0, y0, _, v) = pts[0][i];
+            let (x1, y1, _, _) = pts[1][i];
+            if v <= 0.01 { continue; }
+            cmd(g, OP_LINE, &[x0, y0, x1, y1, u * 1.3, 1.0, 1.0, 1.0, 0.42 * v, 0.6]);
+        }
+    }
+    for sd in 0..2 {
+        let c = if sd == 0 { warm } else { tint };
+        // the backbone
+        for i in 0..N - 1 {
+            let (x0, y0, d0, v0) = pts[sd][i];
+            let (x1, y1, d1, v1) = pts[sd][i + 1];
+            let v = v0.min(v1);
+            let d = (d0 + d1) * 0.5;
+            if v <= 0.01 || (d >= 0.0) != front { continue; }
+            let near = d * 0.5 + 0.5;
+            cmd(g, OP_LINE, &[x0, y0, x1, y1, u * (1.3 + 1.5 * near), c.0, c.1, c.2, v * (0.5 + 0.5 * near), 0.8]);
+        }
+        // the beads
+        for i in (0..N).step_by(2) {
+            let (bx, by, d, v) = pts[sd][i];
+            if v <= 0.01 || (d >= 0.0) != front { continue; }
+            let near = d * 0.5 + 0.5;
+            let r = u * (1.5 + 1.9 * near);
+            circle(g, bx, by, r, (c.0, c.1, c.2, v), (col.0 * 0.5, col.1 * 0.5, col.2 * 0.5, 0.55 * v), u * 0.7, false);
+        }
     }
 }

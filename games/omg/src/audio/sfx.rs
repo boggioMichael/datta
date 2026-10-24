@@ -1279,3 +1279,30 @@ pub fn creation(sr: f32, seed: u32) -> St {
     s.add(&b, n_of(sr, 0.02), 0.4);
     reverb(&s, 3.0, 1.5, 0.6, 0.01, 0.35, 1.0, sr)
 }
+
+/// The bubble strains around the light of God: a rising cluster, a rushing
+/// sweep and a quickening tremble, cut off by the burst.
+pub fn strain(sr: f32, seed: u32) -> St {
+    let dur = 2.6;
+    let n = n_of(sr, dur);
+    let mut o1 = Osc::default(); let mut o2 = Osc::default(); let mut o3 = Osc::default();
+    let mut nz = Noise::new(seed);
+    let mut bp = Bq::bp(sr, 300.0, 2.0);
+    let mut x = vec![0.0f32; n];
+    let mut trem_ph = 0.0f32;
+    for i in 0..n {
+        let k = i as f32 / n as f32;
+        if i % 64 == 0 { bp.coef(Bq::bp(sr, 300.0 + 4200.0 * k * k, 2.2)); }
+        let f = 55.0 * pow(5.0, k * k);
+        trem_ph += (6.0 + 22.0 * k * k) / sr;
+        let trem = 0.65 + 0.35 * sin(TAU * trem_ph);
+        let tone = o1.sine(f, sr) + 0.5 * o2.sine(f * 1.498, sr) + 0.3 * o3.sine(f * 2.013, sr);
+        x[i] = (tone * 0.45 + bp.run(nz.white()) * 0.8) * pow(k, 1.6) * trem;
+    }
+    // no tail: the burst cuts it
+    fade(&mut x, n_of(sr, 0.05), n_of(sr, 0.02));
+    normalize(&mut x, 0.85);
+    let mut s = St::from_mono(&x, 0.0);
+    let d = n_of(sr, 0.011); let mut r = vec![0.0f32; n]; for i in d..n { r[i] = s.l[i - d]; } s.r = r;
+    s
+}

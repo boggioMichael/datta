@@ -178,3 +178,15 @@ select option { background: #111; }
 #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (prefers-reduced-motion: reduce) { .cta, .ib, .tool, .mode { transition: none; } #btn-rec.on, .tool.armed { animation: none; } }
+
+.num { unicode-bidi: isolate; white-space: nowrap; }
+.num sup { font-size: .62em; vertical-align: .55em; line-height: 0; margin-inline-start: .04em; }
+
+#end-evo { width: min(100%, 420px); margin: 2px auto 6px; }
+#end-evo .evo-h { font: 500 11px "IBM Plex Mono", monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-2); text-align: center; margin-bottom: 6px; }
+html[lang="he"] #end-evo .evo-h { font-family: inherit; font-weight: 600; font-size: 13px; letter-spacing: 0; }
+#end-evo .evo-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px 2px; }
+#end-evo .evo-it { display: grid; justify-items: center; gap: 1px; }
+#end-evo .evo-it canvas { width: 30px; height: 30px; }
+#end-evo .evo-it span { font: 500 9px "IBM Plex Mono", monospace; color: var(--fg-2); direction: ltr; min-height: 11px; }
+#end-evo .evo-it.off canvas { width: 30px; height: 30px; border-radius: 50%; border: 1px dashed rgba(255,255,255,.22); box-sizing: border-box; transform: scale(.55); }

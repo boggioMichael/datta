@@ -34,6 +34,7 @@ pub static UI: &[(&str, &str, &str)] = &[
     ("caption_ph", "האם התינוק יגיע לאלוהים?", "Will the Baby Reach God?"),
     ("locked", "עוד לא נפתח", "Not unlocked yet"),
     ("unlocked", "נפתחו", "Unlocked"),
+    ("evolution", "האבולוציה שלך", "Your evolution"),
     ("play_sound", "השמע", "Play"),
     ("tier", "דרגה", "Tier"),
     ("best", "שיא", "Best"),
@@ -108,7 +109,7 @@ fn num(out: &mut String, x: f32) {
 
 pub fn schema() -> String {
     let mut o = String::with_capacity(32 * 1024);
-    let _ = write!(o, "{{\"version\":\"3.0\",\"god\":{},\"n\":{},\"ncats\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{},\"sfx1\":{}}},\"tiers\":[", GOD, N_TIERS, N_CATS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP, crate::game::S_CREATE);
+    let _ = write!(o, "{{\"version\":\"3.0\",\"god\":{},\"n\":{},\"ncats\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{},\"sfx1\":{}}},\"tiers\":[", GOD, N_TIERS, N_CATS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP, crate::game::S_STRAIN);
     for (i, t) in TIERS.iter().enumerate() {
         if i > 0 { o.push(','); }
         o.push_str("{\"key\":"); js(&mut o, t.key);

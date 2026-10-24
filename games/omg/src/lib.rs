@@ -196,6 +196,9 @@ pub extern "C" fn omg_debug(op: u32, a: f32) {
         _ => {}
     }
 }
+/// When this run reached era `i` (game seconds), or −1.
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_era_time(i: u32) -> f32 { let gm = g(); if (i as usize) < tiers::N_CATS { gm.era_time[i as usize] } else { -1.0 } }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_device_tilt(rad: f32) { if rad.is_finite() { g().device_tilt = m::clamp(rad, -0.65, 0.65); } }
 #[unsafe(no_mangle)]

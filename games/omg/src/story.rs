@@ -217,11 +217,15 @@ pub fn draw(g: &mut Game) {
 
     // the split of light from darkness (verse 4): a dark half drawn over the light
     if split > 0.01 {
-        let edge = cx + sw * (0.5 - 1.0 * c.ramp(c.v(4) - 1.0, 9.0)) ;
-        let mut pts = Vec::with_capacity(16);
-        pts.extend_from_slice(&[edge, 0.0, w, 0.0, w, h, edge, h]);
-        path(g, &pts, (0.02, 0.03, 0.09, 0.9 * split), NONE, 0.0, true, false);
-        cmd(g, OP_GLOW, &[edge, horizon * 0.6, sw * 0.7, 1.0, 0.92, 0.75, 0.25 * split]);
+        // night sweeps in from one side, with a soft dusk at its edge
+        let edge = cx + sw * (0.5 - 1.0 * c.ramp(c.v(4) - 1.0, 9.0));
+        let soft = 70.0 * u;
+        rect(g, edge, 0.0, (w - edge).max(0.0), h, (0.02, 0.03, 0.09, 0.9 * split), 0.0, false);
+        for k in 0..8 {
+            let f = (k as f32 + 0.5) / 8.0;
+            rect(g, edge - soft * (1.0 - k as f32 / 8.0), 0.0, soft / 8.0 + 0.5, h, (0.02, 0.03, 0.09, 0.9 * split * f), 0.0, false);
+        }
+        cmd(g, OP_GLOW, &[edge - soft * 0.5, horizon * 0.6, sw * 0.7, 1.0, 0.92, 0.75, 0.25 * split]);
     }
 
     // stars (day four), and the night of each evening
