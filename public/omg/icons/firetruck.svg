@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<g transform="translate(0 -8)">
+<ellipse cx="260" cy="386" rx="184" ry="13" fill="#000" opacity="0.18" stroke="none"/>
+<path fill="#E42C2C" d="M66 176 L326 176 L326 334 L66 334 Q56 334 56 324 L56 186 Q56 176 66 176 Z"/>
+<path fill="#E42C2C" d="M326 186 L410 186 Q426 186 432 200 L456 256 L456 322 Q456 334 444 334 L326 334 Z"/>
+<path fill="#B11B23" stroke="none" d="M61 306 L451 306 L451 322 Q451 329 444 329 L66 329 Q61 329 61 324 Z"/>
+<path fill="#FF7B74" stroke="none" d="M66 181 L321 181 L321 189 L61 189 L61 186 Q61 181 66 181 Z M331 191 L408 191 Q420 191 425 199 L331 199 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M61 266 L451 266 L451 284 L61 284 Z"/>
+<path fill="none" d="M66 176 L326 176 L326 334 L66 334 Q56 334 56 324 L56 186 Q56 176 66 176 Z M326 186 L410 186 Q426 186 432 200 L456 256 L456 322 Q456 334 444 334 L326 334"/>
+<path fill="none" stroke-width="7" d="M146 194 L146 252 M236 194 L236 252"/>
+<path fill="#9ED8FF" d="M338 200 L404 200 Q414 200 418 210 L436 254 L338 254 Z"/>
+<path fill="#D9F2FF" stroke="none" d="M348 206 L368 206 L350 248 L346 248 Z"/>
+<path fill="none" stroke-width="8" d="M346 300 L364 300"/>
+<path fill="#FFF3A6" stroke-width="7" d="M444 292 L456 292 L456 310 L444 310 Z"/>
+<path fill="#CFD4DE" stroke-width="8" d="M436 322 L462 322 Q468 322 468 328 L468 334 Q468 340 462 340 L436 340 Z"/>
+<path fill="#3DA5FF" stroke-width="8" d="M386 186 L386 170 Q386 162 394 162 L417 162 L417 186 Z"/>
+<path fill="#FF4747" stroke-width="8" d="M417 186 L417 162 L440 162 Q448 162 448 170 L448 186 Z"/>
+<path fill="none" stroke-width="16" d="M72 146 L370 146 M72 170 L370 170 M72 146 L72 170 M105 146 L105 170 M138 146 L138 170 M171 146 L171 170 M204 146 L204 170 M237 146 L237 170 M270 146 L270 170 M303 146 L303 170 M336 146 L336 170 M370 146 L370 170"/>
+<path fill="none" stroke="#CFD4DE" stroke-width="7" d="M72 146 L370 146 M72 170 L370 170 M72 146 L72 170 M105 146 L105 170 M138 146 L138 170 M171 146 L171 170 M204 146 L204 170 M237 146 L237 170 M270 146 L270 170 M303 146 L303 170 M336 146 L336 170 M370 146 L370 170"/>
+<circle cx="150" cy="344" r="42" fill="#23232F"/>
+<circle cx="150" cy="344" r="24" fill="#CFD4DE"/>
+<circle cx="150" cy="344" r="8" fill="#7D8496"/>
+<circle cx="382" cy="344" r="42" fill="#23232F"/>
+<circle cx="382" cy="344" r="24" fill="#CFD4DE"/>
+<circle cx="382" cy="344" r="8" fill="#7D8496"/>
+</g>
+</g>
+</svg>

@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>OH MY GOD — מזחילה עד אלוהים · DATTA</title>
-<meta name="description" content="משחק מיזוג: שני כלי רכב זהים מתמזגים למשהו גדול ויוקרתי יותר — 124 דרגות מזחילה, דרך אופניים, מכוניות, רכבות, ספינות, מטוסים, חלליות ורכבי האלים, עד אלוהי ישראל. כל מיזוג צועק OMG חזק יותר. נכתב ב־Rust.">
+<meta name="description" content="משחק מיזוג בבועת חיים: רק תינוקות זוחלים, ושני תאים זהים מתמזגים למשהו גדול יותר — 155 דרגות ו־19 עידנים, עולם שמתרחק עד קצה היקום, ובסוף הבועה מתפוצצת ואלוהים מספר את סיפור הבריאה בזמן שאתם בוראים בנגיעה. נכתב ב־Rust.">
 <meta property="og:title" content="OH MY GOD — מזחילה עד אלוהים">
-<meta property="og:description" content="Merge two identical rides into something bigger — 124 tiers from crawling to the God of Israel. Every merge screams OMG louder. Written in Rust.">
+<meta property="og:description" content="A merge game in a bubble of life: nothing but crawling babies, and two identical cells fuse into something bigger — 155 tiers, 19 eras, a world that pulls back to the edge of the universe, and at the end the bubble bursts and God tells the story of creation while you touch it into being. Written in Rust.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://boggiomichael.github.io/datta/omg/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -29,6 +29,12 @@
     <button class="ib" id="btn-sound" aria-label="סאונד"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l4 4V6L8 10H5z" class="fill"/><path d="M15.5 9a4 4 0 010 6M18 6.5a8 8 0 010 11" class="wave"/><path d="M16 9l5 6M21 9l-5 6" class="x"/></svg></button>
     <button class="ib" id="btn-pause" aria-label="השהה"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
   </div>
+  <div id="zoom" hidden>
+    <button class="ib" id="btn-zin" aria-label="Zoom in"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/></svg></button>
+    <button class="ib" id="btn-zout" aria-label="Zoom out"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M8 10.5h5"/></svg></button>
+    <button class="ib" id="btn-zauto" aria-label="Auto camera"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.2" class="fill"/></svg></button>
+  </div>
+  <button id="story-skip" class="ghost" hidden><span data-ui="skip"></span> ⏭</button>
   <div id="sandbox-pick" hidden></div>
   <div id="tools"></div>
   <div id="rec-badge" hidden><i></i><span></span></div>

@@ -6,6 +6,8 @@ pub mod dsp;
 pub mod sfx;
 pub mod omg;
 pub mod music;
+#[cfg(test)]
+pub mod narrate;
 
 use alloc::vec;
 use alloc::vec::Vec;
@@ -13,6 +15,7 @@ use alloc::vec::Vec;
 use crate::Global;
 use dsp::*;
 use crate::m::db;
+use crate::tiers::GOD;
 
 pub struct Snd {
     pub sr: f32,
@@ -34,8 +37,8 @@ pub fn render_id(snd: &mut Snd, id: u32) -> St {
     let seed = 1000 + id * 7919;
     let m = |mut s: St, lufs: f32, glue: f32| { master(&mut s, lufs, db(-1.0), glue, sr); s };
     match id {
-        0..=122 => { let mut r = omg::recipe(id as u8); omg::apply_style(&mut r, snd.style); omg::render(snd, &r, seed) }
-        123 => { let mut r = omg::recipe(123); omg::apply_style(&mut r, if snd.style == 3 { 0 } else { snd.style }); omg::render(snd, &r, seed) }
+        id if id < GOD as u32 => { let mut r = omg::recipe(id as u8); omg::apply_style(&mut r, snd.style); omg::render(snd, &r, seed) }
+        id if id == GOD as u32 => { let mut r = omg::recipe(GOD); omg::apply_style(&mut r, if snd.style == 3 { 0 } else { snd.style }); omg::render(snd, &r, seed) }
         200 => m(St::from_mono(&sfx::tick(sr), 0.0), -26.0, 0.0),
         201 => m(St::from_mono(&sfx::pop(sr), 0.0), -22.0, 0.0),
         202 => m(sfx::coins(sr), -22.0, 0.0),
@@ -55,8 +58,14 @@ pub fn render_id(snd: &mut Snd, id: u32) -> St {
         216 => m(sfx::impact(sr, seed), -15.0, 0.2),
         217 => m(sfx::blip(sr), -21.0, 0.0),
         218 => m(sfx::boing(sr), -22.0, 0.0),
+        219 => m(sfx::funnel(sr), -24.0, 0.0),
+        220 => m(sfx::zoom_out(sr, seed), -23.0, 0.0),
+        221 => m(sfx::burst(sr, seed), -14.0, 0.2),
+        222 => m(sfx::poke(sr), -21.0, 0.0),
+        223 => m(sfx::drone(sr, seed), -22.0, 0.0),
+        224 => m(sfx::creation(sr, seed), -15.0, 0.15),
         230..=234 => m(sfx::mallet(sr, (id - 230) as u8), -20.0, 0.0),
-        240..=254 => music::render(sr, (id - 240) as u8),
+        240..=259 => music::render(sr, (id - 240) as u8),
         _ => St::new(1),
     }
 }
@@ -167,7 +176,7 @@ mod tests {
         let out = std::env::var("OMG_RENDER_DIR").unwrap_or_else(|_| "target/render".into());
         std::fs::create_dir_all(&out).unwrap();
         let only: Option<Vec<u32>> = std::env::var("OMG_IDS").ok().map(|v| v.split(',').filter_map(|x| x.parse().ok()).collect());
-        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=123).chain(200..=218).chain(230..=234).chain(240..=254).collect());
+        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=GOD as u32).chain(200..=224).chain(230..=234).chain(240..=259).collect());
         for id in ids {
             let t = std::time::Instant::now();
             let snd = s();

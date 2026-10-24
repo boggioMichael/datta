@@ -5,6 +5,9 @@ use alloc::vec::Vec;
 
 use super::dsp::*;
 use crate::m::*;
+use crate::tiers::{cat, Cat};
+#[cfg(test)]
+use crate::tiers::N_CATS;
 
 #[inline] fn midi(m: f32) -> f32 { 440.0 * pow(2.0, (m - 69.0) / 12.0) }
 
@@ -34,28 +37,39 @@ const GOD: &[(&[f32], f32)] = &[(&[60.0, 64.0, 67.0, 72.0], 48.0), (&[60.0, 64.0
 
 fn song(era: u8) -> Song {
     let s = |bpm, chords, kick, hats, arp, toms, pluck, bells, pad_bright, bass, chug, key, minor| Song { bpm, chords, kick, hats, arp, toms, pluck, bells, pad_bright, bass, chug, key, minor };
-    match era {
-        0 => s(112.0, C_MAJ, false, false, false, false, true, true, 0.6, true, false, 72.0, false),
-        1 => s(100.0, G_MAJ, true, true, false, false, true, false, 0.5, true, false, 67.0, false),
-        2 => s(104.0, A_MIN, true, true, false, false, false, false, 0.5, true, false, 69.0, true),
-        3 => s(96.0, A_MIN, true, false, false, false, true, false, 0.45, true, false, 69.0, true),
-        4 => s(118.0, E_MIN, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
-        5 => s(124.0, D_MIN, true, true, true, false, false, true, 0.6, true, false, 62.0, true),
-        6 => s(90.0, E_MIN, true, false, false, true, false, false, 0.4, true, false, 64.0, true),
-        7 => s(108.0, F_MAJ, false, false, false, false, true, false, 0.5, true, true, 65.0, false),
-        8 => s(84.0, D_MAJ, false, false, false, false, false, true, 0.45, true, false, 62.0, false),
-        9 => s(92.0, D_MAJ, false, false, false, false, true, false, 0.65, true, false, 62.0, false),
-        10 => s(70.0, SPACE, false, false, false, false, false, true, 0.35, false, false, 67.0, false),
-        11 => s(112.0, SCIFI, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
-        12 => s(80.0, MYTH, false, false, false, true, false, false, 0.4, true, false, 62.0, true),
-        13 => s(64.0, HOLY, false, false, false, false, false, true, 0.45, false, false, 67.0, false),
-        _ => s(50.0, GOD, false, false, false, false, false, false, 0.3, false, false, 72.0, false),
+    match cat(era) {
+        Cat::Foot => s(112.0, C_MAJ, false, false, false, false, true, true, 0.6, true, false, 72.0, false),
+        Cat::Rides => s(96.0, G_MAJ, false, true, false, false, true, false, 0.55, true, false, 67.0, false),
+        Cat::Motors => s(100.0, G_MAJ, true, true, false, false, true, false, 0.5, true, false, 67.0, false),
+        Cat::Cars => s(104.0, A_MIN, true, true, false, false, false, false, 0.5, true, false, 69.0, true),
+        Cat::Premium => s(96.0, A_MIN, true, false, false, false, true, false, 0.45, true, false, 69.0, true),
+        Cat::Super => s(118.0, E_MIN, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
+        Cat::Hyper => s(124.0, D_MIN, true, true, true, false, false, true, 0.6, true, false, 62.0, true),
+        Cat::Workers => s(100.0, E_MIN, true, false, false, true, false, false, 0.4, true, true, 64.0, true),
+        Cat::Monsters => s(90.0, E_MIN, true, false, false, true, false, false, 0.4, true, false, 64.0, true),
+        Cat::Rails => s(108.0, F_MAJ, false, false, false, false, true, false, 0.5, true, true, 65.0, false),
+        Cat::Sails => s(88.0, D_MIN, false, false, false, false, true, true, 0.45, true, false, 62.0, true),
+        Cat::Seas => s(84.0, D_MAJ, false, false, false, false, false, true, 0.45, true, false, 62.0, false),
+        Cat::Skies => s(92.0, D_MAJ, false, false, false, false, true, false, 0.65, true, false, 62.0, false),
+        Cat::Space => s(70.0, SPACE, false, false, false, false, false, true, 0.35, false, false, 67.0, false),
+        Cat::SciFi => s(112.0, SCIFI, true, true, true, false, false, false, 0.55, true, false, 64.0, true),
+        Cat::Mega => s(60.0, SPACE, false, false, true, false, false, true, 0.3, false, false, 67.0, false),
+        Cat::Myth => s(80.0, MYTH, false, false, false, true, false, false, 0.4, true, false, 62.0, true),
+        Cat::Wonders => s(64.0, HOLY, false, false, false, false, false, true, 0.45, false, false, 67.0, false),
+        Cat::Heavens => s(56.0, C_MAJ, false, false, false, false, false, true, 0.5, false, false, 72.0, false),
+        Cat::God => s(50.0, GOD, false, false, false, false, false, false, 0.3, false, false, 72.0, false),
     }
 }
 
 /// Bounce-melody timbre for an era (see sfx::mallet).
 pub fn note_timbre(era: u8) -> u8 {
-    match era { 0 | 7 => 0, 1 | 2 | 3 | 4 | 6 | 11 => 1, 5 | 8 | 9 => 2, 12 | 13 => 3, _ => 4 }
+    match cat(era) {
+        Cat::Foot | Cat::Rides | Cat::Rails => 0,
+        Cat::Motors | Cat::Cars | Cat::Premium | Cat::Super | Cat::Monsters | Cat::SciFi | Cat::Workers => 1,
+        Cat::Hyper | Cat::Seas | Cat::Skies | Cat::Sails => 2,
+        Cat::Myth | Cat::Wonders | Cat::Heavens => 3,
+        Cat::Space | Cat::Mega | Cat::God => 4,
+    }
 }
 
 /// The i-th note of an era's bounce melody (MIDI), in the key of its music.
@@ -147,7 +161,7 @@ pub fn render(sr: f32, era: u8) -> St {
     let beats = (total / beat) as usize;
     for b in 0..beats {
         let at = (b as f32 * beat * sr) as usize;
-        if s.kick && (era == 4 || era == 5 || era == 11 || b % 2 == 0) {
+        if s.kick && (matches!(cat(era), Cat::Super | Cat::Hyper | Cat::SciFi) || b % 2 == 0) {
             let len = (0.3 * sr) as usize; let mut o = Osc::default();
             let x: Vec<f32> = (0..len).map(|i| { let t = i as f32 / sr; o.sine(48.0 + 90.0 * exp(-t * 30.0), sr) * exp(-t * 9.0) * 0.55 }).collect();
             out.add_mono(&x, at, 1.0, 0.0);
@@ -184,7 +198,7 @@ mod tests {
     use super::*;
     #[test]
     fn melodies_stay_in_range() {
-        for era in 0..15u8 {
+        for era in 0..N_CATS as u8 {
             for i in 0..64 { let m = melody_note(era, i); assert!((50.0..=96.0).contains(&m), "era {era} note {m}"); }
         }
     }

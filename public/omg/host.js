@@ -88,7 +88,7 @@
   let ballStyle = 0;
   function sprite(i, big = false, style = ballStyle) {
     const SPR = big ? SPR_L : SPR_S;
-    const key = (i * 4 + style) * 2 + (big ? 1 : 0);
+    const key = (i * 8 + style) * 2 + (big ? 1 : 0);
     let c = sprites.get(key);
     if (c) return c;
     c = document.createElement('canvas');
@@ -111,10 +111,22 @@
     }
     // soft halo in the ride's colour
     let gr = g.createRadialGradient(cx, cy, R * 0.85, cx, cy, SPR / 2);
-    gr.addColorStop(0, rgba(...col, style === 2 ? 0.7 : 0.36)); gr.addColorStop(1, rgba(...col, 0));
+    gr.addColorStop(0, rgba(...col, style === 2 ? 0.7 : style === 4 ? 0.2 : 0.36)); gr.addColorStop(1, rgba(...col, 0));
     g.fillStyle = gr; g.fillRect(0, 0, SPR, SPR);
     const ink = [21, 21, 42];
-    if (style === 0) {
+    if (style === 4) {
+      // a living cell: a translucent membrane in the ride's colour, lit from the top left
+      gr = g.createRadialGradient(cx - R * 0.34, cy - R * 0.4, R * 0.08, cx, cy, R);
+      gr.addColorStop(0, rgba(...mixc(col, [255, 255, 255], 0.8), 0.55));
+      gr.addColorStop(0.55, rgba(...mixc(col, [255, 255, 255], 0.38), 0.4));
+      gr.addColorStop(0.86, rgba(...col, 0.5));
+      gr.addColorStop(1, rgba(...mixc(col, [16, 16, 40], 0.4), 0.88));
+      g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fillStyle = gr; g.fill();
+      // a soft light behind the picture, like a nucleus
+      gr = g.createRadialGradient(cx, cy + R * 0.04, 0, cx, cy, R * 0.82);
+      gr.addColorStop(0, 'rgba(255,255,255,.66)'); gr.addColorStop(0.6, 'rgba(255,255,255,.26)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fill();
+    } else if (style === 0) {
       // sticker: a bright pastel disc in the ride's colour, dark ink rim
       gr = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R);
       gr.addColorStop(0, rgba(...mixc(col, [255, 255, 255], 0.86), 1));
@@ -136,11 +148,11 @@
     }
     // the picture
     const img = icons[T.icon];
-    const lw = R * (style === 2 ? 0.06 : style === 0 ? 0.075 : 0.085);
+    const lw = R * (style === 2 ? 0.06 : style === 0 ? 0.075 : style === 4 ? 0.05 : 0.085);
     if (img) {
-      const box = Math.round(R * (style === 0 || style === 3 ? 1.78 : 1.62));
+      const box = Math.round(R * (style === 0 || style === 3 ? 1.78 : style === 4 ? 1.58 : 1.62));
       g.save(); g.beginPath(); g.arc(cx, cy, R - lw * 0.6, 0, TAU); g.clip();
-      if (style === 1 || style === 2) {
+      if (style === 1 || style === 2 || style === 4) {
         const st = stickerOf(img, box);
         const pad = (st.width - box) / 2;
         g.drawImage(st, cx - box / 2 - pad, cy - box / 2 - pad);
@@ -151,6 +163,23 @@
     } else {
       g.fillStyle = style === 0 ? rgba(...ink, 1) : '#fff'; g.font = `800 ${R * 0.42}px Assistant, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(T.len || '?', cx, cy, R * 1.6);
+    }
+    if (style === 4) {
+      // the membrane: a light band, a fine dark edge, bounce light along the bottom, a wet highlight
+      g.lineWidth = R * 0.055; g.strokeStyle = rgba(...mixc(col, [255, 255, 255], 0.5), 0.8);
+      g.beginPath(); g.arc(cx, cy, R - R * 0.03, 0, TAU); g.stroke();
+      g.lineWidth = R * 0.024; g.strokeStyle = rgba(...mixc(col, [16, 16, 40], 0.55), 0.85);
+      g.beginPath(); g.arc(cx, cy, R - R * 0.012, 0, TAU); g.stroke();
+      g.lineCap = 'round';
+      g.lineWidth = R * 0.06; g.strokeStyle = rgba(...mixc(col, [255, 255, 255], 0.72), 0.42);
+      g.beginPath(); g.arc(cx, cy, R * 0.88, Math.PI * 0.16, Math.PI * 0.72); g.stroke();
+      g.save(); g.translate(cx - R * 0.38, cy - R * 0.44); g.rotate(-0.72); g.scale(1, 0.5);
+      gr = g.createRadialGradient(0, 0, 0, 0, 0, R * 0.34);
+      gr.addColorStop(0, 'rgba(255,255,255,.7)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(0, 0, R * 0.34, 0, TAU); g.fill(); g.restore();
+      g.fillStyle = 'rgba(255,255,255,.92)'; g.beginPath(); g.arc(cx - R * 0.52, cy - R * 0.5, R * 0.055, 0, TAU); g.fill();
+      sprites.set(key, c);
+      return c;
     }
     // rim
     if (style === 2) { g.shadowColor = rgba(...col, 1); g.shadowBlur = R * 0.25; }
@@ -174,6 +203,11 @@
     sprites.set(key, c);
     return c;
   }
+  // plain picture: a tier's illustration (index < 1000) or a story sprite (1000 + i)
+  function plainIcon(idx) {
+    const key = idx >= 1000 ? (S.story_icons || [])[idx - 1000] : (S.tiers[idx] && S.tiers[idx].icon);
+    return key ? icons[key] : null;
+  }
   const glows = new Map();
   function glow(r, g, b) {
     const key = ((r * 255) << 16) | ((g * 255) << 8) | (b * 255);
@@ -189,6 +223,72 @@
     x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
     glows.set(key, c);
     return c;
+  }
+
+  // blurred silhouettes of the giants waiting in the deep (tinted on a scratch canvas per draw)
+  const ghosts = new Map();
+  const GH = 96;
+  const scratch = document.createElement('canvas'); scratch.width = scratch.height = GH;
+  const scx = scratch.getContext('2d');
+  function ghostOf(idx, lvl) {
+    const key = idx * 4 + lvl;
+    const hit = ghosts.get(key);
+    if (hit) return hit;
+    const img = plainIcon(idx);
+    if (!img) return null;
+    const small = [GH, 34, 18][lvl] || 18;
+    const s = document.createElement('canvas'); s.width = s.height = small;
+    const sg = s.getContext('2d'); sg.drawImage(img, 0, 0, small, small);
+    sg.globalCompositeOperation = 'source-in'; sg.fillStyle = '#fff'; sg.fillRect(0, 0, small, small);
+    const c = document.createElement('canvas'); c.width = c.height = GH;
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = true;
+    if (lvl === 0) g.drawImage(s, 0, 0, GH, GH);
+    else {
+      const k = lvl === 1 ? 2.5 : 5;
+      g.globalAlpha = 0.34;
+      for (const [dx, dy] of [[0, 0], [k, 0], [-k, 0], [0, k], [0, -k], [k * 0.7, k * 0.7], [-k * 0.7, -k * 0.7]]) g.drawImage(s, dx, dy, GH, GH);
+    }
+    ghosts.set(key, c);
+    return c;
+  }
+  // a lens bokeh disc in a colour (quantised so the cache stays small)
+  const bokehs = new Map();
+  function bokehOf(r, g, b) {
+    const q = (v) => Math.max(0, Math.min(15, Math.round(v * 15)));
+    const key = (q(r) << 8) | (q(g) << 4) | q(b);
+    let c = bokehs.get(key);
+    if (c) return c;
+    c = document.createElement('canvas'); c.width = c.height = 64;
+    const x = c.getContext('2d');
+    const col = [q(r) * 17, q(g) * 17, q(b) * 17];
+    const gr = x.createRadialGradient(32, 32, 0, 32, 32, 31);
+    gr.addColorStop(0, rgba(...col, 0.4)); gr.addColorStop(0.74, rgba(...col, 0.48)); gr.addColorStop(0.9, rgba(...col, 0.8)); gr.addColorStop(1, rgba(...col, 0));
+    x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+    bokehs.set(key, c);
+    return c;
+  }
+  let shadowSpr = null;
+  function shadowOf() {
+    if (shadowSpr) return shadowSpr;
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const x = c.getContext('2d');
+    const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.45, 'rgba(0,0,0,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+    shadowSpr = c;
+    return c;
+  }
+  // a wobbly closed curve around (cx, cy): the living membrane's shape
+  function wobblePath(cx, cy, rad, a0, a1, wob, now, closed) {
+    ctx.beginPath();
+    const n = 128;
+    for (let k = 0; k <= n; k++) {
+      const an = a0 + (a1 - a0) * k / n;
+      const w = wob * (Math.sin(an * 3 + now * 2.1) * 0.6 + Math.sin(an * 5 - now * 3.3) * 0.4) + rad * 0.0045 * Math.sin(an * 2 + now * 0.9);
+      const x = cx + Math.cos(an) * (rad + w), y = cy + Math.sin(an) * (rad + w);
+      if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    }
+    if (closed) ctx.closePath();
   }
 
   const puffs = new Map();
@@ -427,7 +527,10 @@
           break;
         }
         case 10: { // RECT
-          const x = D[i + 1], y = D[i + 2], w = D[i + 3], h = D[i + 4], rad = Math.min(D[i + 9], h / 2, w / 2);
+          let x = D[i + 1], y = D[i + 2], w = D[i + 3], h = D[i + 4];
+          if (w < 0) { x += w; w = -w; }
+          if (h < 0) { y += h; h = -h; }
+          const rad = Math.max(0, Math.min(D[i + 9], h / 2, w / 2));
           if (D[i + 10] > 0.5) ctx.globalCompositeOperation = 'lighter';
           ctx.globalAlpha = D[i + 8]; ctx.fillStyle = rgba(D[i + 5] * 255, D[i + 6] * 255, D[i + 7] * 255, 1);
           ctx.beginPath();
@@ -518,12 +621,151 @@
           ctx.restore();
           break;
         }
+        case 20: { // SPRITE: plain picture [idx, x, y, size, rot, flip, alpha]
+          const img = plainIcon(D[i + 1] | 0);
+          const sz = D[i + 4], a = D[i + 7];
+          if (!img || sz < 1 || a <= 0.003) break;
+          ctx.save(); ctx.translate(D[i + 2], D[i + 3]);
+          if (D[i + 5]) ctx.rotate(D[i + 5]);
+          if (D[i + 6] > 0.5) ctx.scale(-1, 1);
+          ctx.globalAlpha = Math.min(1, a);
+          ctx.drawImage(img, -sz / 2, -sz / 2, sz, sz);
+          ctx.restore(); ctx.globalAlpha = 1;
+          break;
+        }
+        case 21: { // VGRAD: vertical gradient band [y0, y1, r0,g0,b0,a0, r1,g1,b1,a1, x0, x1]
+          const y0 = D[i + 1], y1 = D[i + 2];
+          const x0 = D[i + 11] || 0, x1 = D[i + 12] || W;
+          const g = ctx.createLinearGradient(0, y0, 0, y1);
+          g.addColorStop(0, rgba(D[i + 3] * 255, D[i + 4] * 255, D[i + 5] * 255, D[i + 6]));
+          g.addColorStop(1, rgba(D[i + 7] * 255, D[i + 8] * 255, D[i + 9] * 255, D[i + 10]));
+          ctx.fillStyle = g; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+          break;
+        }
         case 19: { // SMOKE
           const x = D[i + 1], y = D[i + 2], r = D[i + 3], a = D[i + 7];
           if (r <= 0 || a <= 0.003) break;
           ctx.globalAlpha = Math.min(1, a);
           ctx.drawImage(puff(D[i + 4], D[i + 5], D[i + 6]), x - r, y - r, r * 2, r * 2);
           ctx.globalAlpha = 1;
+          break;
+        }
+        case 22: { // MEMBRANE: the bubble of life [cx, cy, r, thick, wob, layer, tint rgb, light rgb, alpha, pore, pulse]
+          const cx = D[i + 1], cy = D[i + 2], r = D[i + 3], th = D[i + 4], wob = D[i + 5], layer = D[i + 6];
+          const tint = [D[i + 7] * 255, D[i + 8] * 255, D[i + 9] * 255], lit = [D[i + 10] * 255, D[i + 11] * 255, D[i + 12] * 255];
+          const a = D[i + 13], pore = D[i + 14], pulse = D[i + 15];
+          if (a <= 0.003 || r < 2) break;
+          const now = performance.now() / 1000;
+          if (layer < 0.5) {
+            // the fluid inside: clear near the light, denser toward the wall and the floor
+            const g = ctx.createRadialGradient(cx - r * 0.28, cy - r * 0.36, r * 0.08, cx, cy, r);
+            g.addColorStop(0, rgba(...mixc(tint, [255, 255, 255], 0.55), 0.1 * a));
+            g.addColorStop(0.72, rgba(...tint, 0.17 * a));
+            g.addColorStop(1, rgba(...mixc(tint, [0, 0, 0], 0.35), 0.4 * a));
+            ctx.fillStyle = g; wobblePath(cx, cy, r, 0, TAU, wob, now, true); ctx.fill();
+            const f = ctx.createLinearGradient(0, cy, 0, cy + r);
+            f.addColorStop(0, 'rgba(0,0,0,0)'); f.addColorStop(1, `rgba(0,0,0,${0.16 * a})`);
+            ctx.fillStyle = f; ctx.fill();
+            break;
+          }
+          const a0 = -Math.PI / 2 + pore, a1 = Math.PI * 1.5 - pore;
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          // a halo of light around the wall
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = a * (0.08 + 0.3 * pulse); ctx.lineWidth = th * 3.4; ctx.strokeStyle = rgba(...lit, 1);
+          wobblePath(cx, cy, r + th * 0.5, a0, a1, wob, now, false); ctx.stroke();
+          ctx.globalCompositeOperation = 'source-over';
+          // the wall: lit at the top left, deeper at the bottom right
+          const lg = ctx.createLinearGradient(cx - r * 0.75, cy - r * 0.75, cx + r * 0.75, cy + r * 0.75);
+          lg.addColorStop(0, rgba(...mixc(lit, [255, 255, 255], 0.45), 0.9));
+          lg.addColorStop(0.5, rgba(...mixc(tint, lit, 0.45), 0.55));
+          lg.addColorStop(1, rgba(...mixc(tint, [0, 0, 0], 0.4), 0.8));
+          ctx.globalAlpha = a; ctx.lineWidth = th; ctx.strokeStyle = lg;
+          wobblePath(cx, cy, r + th * 0.5, a0, a1, wob, now, false); ctx.stroke();
+          ctx.globalAlpha = a * 0.5; ctx.lineWidth = Math.max(1, th * 0.16); ctx.strokeStyle = '#fff';
+          wobblePath(cx, cy, r + th * 0.1, a0, a1, wob, now, false); ctx.stroke();
+          ctx.globalAlpha = a * 0.5; ctx.lineWidth = Math.max(1, th * 0.14); ctx.strokeStyle = rgba(...mixc(tint, [0, 0, 0], 0.65), 1);
+          wobblePath(cx, cy, r + th * 0.96, a0, a1, wob, now, false); ctx.stroke();
+          // wet highlights: a long arc at the top left, a spot, bounce light at the bottom right
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = a * 0.32; ctx.lineWidth = th * 1.2; ctx.strokeStyle = '#fff';
+          ctx.beginPath(); ctx.arc(cx, cy, r * 0.94, Math.PI * 1.06, Math.PI * 1.36); ctx.stroke();
+          ctx.globalAlpha = a * 0.16; ctx.lineWidth = th * 0.6;
+          ctx.beginPath(); ctx.arc(cx, cy, r * 0.9, Math.PI * 1.42, Math.PI * 1.5); ctx.stroke();
+          const sx2 = cx + Math.cos(Math.PI * 1.2) * r * 0.88, sy2 = cy + Math.sin(Math.PI * 1.2) * r * 0.88, ss = th * 2.2;
+          ctx.globalAlpha = a * 0.9; ctx.drawImage(glow(1, 1, 1), sx2 - ss, sy2 - ss, ss * 2, ss * 2);
+          ctx.globalAlpha = a * (0.22 + 0.3 * pulse); ctx.lineWidth = th * 0.8; ctx.strokeStyle = rgba(...lit, 1);
+          ctx.beginPath(); ctx.arc(cx, cy, r * 0.955, Math.PI * 0.08, Math.PI * 0.46); ctx.stroke();
+          ctx.globalCompositeOperation = 'source-over';
+          // the lips of the pore the stem feeds through
+          if (pore > 0.001) {
+            ctx.globalAlpha = a;
+            for (const an of [a0, a1]) {
+              const x = cx + Math.cos(an) * (r + th * 0.5), y = cy + Math.sin(an) * (r + th * 0.5);
+              const lg2 = ctx.createRadialGradient(x - th * 0.3, y - th * 0.3, 0, x, y, th * 0.9);
+              lg2.addColorStop(0, rgba(...mixc(lit, [255, 255, 255], 0.5), 1)); lg2.addColorStop(1, rgba(...mixc(tint, [0, 0, 0], 0.3), 1));
+              ctx.fillStyle = lg2; ctx.beginPath(); ctx.arc(x, y, th * 0.85, 0, TAU); ctx.fill();
+            }
+          }
+          ctx.globalAlpha = 1;
+          break;
+        }
+        case 23: { // GHOST: a blurred, tinted silhouette [idx, x, y, size, rot, flip, alpha, blur 0..2, r, g, b]
+          const sz = D[i + 4], a = D[i + 7];
+          if (sz < 2 || a <= 0.003) break;
+          const c = ghostOf(D[i + 1] | 0, D[i + 8] | 0);
+          if (!c) break;
+          scx.globalCompositeOperation = 'copy'; scx.drawImage(c, 0, 0);
+          scx.globalCompositeOperation = 'source-in'; scx.fillStyle = rgba(D[i + 9] * 255, D[i + 10] * 255, D[i + 11] * 255, 1); scx.fillRect(0, 0, GH, GH);
+          ctx.save(); ctx.translate(D[i + 2], D[i + 3]);
+          if (D[i + 5]) ctx.rotate(D[i + 5]);
+          if (D[i + 6] > 0.5) ctx.scale(-1, 1);
+          ctx.globalAlpha = Math.min(1, a);
+          ctx.drawImage(scratch, -sz / 2, -sz / 2, sz, sz);
+          ctx.restore(); ctx.globalAlpha = 1;
+          break;
+        }
+        case 24: { // BOKEH: an out-of-focus light [x, y, r, r, g, b, alpha]
+          const r = D[i + 3], a = D[i + 7];
+          if (r < 0.5 || a <= 0.003) break;
+          ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, a);
+          ctx.drawImage(bokehOf(D[i + 4], D[i + 5], D[i + 6]), D[i + 1] - r, D[i + 2] - r, r * 2, r * 2);
+          ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+          break;
+        }
+        case 25: { // SHADOW: a soft dark ellipse [x, y, rx, ry, alpha]
+          const a = D[i + 5];
+          if (a <= 0.003 || D[i + 3] < 0.5) break;
+          ctx.globalAlpha = Math.min(1, a);
+          ctx.drawImage(shadowOf(), D[i + 1] - D[i + 3], D[i + 2] - D[i + 4], D[i + 3] * 2, D[i + 4] * 2);
+          ctx.globalAlpha = 1;
+          break;
+        }
+        case 26: { // BLOB: a wobbling glossy droplet of goo [x, y, r, wob, phase, r, g, b, alpha, highlight]
+          const x = D[i + 1], y = D[i + 2], r = D[i + 3], wob = D[i + 4], ph = D[i + 5], a = D[i + 9];
+          if (r < 0.5 || a <= 0.003) break;
+          const col = [D[i + 6] * 255, D[i + 7] * 255, D[i + 8] * 255];
+          ctx.beginPath();
+          for (let k = 0; k <= 20; k++) {
+            const an = k / 20 * TAU;
+            const rr = r * (1 + wob * (Math.sin(an * 3 + ph) * 0.5 + Math.sin(an * 2 - ph * 1.3) * 0.5));
+            const px = x + Math.cos(an) * rr, py = y + Math.sin(an) * rr;
+            if (k) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+          }
+          const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.08, x, y, r * 1.1);
+          g.addColorStop(0, rgba(...mixc(col, [255, 255, 255], 0.7), a)); g.addColorStop(0.6, rgba(...col, a * 0.85)); g.addColorStop(1, rgba(...mixc(col, [0, 0, 0], 0.3), a * 0.9));
+          ctx.fillStyle = g; ctx.fill();
+          if (D[i + 10] > 0 && r > 2) { ctx.globalAlpha = a * 0.85; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x - r * 0.36, y - r * 0.38, r * 0.17, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; }
+          break;
+        }
+        case 28: // SHIFT: move what follows (a shake) [dx, dy]
+          ctx.setTransform(DPR, 0, 0, DPR, D[i + 1] * DPR, D[i + 2] * DPR);
+          break;
+        case 27: { // VIGNETTE: darken toward the edges [cx, cy, r0, r1, r, g, b, alpha]
+          const g = ctx.createRadialGradient(D[i + 1], D[i + 2], D[i + 3], D[i + 1], D[i + 2], D[i + 4]);
+          const col = [D[i + 5] * 255, D[i + 6] * 255, D[i + 7] * 255];
+          g.addColorStop(0, rgba(...col, 0)); g.addColorStop(1, rgba(...col, Math.min(1, D[i + 8])));
+          ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
           break;
         }
         default: break;
@@ -615,11 +857,14 @@
     },
     prefetch(maxTier) {
       const s0 = S.sounds.sfx0;
-      for (let id = s0; id <= s0 + 18; id++) if (id !== S.sounds.iam) this.ensure(id);
+      // the long creation sounds (held breath, creation swell) only near the end
+      for (let id = s0; id <= S.sounds.sfx1; id++) if (id !== S.sounds.iam && id < s0 + 23) this.ensure(id);
       for (let k = 0; k < 5; k++) this.ensure(S.sounds.note0 + k);
       const lo = Math.max(0, maxTier - 1), hi = Math.min(S.god, maxTier + 5);
       for (let k = lo; k <= hi; k++) this.ensure(k);
-      if (maxTier >= S.god - 10) { this.ensure(S.god); this.ensure(S.sounds.iam); }
+      if (maxTier >= S.god - 10) { this.ensure(S.god); this.ensure(S.sounds.iam); this.ensure(s0 + 23); this.ensure(s0 + 24); }
+      // the narration of the ending, well before it's needed
+      if (maxTier >= S.god - 24) story.preload(he);
     },
     note(timbre, midi, gain, pan) {
       if (!this.ctx || this.ctx.state !== 'running' || opt('notes') < 0.5) return;
@@ -664,6 +909,10 @@
     setMusic(cat) {
       this.musicCat = cat;
       if (!this.ctx) return;
+      if (cat < 0) {
+        if (this.musicSrc) { const old = this.musicSrc, og = this.musicGain, now = this.ctx.currentTime; og.gain.setTargetAtTime(0.0001, now, 1.2); setTimeout(() => { try { old.stop(); } catch { /* */ } }, 6000); this.musicSrc = null; }
+        return;
+      }
       const id = S.sounds.music0 + cat;
       if (this.buffers.has(id)) this.startMusic(id); else this.ensure(id);
     },
@@ -683,10 +932,130 @@
       for (const k of [...this.buffers.keys()]) if (isVoice(k)) this.buffers.delete(k);
       if (this.ready) this.worker.postMessage({ type: 'style', style: s });
     },
+    // the held breath of creation: a long low choir, faded in and out
+    droneSrc: null, droneGain: null,
+    drone(on) {
+      if (!this.ctx) return;
+      const id = S.sounds.sfx0 + 23, c = this.ctx, now = c.currentTime;
+      if (on) {
+        if (this.droneSrc) return;
+        const buf = this.buffers.get(id);
+        if (!buf) { this.ensure(id); return; }
+        const src = c.createBufferSource(); src.buffer = buf;
+        const g = c.createGain(); g.gain.value = 0.0001; g.gain.setTargetAtTime(0.9, now, 0.35);
+        src.connect(g); g.connect(this.music);
+        src.start();
+        this.droneSrc = src; this.droneGain = g;
+        src.onended = () => { if (this.droneSrc === src) { this.droneSrc = null; this.droneGain = null; } };
+      } else if (this.droneSrc) {
+        const src = this.droneSrc, g = this.droneGain;
+        g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0.0001, now, 0.18);
+        setTimeout(() => { try { src.stop(); } catch { /* */ } }, 1200);
+        this.droneSrc = null; this.droneGain = null;
+      }
+    },
     toggleMute() {
       this.muted = !this.muted; store.set('omg.muted', this.muted ? '1' : '0');
       this.volumes();
       $('#btn-sound').classList.toggle('muted', this.muted);
+    },
+  };
+
+  // ───────────────────────── the Genesis narration (one MP3 per language, streamed)
+  const story = {
+    el: null, node: null, gain: null, lang: null, on: false, failed: false, unlocked: false, held: false, paused: false,
+    make() {
+      if (this.el) return;
+      const el = new Audio();
+      el.preload = 'none'; el.playsInline = true; el.setAttribute('playsinline', '');
+      el.addEventListener('error', () => { if (this.on) this.failed = true; });
+      this.el = el;
+    },
+    // iOS lets a media element play later only if a tap started it once
+    unlock() {
+      this.make();
+      if (this.unlocked) return;
+      this.unlocked = true;
+      try {
+        const el = this.el;
+        el.src = 'story/silence.mp3';
+        const pr = el.play();
+        if (pr && pr.then) pr.then(() => { el.pause(); el.removeAttribute('src'); el.load(); if (this.lang) { el.src = this.url(this.lang === 'he'); el.load(); } }).catch(() => {});
+      } catch { /* old browsers */ }
+    },
+    url(isHe) { return `story/genesis_${isHe ? 'he' : 'en'}.mp3`; },
+    preload(isHe) {
+      this.make();
+      const l = isHe ? 'he' : 'en';
+      if (this.lang === l) return;
+      this.lang = l;
+      this.el.preload = 'auto';
+      this.el.src = this.url(isHe);
+      try { this.el.load(); } catch { /* */ }
+    },
+    route() {
+      if (this.node || !audio.ctx) return;
+      try {
+        this.node = audio.ctx.createMediaElementSource(this.el);
+        this.gain = audio.ctx.createGain();
+        this.node.connect(this.gain); this.gain.connect(audio.voice);
+      } catch { this.node = null; this.gain = null; }
+    },
+    start(isHe, at = 0) {
+      this.preload(isHe);
+      audio.ensure(S.sounds.sfx0 + 23); audio.ensure(S.sounds.sfx0 + 24);
+      this.on = true; this.failed = false; this.held = false; this.paused = false;
+      this.route();
+      if (this.gain) { this.gain.gain.cancelScheduledValues(0); this.gain.gain.value = 1; }
+      const el = this.el;
+      const seek = () => { try { el.currentTime = at || 0; } catch { /* */ } };
+      if (el.readyState >= 1) seek(); else el.addEventListener('loadedmetadata', seek, { once: true });
+      const pr = el.play();
+      if (pr && pr.catch) pr.catch(() => { this.failed = true; });
+      $('#story-skip').hidden = false;
+      $('#zoom').hidden = true;
+      toolsUI(false);
+    },
+    stop() {
+      this.on = false; this.held = false;
+      audio.drone(false);
+      if (this.el) try { this.el.pause(); } catch { /* */ }
+      $('#story-skip').hidden = true;
+    },
+    // the story waits for the player: the narration goes quiet, the world holds its breath
+    hold(at) {
+      this.held = true;
+      audio.drone(true);
+      if (!this.on || this.failed || !this.el) return;
+      const el = this.el;
+      if (this.gain && audio.ctx) {
+        const g = this.gain.gain, now = audio.ctx.currentTime;
+        g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + 0.06);
+        setTimeout(() => { if (this.held) { try { el.pause(); el.currentTime = at; } catch { /* */ } } }, 70);
+      } else { try { el.pause(); el.currentTime = at; } catch { /* */ } }
+    },
+    // …and goes on from the moment of creation
+    release(at) {
+      this.held = false;
+      audio.drone(false);
+      if (!this.on || this.failed || !this.el || this.paused) return;
+      const el = this.el;
+      try { el.currentTime = at; } catch { /* */ }
+      const pr = el.play(); if (pr && pr.catch) pr.catch(() => {});
+      if (this.gain && audio.ctx) {
+        const g = this.gain.gain, now = audio.ctx.currentTime;
+        g.cancelScheduledValues(now); g.setValueAtTime(0, now); g.linearRampToValueAtTime(1, now + 0.08);
+      }
+    },
+    pause(p) {
+      this.paused = p;
+      if (this.on && this.el && !this.failed && !this.held) { if (p) this.el.pause(); else this.el.play().catch(() => {}); }
+    },
+    // the story's clock: the narration's position, or −1 to let the engine keep time
+    tick() {
+      if (!this.on) return;
+      const el = this.el;
+      X.omg_story_time(this.failed || !el ? -1 : el.currentTime);
     },
   };
 
@@ -711,6 +1080,12 @@
         case 10: toolsUI(true); break;
         case 11: audio.setMusic(a | 0); break;
         case 12: audio.note(a | 0, b, c, d); break;
+        case 13:
+          if (a > 2.5) story.release(b);
+          else if (a > 1.5) story.hold(b);
+          else if (a > 0.5) story.start(b > 0.5, c);
+          else story.stop();
+          break;
         default: break;
       }
     }
@@ -730,6 +1105,7 @@
     const dt = last ? Math.min(0.1, (ts - last) / 1000) : 1 / 60;
     last = ts;
     const p0 = performance.now();
+    story.tick();
     X.omg_frame(dt);
     events();
     const p1 = performance.now();
@@ -745,15 +1121,48 @@
   // ───────────────────────── input
   function bindInput() {
     const pos = (e) => [e.clientX, e.clientY];
+    // two fingers pinch-zoom and pan; one finger taps, tilts, or looks around when zoomed in
+    const pts = new Map();
+    let pinch = null;
+    const mid = () => { const v = [...pts.values()]; return [(v[0][0] + v[1][0]) / 2, (v[0][1] + v[1][1]) / 2, Math.hypot(v[0][0] - v[1][0], v[0][1] - v[1][1])]; };
     canvas.addEventListener('pointerdown', (e) => {
-      audio.unlock();
+      audio.unlock(); story.unlock();
       try { canvas.setPointerCapture(e.pointerId); } catch { /* */ }
-      X.omg_pointer(0, ...pos(e));
+      pts.set(e.pointerId, pos(e));
+      if (pts.size === 2) { X.omg_pointer(3, ...pos(e)); pinch = mid(); return; }
+      if (pts.size === 1) X.omg_pointer(0, ...pos(e));
     });
-    canvas.addEventListener('pointermove', (e) => X.omg_pointer(1, ...pos(e)));
-    canvas.addEventListener('pointerup', (e) => X.omg_pointer(2, ...pos(e)));
-    canvas.addEventListener('pointercancel', (e) => X.omg_pointer(3, ...pos(e)));
-    const keys = { ArrowLeft: 1, ArrowRight: 2, ' ': 3, Enter: 3, 1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9 };
+    canvas.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, pos(e));
+      if (pinch && pts.size >= 2) {
+        const m = mid();
+        if (pinch[2] > 10 && m[2] > 10) X.omg_view(0, m[2] / pinch[2], m[0], m[1]);
+        X.omg_view(1, m[0] - pinch[0], m[1] - pinch[1], 0);
+        pinch = m; zoomUI();
+        return;
+      }
+      if (!pinch) X.omg_pointer(1, ...pos(e));
+    });
+    const up = (e, kind) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.delete(e.pointerId);
+      if (pinch) { if (pts.size === 0) pinch = null; return; }
+      X.omg_pointer(kind, ...pos(e));
+    };
+    canvas.addEventListener('pointerup', (e) => up(e, 2));
+    canvas.addEventListener('pointercancel', (e) => up(e, 3));
+    canvas.addEventListener('wheel', (e) => {
+      if (!running) return;
+      e.preventDefault();
+      const k = Math.exp(-Math.max(-120, Math.min(120, e.deltaY)) * 0.0022);
+      X.omg_view(0, k, e.clientX, e.clientY); zoomUI();
+    }, { passive: false });
+    const centre = () => [X.omg_layout(5), X.omg_layout(6)];
+    $('#btn-zin').addEventListener('click', () => { X.omg_view(0, 1.6, ...centre()); zoomUI(); });
+    $('#btn-zout').addEventListener('click', () => { X.omg_view(0, 1 / 1.6, ...centre()); zoomUI(); });
+    $('#btn-zauto').addEventListener('click', () => { X.omg_view(2, 0, 0, 0); zoomUI(); });
+    const keys = { ArrowLeft: 1, ArrowRight: 2, ' ': 3, Enter: 3, 1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, '+': 10, '=': 10, '-': 11, _: 11, 0: 12 };
     window.addEventListener('keydown', (e) => {
       if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
       if (e.key === 'Escape') { menuOpen ? closeMenu() : openMenu('modes'); return; }
@@ -761,14 +1170,14 @@
       if (e.key === 'p' || e.key === 'P') { togglePause(); return; }
       if (e.key === 'm' || e.key === 'M') { audio.toggleMute(); return; }
       const k = keys[e.key];
-      if (k && !e.repeat) { e.preventDefault(); audio.unlock(); X.omg_key(k, 1); }
+      if (k && !e.repeat) { e.preventDefault(); audio.unlock(); story.unlock(); X.omg_key(k, 1); if (k >= 10) zoomUI(); }
     });
     window.addEventListener('keyup', (e) => { const k = keys[e.key]; if (k === 1 || k === 2) X.omg_key(k, 0); });
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', () => setTimeout(resize, 200));
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { if (running) X.omg_pause(1); if (audio.ctx) audio.ctx.suspend().catch(() => {}); }
-      else { if (running && !userPaused && !menuOpen) X.omg_pause(0); if (audio.ctx && audio.unlocked) audio.ctx.resume().catch(() => {}); }
+      if (document.hidden) { if (running) X.omg_pause(1); story.pause(true); if (audio.ctx) audio.ctx.suspend().catch(() => {}); }
+      else { if (running && !userPaused && !menuOpen) { X.omg_pause(0); story.pause(false); } if (audio.ctx && audio.unlocked) audio.ctx.resume().catch(() => {}); }
     });
   }
 
@@ -787,8 +1196,9 @@
   function toolsUI(rebuild) {
     const box = $('#tools');
     const m = X.omg_info(4) | 0;
-    const show = running && m !== 1;
+    const show = running && m !== 1 && !X.omg_info(17);
     box.hidden = !show;
+    zoomUI();
     if (!show) return;
     if (rebuild || !box.children.length) {
       box.innerHTML = '';
@@ -812,11 +1222,18 @@
     });
   }
 
+  function zoomUI() {
+    const z = $('#zoom');
+    const show = running && !X.omg_info(17) && !X.omg_info(2);
+    z.hidden = !show;
+    if (show) $('#btn-zauto').classList.toggle('on', X.omg_info(19) > 0.5);
+  }
+
   // ───────────────────────── sandbox picker
   function sandboxUI() {
     const box = $('#sandbox-pick');
     const m = X.omg_info(4) | 0;
-    box.hidden = !(running && m === 5);
+    box.hidden = !(running && m === 7);
     if (box.hidden) return;
     box.innerHTML = '';
     for (let k = 0; k < S.god; k++) {
@@ -876,7 +1293,9 @@
     audio.unlock();
     mode = m; store.set('omg.mode', String(m));
     $('#start').hidden = true; $('#end').hidden = true;
+    document.body.classList.remove('home');
     closeMenu(true);
+    story.stop();
     X.omg_start(m);
     running = true; userPaused = false;
     X.omg_pause(0);
@@ -888,17 +1307,26 @@
   function togglePause() {
     userPaused = !userPaused;
     X.omg_pause(userPaused || menuOpen ? 1 : 0);
+    story.pause(userPaused);
     $('#btn-pause').classList.toggle('paused', userPaused);
     if (audio.ctx) userPaused ? audio.ctx.suspend().catch(() => {}) : audio.ctx.resume().catch(() => {});
   }
   function fmtTime(s) { const m = Math.floor(s / 60); const r = s - m * 60; return `${m}:${String(Math.floor(r)).padStart(2, '0')}.${Math.floor((r % 1) * 10)}`; }
 
+  const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  function fmtPow(log10) {
+    if (!(log10 >= 0)) return '0';
+    if (log10 < 15) { const x = Math.pow(10, log10); return x < 1e3 ? String(Math.round(x)) : x < 1e6 ? (x / 1e3).toFixed(1) + 'K' : x < 1e9 ? (x / 1e6).toFixed(1) + 'M' : x < 1e12 ? (x / 1e9).toFixed(1) + 'B' : (x / 1e12).toFixed(1) + 'T'; }
+    return '10' + String(Math.floor(log10)).split('').map((d) => SUP[+d]).join('');
+  }
   function showEnd(time, merges, drops, m) {
     const el = $('#end'); el.classList.add('god');
     $('#end-title').textContent = t('end_title');
-    $('#end-sub').textContent = S.tiers[S.god][he ? 'bhe' : 'ben'];
+    $('#end-sub').textContent = t('end_story');
     const best = X.omg_stat(10 + m);
-    $('#end-stats').innerHTML = `<div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${merges | 0}</dd></div><div><dt>${t('end_drops')}</dt><dd>${drops | 0}</dd></div>`;
+    const st = $('#end-stats'); st.classList.add('five');
+    st.innerHTML = `<div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${merges | 0}</dd></div><div><dt>${t('end_drops')}</dt><dd>${drops | 0}</dd></div>`
+      + `<div><dt>👶 ${t('end_babies')}</dt><dd>${fmtPow(X.omg_info(15))}</dd></div><div><dt>🔍 ${t('end_zoom')}</dt><dd>×${fmtPow(X.omg_info(16))}</dd></div>`;
     const rec = $('#end-record');
     rec.hidden = !(best > 0 && Math.abs(best - time) < 0.05 && [0, 2, 3, 4, 5].includes(m));
     rec.textContent = t('end_record');
@@ -908,6 +1336,7 @@
   }
   function showOver(reason, top, time) {
     const el = $('#end'); el.classList.remove('god');
+    $('#end-stats').classList.remove('five');
     $('#end-title').textContent = reason === 1 ? t('over_time') : t('over_jam');
     $('#end-sub').textContent = `${t('over_reached')}: ${tierName(top)}`;
     $('#end-stats').innerHTML = `<div><dt>${t('tier')}</dt><dd>${top + 1}/${S.n}</dd></div><div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${X.omg_info(8) | 0}</dd></div>`;
@@ -1040,7 +1469,8 @@
       const cv = document.createElement('canvas'); cv.width = cv.height = 112;
       const g = cv.getContext('2d'); if (!open) g.filter = 'grayscale(1) brightness(.5)'; g.drawImage(sprite(k, true), -28, -28, 168, 168);
       const info = document.createElement('div');
-      info.innerHTML = `<div class="n">${t('tier')} ${k + 1}</div><div class="t">${open ? T[he ? 'he' : 'en'] : '???'}</div><div class="b">${open ? T[he ? 'bhe' : 'ben'] : t('locked')}</div>`;
+      const wide = k > 0 && k < S.god ? ` · 👶×${fmtPow(k * Math.log10(opt('sizegrow')))}` : '';
+      info.innerHTML = `<div class="n">${t('tier')} ${k + 1}${open ? wide : ''}</div><div class="t">${open ? T[he ? 'he' : 'en'] : '???'}</div><div class="b">${open ? T[he ? 'bhe' : 'ben'] : t('locked')}</div>`;
       c.append(cv, info);
       if (open) c.addEventListener('click', () => { audio.unlock(); audio.play(k, 1, 0); });
       grid.appendChild(c);
@@ -1127,14 +1557,15 @@
 
   // ───────────────────────── wiring
   function bindUI() {
-    $('#btn-play').addEventListener('click', () => startGame(mode));
+    $('#btn-play').addEventListener('click', () => { story.unlock(); startGame(mode); });
     $('#btn-lang').addEventListener('click', () => setLang(!he));
     $('#btn-start-settings').addEventListener('click', () => openMenu('settings'));
     $('#btn-menu').addEventListener('click', () => { audio.unlock(); openMenu('modes'); });
     $('#btn-close').addEventListener('click', () => closeMenu());
     $('#btn-resume').addEventListener('click', () => closeMenu());
     $('#btn-restart').addEventListener('click', () => startGame(X.omg_info(4) | 0));
-    $('#btn-home').addEventListener('click', () => { closeMenu(true); running = false; X.omg_pause(1); $('#start').hidden = false; buildLadder(); buildModes(); toolsUI(false); sandboxUI(); });
+    $('#btn-home').addEventListener('click', () => { closeMenu(true); running = false; story.stop(); X.omg_pause(1); $('#start').hidden = false; document.body.classList.add('home'); buildLadder(); buildModes(); toolsUI(false); sandboxUI(); });
+    $('#story-skip').addEventListener('click', () => { X.omg_story_skip(); });
     $('#btn-sound').addEventListener('click', () => { audio.unlock(); audio.toggleMute(); });
     $('#btn-pause').addEventListener('click', () => togglePause());
     $('#btn-rec').addEventListener('click', () => rec.start());
@@ -1178,18 +1609,19 @@
     X.omg_resize(W, H, DPR);
     if (opt('devicetilt') > 0.5) X.omg_set_opt(optIndex('devicetilt'), 0);
     try { iconBundle = await (await fetch('icons/all.json')).json(); } catch { iconBundle = null; }
-    const keys = [...new Set(S.tiers.map((x) => x.icon).filter(Boolean))];
+    const keys = [...new Set(S.tiers.map((x) => x.icon).filter(Boolean).concat(S.story_icons || []))];
     await Promise.all(keys.map(loadIcon));
     iconBundle = null;
     ballStyle = Math.round(opt('ballstyle'));
     try { await document.fonts.load('800 20px Assistant'); } catch { /* */ }
     bindInput(); bindUI(); applyLang();
     $('#loading').hidden = true;
+    if (!$('#start').hidden) document.body.classList.add('home');
     audio.create();
     if (/[?&]play/.test(location.search)) startGame(mode);
     if (/[?&]sheet/.test(location.search)) debugSheet();
     requestAnimationFrame(loop);
   }
   boot().catch((e) => { console.error(e); const l = $('#loading'); l.hidden = false; l.textContent = 'WebAssembly failed to load: ' + (e && e.message); });
-  window.__omg = { get X() { return X; }, get S() { return S; }, audio, startGame, openMenu, perf };
+  window.__omg = { get X() { return X; }, get S() { return S; }, audio, story, startGame, openMenu, perf };
 })();

@@ -9,7 +9,7 @@ use crate::tiers::*;
 pub static UI: &[(&str, &str, &str)] = &[
     ("title", "OH MY GOD", "OH MY GOD"),
     ("subtitle", "מזחילה עד אלוהים", "From Crawling to God"),
-    ("tagline", "שני כלי רכב זהים מתמזגים למשהו גדול ויוקרתי יותר — 124 דרגות, 14 עידנים, וה־OMG רק מתחזק.", "Two identical rides merge into something bigger and fancier — 124 tiers, 14 eras, and the OMG only gets louder."),
+    ("tagline", "בועת חיים אחת, תינוק זוחל אחד, ומסע עד אלוהים. כל שני זהים מתמזגים למשהו גדול יותר, העולם מתרחק עד קצה היקום, וה־OMG רק מתחזק.", "One bubble of life, one crawling baby, and a journey all the way to God. Every two twins fuse into something bigger, the world pulls back to the edge of the universe, and the OMG only gets louder."),
     ("play", "שחק", "Play"),
     ("resume", "המשך", "Resume"),
     ("restart", "מהתחלה", "Restart"),
@@ -62,19 +62,28 @@ pub static UI: &[(&str, &str, &str)] = &[
     ("over_time", "נגמר הזמן", "Time's up"),
     ("over_reached", "הגעת עד", "You reached"),
     ("how", "איך משחקים", "How to play"),
-    ("how1", "כל סיבוב מתחיל מזחילה. שני כדורים זהים שנוגעים — מתמזגים לדרגה הבאה, וכדור גדול יותר קופץ החוצה.", "Every run starts with a crawl. Two identical balls that touch merge into the next tier — and a bigger ball bounces out."),
-    ("how2", "נגיעה במסך מפילה עוד אחת. גרירה לצדדים מטה את כוח המשיכה.", "Tap to drop one more. Drag sideways to tilt gravity."),
-    ("how3", "כשבונים מספיק גבוה, הפיה משתדרגת — מאופניים למכוניות, רכבות, ספינות, מטוסים, חלליות, מדע בדיוני ורכבי האלים — עד אלוהים.", "Build high enough and the spout upgrades — bikes, cars, trains, ships, planes, spacecraft, sci-fi and the rides of the gods — all the way to God."),
+    ("how1", "הגבעול שופך לבועה רק תינוקות זוחלים. שני תאים זהים שנוגעים מתמזגים לדרגה הבאה, ותא גדול יותר קופץ החוצה.", "The stem pours nothing but crawling babies into the bubble. Two identical cells that touch fuse into the next tier, and a bigger one bounces out."),
+    ("how2", "נגיעה שופכת עוד תינוק, ונגיעה בדופן הבועה דוחפת פנימה. גרירה בתוך הבועה מערבבת את הנוזל ומטה את כוח המשיכה. צביטה, גלגלת או + ו־− מתקרבים ומתרחקים.", "Tap to pour another baby; tap the bubble's wall to poke it. Drag inside the bubble to stir the fluid and tilt gravity. Pinch, scroll or + and − zoom in and out."),
+    ("how3", "כל דרגה רחבה הרבה יותר מזו שמתחתיה, אז העולם סביב הבועה מתרחק כל הזמן, ומאחוריה כבר מרחפים הענקים שעוד יבואו. כשהתינוקות קטנים מדי לראות, הם מתגבשים בגבעול לתא אחד, וכך עד אלוהים. ואז הבועה מתפוצצת, ואלוהים מספר איך הכול התחיל, ובכל רגע של בריאה מחכה לנגיעה שלך.", "Every tier is much wider than the one below, so the world around the bubble keeps pulling back, and the giants still to come already float behind it. Once the babies are too small to see, they clump in the stem into one cell, and on it goes to God. Then the bubble bursts, God tells how it all began, and every moment of creation waits for your touch."),
     ("sandbox_pick", "מה ליפול?", "What to drop?"),
     ("tools", "כלים", "Tools"),
     ("credits", "קרדיטים", "Credits"),
-    ("credits_body", "משחק של סטודיו דאטא. המנוע, הפיזיקה, החוקים, הנופים ומנוע הסאונד כתובים ב־Rust ומקומפלים ל־WebAssembly. הקולות הבסיסיים נוצרו במודל הדיבור הפתוח Kokoro (רישיון Apache 2.0), וכל העיבוד שלהם — העמקה, מקהלות, ריוורב, אפקטים — קורה בזמן אמת בתוך ה־Rust. כל 123 האיורים צוירו במיוחד למשחק. פונטים: Assistant ו־Frank Ruhl Libre (SIL OFL).", "A Datta studio game. The engine, physics, rules, scenery and sound engine are written in Rust and compiled to WebAssembly. The base voices were generated with the open Kokoro speech model (Apache 2.0), and all of their processing — deepening, choirs, reverb, effects — happens live inside the Rust. All 123 illustrations were drawn for this game. Fonts: Assistant and Frank Ruhl Libre (SIL OFL)."),
+    ("credits_body", "משחק של סטודיו דאטא. המנוע, הפיזיקה, החוקים, המצלמה, העולם החי, סיפור הבריאה האינטראקטיבי ומנוע הסאונד כתובים ב־Rust ומקומפלים ל־WebAssembly. הקולות הבסיסיים נוצרו במודל הדיבור הפתוח Kokoro (רישיון Apache 2.0), וכל העיבוד שלהם — העמקה, מקהלות, ריוורב, אפקטים — קורה בתוך ה־Rust. את פרק א׳ של בראשית מקריא קול של Kokoro שעובד באותו מנוע; הטקסט העברי הוא נוסח המסורה, והאנגלי הוא תרגום JPS משנת 1917 (נחלת הכלל). כל 168 האיורים צוירו במיוחד למשחק. פונטים: Assistant ו־Frank Ruhl Libre (SIL OFL).", "A Datta studio game. The engine, physics, rules, camera, the living world, the interactive creation story and the sound engine are written in Rust and compiled to WebAssembly. The base voices were generated with the open Kokoro speech model (Apache 2.0), and all of their processing — deepening, choirs, reverb, effects — happens inside the Rust. Genesis 1 is read by a Kokoro voice processed by the same engine; the Hebrew is the Masoretic text and the English the 1917 JPS translation (public domain). All 168 illustrations were drawn for this game. Fonts: Assistant and Frank Ruhl Libre (SIL OFL)."),
     ("not_brands", "שמות הדגמים מוזכרים לשם ההומור; אין קשר לחברות. האיורים הם פרשנות בצבעים ובסגנון של כל דגם — בלי לוגואים וסמלים מסחריים.", "Model names appear for fun; no affiliation. The illustrations are interpretations in each model's colours and style — no logos or trademarks."),
     ("loading", "טוען…", "Loading…"),
     ("tap_to_start", "לחצו כדי להתחיל", "Tap to start"),
     ("sound_note", "מומלץ עם סאונד", "Best with sound on"),
     ("site", "חזרה לאתר", "Back to the site"),
     ("charges", "מטענים", "Charges"),
+    ("zoom_in", "התקרבות", "Zoom in"),
+    ("zoom_out", "התרחקות", "Zoom out"),
+    ("zoom_auto", "מצלמה אוטומטית", "Auto camera"),
+    ("skip", "דילוג", "Skip"),
+    ("story_title", "בְּרֵאשִׁית", "In the Beginning"),
+    ("story_loading", "אלוהים מתכונן לספר…", "God is about to speak…"),
+    ("end_babies", "תינוקות", "Babies"),
+    ("end_zoom", "זום", "Zoom"),
+    ("end_story", "הייתם שם כשהעולם נברא", "You were there when the world was made"),
 ];
 
 fn js(out: &mut String, s: &str) {
@@ -99,7 +108,7 @@ fn num(out: &mut String, x: f32) {
 
 pub fn schema() -> String {
     let mut o = String::with_capacity(32 * 1024);
-    let _ = write!(o, "{{\"version\":\"2.0\",\"god\":{},\"n\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{}}},\"tiers\":[", GOD, N_TIERS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP);
+    let _ = write!(o, "{{\"version\":\"3.0\",\"god\":{},\"n\":{},\"ncats\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{},\"sfx1\":{}}},\"tiers\":[", GOD, N_TIERS, N_CATS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP, crate::game::S_CREATE);
     for (i, t) in TIERS.iter().enumerate() {
         if i > 0 { o.push(','); }
         o.push_str("{\"key\":"); js(&mut o, t.key);
@@ -175,7 +184,11 @@ pub fn schema() -> String {
         o.push_str(",\"def\":"); num(&mut o, d.default);
         o.push('}');
     }
-    o.push_str("],\"clips\":[");
+    o.push_str("],\"story_icons\":[");
+    for (i, k) in crate::story::SPRITES.iter().enumerate() { if i > 0 { o.push(','); } js(&mut o, k); }
+    o.push_str("],\"story\":");
+    crate::story::schema(&mut o);
+    o.push_str(",\"clips\":[");
     for (i, c) in crate::audio::omg::CLIPS.iter().enumerate() { if i > 0 { o.push(','); } js(&mut o, c); }
     o.push_str("],\"ui\":{");
     for (i, u) in UI.iter().enumerate() {

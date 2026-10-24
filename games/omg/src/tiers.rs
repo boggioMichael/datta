@@ -1,15 +1,21 @@
-//! The ladder: 124 rides, from a crawling baby to the God of Israel, in 15 eras.
+//! The ladder: 155 rides, from a crawling baby to the God of Israel, in 20 eras.
 //! Facts in the blurbs are checked; the rest is play.
 
-pub const N_TIERS: usize = 124;
-pub const GOD: u8 = 123;
-pub const N_CATS: usize = 15;
+pub const N_TIERS: usize = 155;
+pub const GOD: u8 = 154;
+pub const N_CATS: usize = 20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Cat {
-    Foot = 0, Motors = 1, Cars = 2, Premium = 3, Super = 4, Hyper = 5, Monsters = 6, Rails = 7,
-    Seas = 8, Skies = 9, Space = 10, SciFi = 11, Myth = 12, Holy = 13, God = 14,
+    Foot = 0, Rides = 1, Motors = 2, Cars = 3, Premium = 4, Super = 5, Hyper = 6, Workers = 7, Monsters = 8, Rails = 9,
+    Sails = 10, Seas = 11, Skies = 12, Space = 13, SciFi = 14, Mega = 15, Myth = 16, Wonders = 17, Heavens = 18, God = 19,
 }
+pub const ALL_CATS: [Cat; N_CATS] = [
+    Cat::Foot, Cat::Rides, Cat::Motors, Cat::Cars, Cat::Premium, Cat::Super, Cat::Hyper, Cat::Workers, Cat::Monsters, Cat::Rails,
+    Cat::Sails, Cat::Seas, Cat::Skies, Cat::Space, Cat::SciFi, Cat::Mega, Cat::Myth, Cat::Wonders, Cat::Heavens, Cat::God,
+];
+/// The era for an index (anything out of range is God).
+#[inline] pub fn cat(i: u8) -> Cat { ALL_CATS[(i as usize).min(N_CATS - 1)] }
 
 pub struct Tier {
     /// also the icon file name (icons/<key>.svg)
@@ -47,6 +53,21 @@ pub static TIERS: [Tier; N_TIERS] = [
        "הרכב הלאומי של בני הנוער.", "The national vehicle of teenagers."),
     t!("segway", Foot, 0xD8DEE9, "סגוויי", "Segway", "סגוויי", "SEGWAY",
        "מאזן את עצמו בעזרת ג׳ירוסקופים. נחשף ב־2001.", "Balances itself with gyroscopes. Unveiled in 2001."),
+    // ── riding animals
+    t!("burro", Rides, 0xB8B0A0, "חמור", "Donkey", "חמור", "DONKEY",
+       "בוית לפני כ־7,000 שנה. לא נופל באף שביל.", "Domesticated about 7,000 years ago. Sure-footed on any trail."),
+    t!("pony", Rides, 0xD99A5B, "פוני", "Pony", "פוני", "PONY",
+       "פוני הוא סוס שגובהו מתחת ל־147 ס״מ.", "A pony is a horse under 147 cm tall."),
+    t!("dogsled", Rides, 0x9FD8FF, "מזחלת כלבים", "Dog Sled", "מזחלת", "DOG SLED",
+       "מרוץ האידיטרוד חוצה יותר מ־1,500 ק״מ של אלסקה.", "The Iditarod crosses more than 1,500 km of Alaska."),
+    t!("camel", Rides, 0xE8B860, "גמל", "Camel", "גמל", "CAMEL",
+       "גמל צמא שותה כ־100 ליטר בעשר דקות.", "A thirsty camel can drink about 100 litres in ten minutes."),
+    t!("horse", Rides, 0xC0603A, "סוס מרוץ", "Racehorse", "סוס", "HORSE",
+       "סוס מרוץ נמדד בכ־70 קמ״ש.", "A racehorse has been clocked at about 70 km/h."),
+    t!("elephant", Rides, 0xC9A0FF, "פיל", "Elephant", "פיל", "ELEPHANT",
+       "חיית היבשה הגדולה בעולם — שישה טון ומעלה.", "The largest land animal — six tonnes and up."),
+    t!("carriage", Rides, 0xFFD54F, "כרכרה מלכותית", "Royal Carriage", "כרכרה", "CARRIAGE",
+       "כרכרת הזהב הבריטית מ־1762 שוקלת כארבעה טון.", "Britain's Gold State Coach (1762) weighs about four tonnes."),
     // ── small motors
     t!("vespa", Motors, 0x8FE3C4, "וספה", "Vespa", "וספה", "VESPA",
        "״צרעה״ באיטלקית. מאז 1946.", "Italian for “wasp”. Since 1946."),
@@ -126,6 +147,19 @@ pub static TIERS: [Tier; N_TIERS] = [
        "חשמלית מקרואטיה. 412 קמ״ש.", "Electric, from Croatia. 412 km/h."),
     t!("boattail", Hyper, 0x9FD8FF, "רולס־רויס בואט טייל", "Rolls-Royce Boat Tail", "בואט טייל", "BOAT TAIL",
        "דווח כמכונית החדשה היקרה בעולם — כ־28 מיליון דולר.", "Reportedly the priciest new car ever — about $28M."),
+    // ── heavy duty
+    t!("tractor", Workers, 0xFF5A3D, "טרקטור", "Tractor", "טרקטור", "TRACTOR",
+       "הטרקטור הראשון על בנזין נבנה ב־1892.", "The first petrol tractor was built in 1892."),
+    t!("garbage", Workers, 0x6BCF5A, "משאית זבל", "Garbage Truck", "זבל", "GARBAGE",
+       "הגיבורה של כל רחוב, פעם בשבוע.", "Every street's weekly hero."),
+    t!("firetruck", Workers, 0xFF2E2E, "כבאית", "Fire Engine", "כבאית", "FIRE",
+       "הפלטפורמות הגבוהות ביותר מגיעות ל־112 מטר.", "The tallest aerial platforms reach 112 metres."),
+    t!("mixer", Workers, 0xFF9A2E, "מערבל בטון", "Cement Mixer", "מערבל", "MIXER",
+       "התוף מסתובב כל הדרך, כדי שהבטון לא יתקשה.", "The drum keeps turning so the concrete doesn't set."),
+    t!("excavator", Workers, 0xFFC81E, "מחפר", "Excavator", "מחפר", "DIGGER",
+       "חופר בריכה עד הצהריים.", "Digs a pool before lunch."),
+    t!("crane", Workers, 0xFFB000, "מנוף ענק", "Mobile Crane", "מנוף", "CRANE",
+       "הגדולים מרימים יותר מ־1,000 טון.", "The biggest lift more than 1,000 tonnes."),
     // ── monsters & records
     t!("f1", Monsters, 0xFF3030, "מכונית פורמולה 1", "Formula 1 Car", "F1", "F1",
        "כל כך הרבה כוח צמידה, שבתיאוריה תיסע הפוך על התקרה.", "Enough downforce to drive upside down — in theory."),
@@ -150,6 +184,21 @@ pub static TIERS: [Tier; N_TIERS] = [
        "מרחפת על מגנטים. 603 קמ״ש ב־2015.", "Floats on magnets. 603 km/h in 2015."),
     t!("hyperloop", Rails, 0xB5F0FF, "היפרלופ", "Hyperloop", "היפרלופ", "HYPERLOOP",
        "קפסולה בצינור ריק מאוויר. עדיין חלום.", "A pod in a vacuum tube. Still a dream."),
+    // ── under sail
+    t!("raft", Sails, 0xC8A06A, "רפסודה", "Raft", "רפסודה", "RAFT",
+       "קון־טיקי חצתה את האוקיינוס השקט על רפסודה ב־1947.", "Kon-Tiki crossed the Pacific on a raft in 1947."),
+    t!("canoe", Sails, 0xD98A4E, "קאנו", "Canoe", "קאנו", "CANOE",
+       "הקאנו העתיק ביותר שנמצא בן כ־10,000 שנה.", "The oldest canoe ever found is about 10,000 years old."),
+    t!("trireme", Sails, 0xD9B36A, "טרירמה", "Trireme", "טרירמה", "TRIREME",
+       "שלוש שורות משוטים וכ־170 חותרים.", "Three rows of oars and about 170 rowers."),
+    t!("caravel", Sails, 0xE8D5A8, "קרוול", "Caravel", "קרוול", "CARAVEL",
+       "כמו הנינה והפינטה של קולומבוס, 1492.", "Like Columbus's Niña and Pinta, 1492."),
+    t!("junk", Sails, 0xFF5A3D, "ג׳ונקה סינית", "Chinese Junk", "ג׳ונקה", "JUNK",
+       "צי האוצר של ג׳נג חה הגיע עד אפריקה במאה ה־15.", "Zheng He's treasure fleet reached Africa in the 1400s."),
+    t!("galleon", Sails, 0x8A5A3A, "ספינת פיראטים", "Pirate Galleon", "פיראטים", "PIRATES",
+       "שלושה תרנים, עשרות תותחים, ואוצר בבטן.", "Three masts, dozens of cannons, treasure in the hold."),
+    t!("clipper", Sails, 0xF2F6FF, "קליפר", "Clipper Ship", "קליפר", "CLIPPER",
+       "הקאטי סארק מ־1869 עדיין עומדת בגריניץ׳.", "The Cutty Sark (1869) still stands in Greenwich."),
     // ── seas
     t!("jetski", Seas, 0xFF5A4E, "אופנוע ים", "Jet Ski", "אופנוע ים", "JET SKI",
        "אופנוע — אבל על המים.", "A motorbike — on water."),
@@ -240,6 +289,19 @@ pub static TIERS: [Tier; N_TIERS] = [
        "מגיעים לפני שיצאת (ה״ג ולס, 1895).", "Arrive before you leave (H. G. Wells, 1895)."),
     t!("planetengine", SciFi, 0x4DA6FF, "מנוע פלנטרי", "Planet Engine", "פלנטרי", "PLANET",
        "למה לטוס בחללית, אם אפשר לקחת את כל כדור הארץ?", "Why take a ship when you can take the whole planet?"),
+    // ── megastructures
+    t!("spaceelevator", Mega, 0x9FE8FF, "מעלית לחלל", "Space Elevator", "מעלית", "ELEVATOR",
+       "ציולקובסקי חלם עליה ב־1895, בהשראת מגדל אייפל.", "Tsiolkovsky dreamed it up in 1895, inspired by the Eiffel Tower."),
+    t!("oneill", Mega, 0x8FD3FF, "גליל או׳ניל", "O'Neill Cylinder", "או׳ניל", "O'NEILL",
+       "עולם שלם בתוך גליל מסתובב (ג׳רארד או׳ניל, 1976).", "A whole world inside a spinning cylinder (Gerard O'Neill, 1976)."),
+    t!("worldship", Mega, 0x7CFFB2, "ספינת דורות", "Generation Ship", "דורות", "WORLDSHIP",
+       "ספינה שרק הנכדים יגיעו בה ליעד.", "A ship whose grandchildren do the arriving."),
+    t!("ringworld", Mega, 0x6FE6FF, "עולם־טבעת", "Ringworld", "טבעת", "RINGWORLD",
+       "טבעת סביב כוכב, ברוחב מיליון מייל (לארי ניבן, 1970).", "A ring around a star, a million miles wide (Larry Niven, 1970)."),
+    t!("dysonsphere", Mega, 0xFFB627, "כדור דייסון", "Dyson Sphere", "דייסון", "DYSON",
+       "פרימן דייסון, 1960: לאסוף את כל האנרגיה של כוכב.", "Freeman Dyson, 1960: harvest all of a star's energy."),
+    t!("stellarengine", Mega, 0xFFD54F, "מנוע כוכבי", "Stellar Engine", "מנוע כוכבי", "STELLAR",
+       "מראה ענקית שמסיעה את השמש עצמה (שקדוב, 1987).", "A giant mirror that moves the Sun itself (Shkadov, 1987)."),
     // ── rides of the gods
     t!("mushika", Myth, 0xFFB84D, "מושיקה, העכבר של גנש", "Mushika, Ganesha's Mouse", "מושיקה", "MUSHIKA",
        "אל עם ראש של פיל — שרוכב על עכבר.", "An elephant-headed god — who rides a mouse."),
@@ -271,26 +333,37 @@ pub static TIERS: [Tier; N_TIERS] = [
        "חוצה את השמיים בכל יום.", "Crosses the sky every day."),
     t!("helios", Myth, 0xFFE98A, "מרכבת השמש של הליוס", "Helios' Sun Chariot", "הליוס", "HELIOS",
        "מושך את השמש על פני השמיים.", "Hauls the sun across the sky."),
-    // ── holy
-    t!("ark", Holy, 0xC98B4F, "תיבת נח", "Noah's Ark", "תיבת נח", "ARK",
+    // ── wonders
+    t!("basket", Wonders, 0xD9B36A, "תיבת משה", "Moses' Basket", "תיבת משה", "BASKET",
+       "״וַתִּקַּח לוֹ תֵּבַת גֹּמֶא״ (שמות ב, ג)", "“She took for him an ark of bulrushes” (Exodus 2:3)"),
+    t!("ark", Wonders, 0xC98B4F, "תיבת נח", "Noah's Ark", "תיבת נח", "ARK",
        "״שְׁלֹשׁ מֵאוֹת אַמָּה אֹרֶךְ הַתֵּבָה״ (בראשית ו, טו)", "“The length of the ark shall be three hundred cubits” (Genesis 6:15)"),
-    t!("jonah", Holy, 0x5AB4FF, "הדג הגדול של יונה", "Jonah's Great Fish", "יונה", "JONAH",
+    t!("jonah", Wonders, 0x5AB4FF, "הדג הגדול של יונה", "Jonah's Great Fish", "יונה", "JONAH",
        "״וַיְמַן ה׳ דָּג גָּדוֹל לִבְלֹעַ אֶת יוֹנָה״ (יונה ב, א)", "“The LORD had prepared a great fish to swallow up Jonah” (Jonah 1:17)"),
-    t!("eagles", Holy, 0xE8B04F, "על כנפי נשרים", "On Eagles' Wings", "נשרים", "EAGLES",
+    t!("redsea", Wonders, 0x3DA0FF, "קריעת ים סוף", "The Parting of the Red Sea", "ים סוף", "RED SEA",
+       "״וַיָּבֹאוּ בְנֵי יִשְׂרָאֵל בְּתוֹךְ הַיָּם בַּיַּבָּשָׁה״ (שמות יד, כב)", "“The children of Israel went into the midst of the sea upon the dry ground” (Exodus 14:22)"),
+    t!("eagles", Wonders, 0xE8B04F, "על כנפי נשרים", "On Eagles' Wings", "נשרים", "EAGLES",
        "״וָאֶשָּׂא אֶתְכֶם עַל כַּנְפֵי נְשָׁרִים״ (שמות יט, ד)", "“I bare you on eagles' wings” (Exodus 19:4)"),
-    t!("ladder", Holy, 0xFFE7A0, "סולם יעקב", "Jacob's Ladder", "סולם", "LADDER",
-       "״סֻלָּם מֻצָּב אַרְצָה וְרֹאשׁוֹ מַגִּיעַ הַשָּׁמָיְמָה״ (בראשית כח, יב)", "“A ladder set up on the earth, and the top of it reached to heaven” (Genesis 28:12)"),
-    t!("kfitzat", Holy, 0xFFF0B5, "קפיצת הדרך", "Kfitzat HaDerech", "קפיצת הדרך", "THE LEAP",
-       "״שְׁלֹשָׁה קָפְצָה לָהֶם הָאָרֶץ״ (סנהדרין צה, א)", "“For three, the earth leapt” — the road that shrinks (Sanhedrin 95a)"),
-    t!("pillar", Holy, 0xFFB25A, "עמוד הענן", "Pillar of Cloud and Fire", "עמוד ענן", "PILLAR",
+    t!("pillar", Wonders, 0xFFB25A, "עמוד הענן", "Pillar of Cloud and Fire", "עמוד ענן", "PILLAR",
        "״יוֹמָם בְּעַמּוּד עָנָן… וְלַיְלָה בְּעַמּוּד אֵשׁ״ (שמות יג, כא)", "“By day in a pillar of a cloud… by night in a pillar of fire” (Exodus 13:21)"),
-    t!("elijah", Holy, 0xFF6A1F, "מרכבת האש של אליהו", "Elijah's Chariot of Fire", "אליהו", "ELIJAH",
+    t!("arkcovenant", Wonders, 0xFFD27A, "ארון הברית", "The Ark of the Covenant", "ארון הברית", "THE ARK",
+       "״וַיְהִי בִּנְסֹעַ הָאָרֹן״ (במדבר י, לה)", "“And it came to pass, when the ark set forward” (Numbers 10:35)"),
+    // ── the heavens
+    t!("ladder", Heavens, 0xFFE7A0, "סולם יעקב", "Jacob's Ladder", "סולם", "LADDER",
+       "״סֻלָּם מֻצָּב אַרְצָה וְרֹאשׁוֹ מַגִּיעַ הַשָּׁמָיְמָה״ (בראשית כח, יב)", "“A ladder set up on the earth, and the top of it reached to heaven” (Genesis 28:12)"),
+    t!("enoch", Heavens, 0xFFF0B5, "חנוך הולך עם האלוהים", "Enoch Walked with God", "חנוך", "ENOCH",
+       "״וַיִּתְהַלֵּךְ חֲנוֹךְ אֶת הָאֱלֹהִים וְאֵינֶנּוּ כִּי לָקַח אֹתוֹ אֱלֹהִים״ (בראשית ה, כד)", "“Enoch walked with God: and he was not; for God took him” (Genesis 5:24)"),
+    t!("kfitzat", Heavens, 0xFFF0B5, "קפיצת הדרך", "Kfitzat HaDerech", "קפיצת הדרך", "THE LEAP",
+       "״שְׁלֹשָׁה קָפְצָה לָהֶם הָאָרֶץ״ (סנהדרין צה, א)", "“For three, the earth leapt” — the road that shrinks (Sanhedrin 95a)"),
+    t!("elijah", Heavens, 0xFF6A1F, "מרכבת האש של אליהו", "Elijah's Chariot of Fire", "אליהו", "ELIJAH",
        "״רֶכֶב אֵשׁ וְסוּסֵי אֵשׁ״ (מלכים ב׳ ב, יא)", "“A chariot of fire, and horses of fire” (2 Kings 2:11)"),
-    t!("merkavah", Holy, 0xFFE066, "מרכבת יחזקאל", "Ezekiel's Chariot", "מרכבה", "MERKAVAH",
+    t!("cloudchariot", Heavens, 0xE8F0FF, "מרכבת העננים", "The Chariot of Clouds", "עננים", "CLOUDS",
+       "״הַשָּׂם עָבִים רְכוּבוֹ הַמְהַלֵּךְ עַל כַּנְפֵי רוּחַ״ (תהלים קד, ג)", "“Who maketh the clouds his chariot: who walketh upon the wings of the wind” (Psalm 104:3)"),
+    t!("merkavah", Heavens, 0xFFE066, "מרכבת יחזקאל", "Ezekiel's Chariot", "מרכבה", "MERKAVAH",
        "״כַּאֲשֶׁר יִהְיֶה הָאוֹפַן בְּתוֹךְ הָאוֹפָן״ (יחזקאל א, טז)", "“As it were a wheel in the middle of a wheel” (Ezekiel 1:16)"),
-    t!("cherub", Holy, 0xFFD86B, "כרוב", "Cherub", "כרוב", "CHERUB",
+    t!("cherub", Heavens, 0xFFD86B, "כרוב", "Cherub", "כרוב", "CHERUB",
        "״וַיִּרְכַּב עַל כְּרוּב וַיָּעֹף״ (תהלים יח, יא)", "“And he rode upon a cherub, and did fly” (Psalm 18:10)"),
-    t!("donkey", Holy, 0xFFF6E0, "החמור הלבן של המשיח", "The Messiah's White Donkey", "חמור המשיח", "MESSIAH",
+    t!("donkey", Heavens, 0xFFF6E0, "החמור הלבן של המשיח", "The Messiah's White Donkey", "חמור המשיח", "MESSIAH",
        "״עָנִי וְרֹכֵב עַל חֲמוֹר״ (זכריה ט, ט)", "“Lowly, and riding upon an ass” (Zechariah 9:9)"),
     t!("god", God, 0xFFFFFF, "אלוהי ישראל", "The God of Israel", "", "",
        "״אֶהְיֶה אֲשֶׁר אֶהְיֶה״ (שמות ג, יד)", "“I AM THAT I AM” (Exodus 3:14)"),
@@ -304,19 +377,24 @@ pub struct CatInfo {
 }
 pub static CATS: [CatInfo; N_CATS] = [
     CatInfo { he: "ברגל", en: "On Foot", sub_he: "הכול מתחיל בזחילה", sub_en: "It all starts with a crawl", bg_top: 0x120814, bg_bottom: 0x2A1230, accent: 0xFFB3C7 },
+    CatInfo { he: "חיות רכיבה", en: "Riding Animals", sub_he: "לפני המנועים היו סוסים", sub_en: "Before engines, there were horses", bg_top: 0x0E0A04, bg_bottom: 0x2E2210, accent: 0xE8B860 },
     CatInfo { he: "מנועים קטנים", en: "Small Motors", sub_he: "שומעים מנוע?", sub_en: "Is that an engine?", bg_top: 0x050F0B, bg_bottom: 0x0E2A1E, accent: 0x7CFFB2 },
     CatInfo { he: "מכוניות", en: "Cars", sub_he: "מתניעים", sub_en: "Engines on", bg_top: 0x05060B, bg_bottom: 0x0B1022, accent: 0x9FC2FF },
     CatInfo { he: "פרימיום", en: "Premium", sub_he: "עור, עץ ו־V8", sub_en: "Leather, wood and V8s", bg_top: 0x03070F, bg_bottom: 0x0C1A33, accent: 0x6FE6FF },
     CatInfo { he: "סופרקארים", en: "Supercars", sub_he: "פוסטרים על הקיר", sub_en: "Bedroom-wall posters", bg_top: 0x0F0305, bg_bottom: 0x2E0A0E, accent: 0xFF5A5A },
     CatInfo { he: "היפרקארים", en: "Hypercars", sub_he: "מיליונים על גלגלים", sub_en: "Millions on wheels", bg_top: 0x07040F, bg_bottom: 0x1F1040, accent: 0xB18CFF },
+    CatInfo { he: "רכבי עבודה", en: "Heavy Duty", sub_he: "מישהו צריך לעבוד פה", sub_en: "Somebody has to do the work", bg_top: 0x0F0A02, bg_bottom: 0x33260A, accent: 0xFFC81E },
     CatInfo { he: "מפלצות ושיאים", en: "Monsters & Records", sub_he: "גדול. מהיר. מטורף.", sub_en: "Bigger. Faster. Madder.", bg_top: 0x120A02, bg_bottom: 0x3A2406, accent: 0xFFB627 },
     CatInfo { he: "רכבות", en: "Rails", sub_he: "כל הנוסעים לעלות!", sub_en: "All aboard!", bg_top: 0x0A0804, bg_bottom: 0x2A2010, accent: 0xFFD08A },
+    CatInfo { he: "מפרשים", en: "Under Sail", sub_he: "רוח במפרשים", sub_en: "Wind in the sails", bg_top: 0x03080C, bg_bottom: 0x0E2A33, accent: 0xE8D5A8 },
     CatInfo { he: "ים", en: "Seas", sub_he: "מפליגים", sub_en: "Setting sail", bg_top: 0x020A14, bg_bottom: 0x05304A, accent: 0x4FD8FF },
     CatInfo { he: "שמיים", en: "Skies", sub_he: "המראה!", sub_en: "Takeoff!", bg_top: 0x020818, bg_bottom: 0x0B2346, accent: 0x8FD3FF },
     CatInfo { he: "חלל", en: "Space", sub_he: "יוצאים מהאטמוספרה", sub_en: "Leaving the atmosphere", bg_top: 0x000000, bg_bottom: 0x120A2A, accent: 0xB9A2FF },
     CatInfo { he: "מדע בדיוני", en: "Science Fiction", sub_he: "מעבר לגבולות המדע", sub_en: "Beyond known physics", bg_top: 0x07000F, bg_bottom: 0x2A0533, accent: 0xFF52DC },
+    CatInfo { he: "מגה־מבנים", en: "Megastructures", sub_he: "הנדסה בגודל של כוכבים", sub_en: "Engineering the size of stars", bg_top: 0x00030A, bg_bottom: 0x06142E, accent: 0x6FE6FF },
     CatInfo { he: "רכבי האלים", en: "Rides of the Gods", sub_he: "ארץ האלים", sub_en: "Realm of the gods", bg_top: 0x0E0603, bg_bottom: 0x3A1E05, accent: 0xFFC34D },
-    CatInfo { he: "קודש", en: "Holy", sub_he: "מכאן — רק ניסים", sub_en: "From here on, only miracles", bg_top: 0x120804, bg_bottom: 0x4A2A0C, accent: 0xFFE2A8 },
+    CatInfo { he: "ניסים ונפלאות", en: "Wonders", sub_he: "מכאן — רק ניסים", sub_en: "From here on, only miracles", bg_top: 0x120804, bg_bottom: 0x4A2A0C, accent: 0xFFE2A8 },
+    CatInfo { he: "השמיים", en: "The Heavens", sub_he: "הדרך למעלה", sub_en: "The way up", bg_top: 0x140C04, bg_bottom: 0x5A3A12, accent: 0xFFF0B5 },
     CatInfo { he: "אלוהים", en: "God", sub_he: "", sub_en: "", bg_top: 0x1A1408, bg_bottom: 0xFFF6DD, accent: 0xFFFFFF },
 ];
 
@@ -361,6 +439,8 @@ mod tests {
         }
         assert_eq!(era_first(0), 0);
         assert_eq!(TIERS[era_first(Cat::Cars as u8) as usize].key, "picanto");
-        assert_eq!(TIERS[era_first(Cat::Holy as u8) as usize].key, "ark");
+        assert_eq!(TIERS[era_first(Cat::Wonders as u8) as usize].key, "basket");
+        assert_eq!(TIERS[era_first(Cat::Heavens as u8) as usize].key, "ladder");
+        for (i, c) in ALL_CATS.iter().enumerate() { assert_eq!(*c as usize, i); }
     }
 }

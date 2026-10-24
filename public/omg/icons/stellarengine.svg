@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#FFF6B0" stroke-width="6" d="M436 132 Q441 145 454 150 Q441 155 436 168 Q431 155 418 150 Q431 145 436 132 Z"/>
+<path fill="#FFFFFF" stroke-width="5" d="M438 352 Q441 359 448 362 Q441 365 438 372 Q435 365 428 362 Q435 359 438 352 Z"/>
+<circle cx="384" cy="424" r="6" fill="#FFFFFF" stroke-width="4"/>
+<path fill="none" stroke-width="18" d="M100 146 H176 M70 176 H118 M100 366 H176 M70 336 H118"/>
+<path fill="none" stroke="#FFF6C8" stroke-width="7" d="M100 146 H176 M70 176 H118 M100 366 H176 M70 336 H118"/>
+<path fill="#FFE680" stroke-width="8" d="M210 220 L58 206 Q40 256 58 306 L210 292 Z"/>
+<path fill="#FFFFFF" stroke="none" d="M210 237 L74 228 Q64 256 74 284 L210 275 Z"/>
+<path fill="none" stroke-width="14" d="M326 256 H358 M308 199 L337 178 M308 313 L337 334"/>
+<path fill="none" stroke="#FFF6B0" stroke-width="5" d="M326 256 H358 M308 199 L337 178 M308 313 L337 334"/>
+<path fill="#FF9A2E" stroke-width="8" d="M246 181 Q279 164 281 201 Q318 203 301 236 Q332 256 301 276 Q318 309 281 311 Q279 348 246 331 Q226 362 206 331 Q173 348 171 311 Q134 309 151 276 Q120 256 151 236 Q134 203 171 201 Q173 164 206 181 Q226 150 246 181 Z"/>
+<circle cx="226" cy="256" r="70" fill="#FFC93C"/>
+<path fill="#F7A23A" stroke="none" d="M289 267.1 A64 64 0 0 1 194 311.4 Q251.1 309.7 289 267.1 Z"/>
+<path fill="#FFF0A0" stroke="none" d="M167.7 234.8 A62 62 0 0 1 247.2 197.7 Q202.3 205.1 167.7 234.8 Z"/>
+<circle cx="226" cy="256" r="70" fill="none"/>
+<path fill="#9ED8FF" stroke="none" d="M282.2 82.9 A182 182 0 0 1 282.2 429.1 A220.7 220.7 0 0 0 282.2 82.9 Z"/>
+<path fill="#5FB0EC" stroke="none" d="M344.4 124.5 A177 177 0 0 1 344.4 387.5 L338.4 380.8 A168 168 0 0 0 338.4 131.2 Z"/>
+<path fill="#FFF6C8" stroke="none" d="M347.9 139 A234 234 0 0 1 347.9 373 L341 369 A226 226 0 0 0 341 143 Z"/>
+<path fill="none" stroke-width="6" d="M351.5 177.6 L380.3 159.5 M351.5 334.4 L380.3 352.5"/>
+<path fill="none" d="M282.2 82.9 A182 182 0 0 1 282.2 429.1 A220.7 220.7 0 0 0 282.2 82.9 Z"/>
+</g>
+</svg>

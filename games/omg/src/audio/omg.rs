@@ -1,4 +1,4 @@
-//! The 124 OMGs. Each tier takes one of the base voice clips and pushes it
+//! The 155 OMGs. Each tier takes one of the base voice clips and pushes it
 //! further: deeper, slower, bigger rooms, choirs that sing the words, and a bed
 //! of effects that matches the ride. Loudness climbs the whole way up.
 
@@ -31,6 +31,8 @@ pub enum Fx {
     // new families
     Bell, Steps(u8, f32, f32), Squeak, Whine(f32, f32), TwoStroke(f32, f32), Honk, BigHorn(u8), Whistle, Chug(u8),
     Waves(f32), Splash, Sonar(u8), Chopper(f32), Burner(f32), Stomp(u8), Crowd, Trumpet, Whale, Wind(f32), Rumble(f32), Coins,
+    // v3
+    Bray, Neigh(f32), Howl, Siren(f32), Beeper(u8), Creak(f32),
 }
 
 #[derive(Clone, Copy)]
@@ -136,6 +138,14 @@ pub fn recipe(t: u8) -> Recipe {
         "escooter" => b("q_af_jessica").p(2.0, 1.05).l(Whine(300.0, 1800.0), 0.0, 0.7).at(0.45),
         "ebike" => b("excl_am_adam").p(3.0, 1.08).l(Whine(200.0, 1400.0), 0.0, 0.6).l(Bell, 0.9, 0.5).at(0.4),
         "segway" => b("calm_am_puck").p(1.0, 1.0).l(Whine(500.0, 900.0), 0.0, 0.6).at(0.4).rv(0.6, 0.14),
+        // ── riding animals
+        "burro" => b("calm_am_puck").p(3.0, 1.06).l(Bray, 0.0, 0.8).at(0.75),
+        "pony" => b("calm_af_bella").p(3.0, 1.06).l(Hooves, 0.0, 0.5).l(Neigh(1.2), 0.5, 0.5).at(0.45),
+        "dogsled" => b("q_af_jessica").p(2.0, 1.05).l(Howl, 0.0, 0.7).l(Bells(1), 0.3, 0.5).at(0.7),
+        "camel" => b("excl_am_adam").p(2.0, 1.02).l(Bells(0), 0.0, 0.5).l(Wind(1.4), 0.0, 0.4).l(Hooves, 0.2, 0.35).at(0.5),
+        "horse" => b("triple_am_liam").p(1.0, 1.02).l(Hooves, 0.0, 0.85).l(Neigh(1.0), 0.8, 0.6).l(Crowd, 0.5, 0.35).at(0.5),
+        "elephant" => b("double_am_echo").l(Trumpet, 0.0, 0.9).at(0.9).ds(0.04),
+        "carriage" => b("excl_bm_lewis").l(Hooves, 0.0, 0.6).l(Bells(1), 0.2, 0.6).l(Chime, 0.6, 0.4).at(0.6).rv(1.0, 0.18),
         // ── small motors
         "vespa" => b("calm_af_bella").p(1.0, 1.0).l(TwoStroke(70.0, 160.0), 0.0, 0.8).at(0.5),
         "supercub" => b("excl_am_adam").p(1.0, 1.0).l(TwoStroke(55.0, 130.0), 0.0, 0.8).at(0.5),
@@ -177,6 +187,13 @@ pub fn recipe(t: u8) -> Recipe {
         "huayra" => b("excl_am_fenrir").p(-3.0, 0.95).l(Engine(6), 0.0, 0.9).l(Wind(2.0), 0.5, 0.5).at(0.8).oc(0.35).st(2),
         "jesko" => b("sep_am_onyx").p(-3.0, 0.94).l(Engine(4), 0.0, 1.0).l(Boom(false), 2.0, 0.6).at(0.8).oc(0.4).st(2),
         "nevera" => b("long_af_jessica").p(-2.0, 0.95).l(Engine(2), 0.0, 0.9).l(Whine(800.0, 3200.0), 0.3, 0.4).at(0.6).st(2).oc(0.3),
+        // ── heavy duty
+        "tractor" => b("excl_am_fenrir").p(-1.0, 0.98).l(Engine(15), 0.0, 0.75).l(TwoStroke(35.0, 70.0), 0.0, 0.4).at(0.7),
+        "garbage" => b("double_am_echo").p(-1.0, 0.98).l(Engine(15), 0.0, 0.6).l(Beeper(4), 0.3, 0.6).l(Stomp(2), 1.2, 0.4).at(0.8),
+        "firetruck" => b("excl_am_adam").p(-1.0, 1.0).l(Siren(2.6), 0.0, 0.85).l(BigHorn(3), 0.3, 0.6).at(0.8).st(2),
+        "mixer" => b("sep_am_onyx").p(-1.0, 0.98).l(Engine(15), 0.0, 0.6).l(Rumble(1.8), 0.0, 0.5).l(Beeper(3), 0.6, 0.4).at(0.8),
+        "excavator" => b("excl_am_echo").p(-2.0, 0.97).l(Engine(15), 0.0, 0.7).l(Stomp(3), 0.4, 0.6).l(Beeper(3), 0.2, 0.4).at(0.8).oc(0.3),
+        "crane" => b("slow_bm_george").p(-2.0, 0.96).l(Whine(80.0, 400.0), 0.0, 0.6).l(Beeper(4), 0.0, 0.5).l(Chime, 1.2, 0.4).at(0.9).st(2).oc(0.3),
         "boattail" => b("slow_bm_george").p(-3.0, 0.92).l(Chime, 0.0, 0.5).l(Waves(3.0), 0.0, 0.5).l(Coins, 1.2, 0.5).rv(2.0, 0.28).at(0.7).oc(0.35).st(2),
         // ── monsters & records
         "f1" => b("triple_am_liam").p(-2.0, 1.0).l(Engine(13), 0.0, 1.0).l(Crowd, 0.9, 0.5).at(0.7).st(2).ds(0.1),
@@ -191,6 +208,14 @@ pub fn recipe(t: u8) -> Recipe {
         "shinkansen" => b("long_am_michael").p(-3.0, 0.95).l(Chime, 0.0, 0.6).l(BigHorn(0), 0.4, 0.6).l(Whoosh(1.0), 1.2, 0.8).at(1.0).dp(0.4).st(2),
         "maglev" => b("excl_am_eric").p(-3.0, 0.95).l(Whine(120.0, 700.0), 0.0, 0.7).l(Hover, 0.3, 0.6).at(0.6).st(2).oc(0.3),
         "hyperloop" => b("long_af_jessica").p(-3.0, 0.92).l(Whoosh(1.4), 0.0, 0.8).l(Warp(1.6), 0.2, 0.5).at(0.4).dp(0.6).st(2),
+        // ── under sail
+        "raft" => b("calm_am_puck").p(-1.0, 1.0).l(Waves(2.0), 0.0, 0.7).l(Creak(1.6), 0.2, 0.5).at(0.5),
+        "canoe" => b("calm_af_bella").p(-1.0, 0.98).l(Splash, 0.0, 0.5).l(Waves(1.8), 0.0, 0.5).l(Splash, 0.7, 0.4).at(0.5),
+        "trireme" => b("triple_am_liam").p(-2.0, 0.97).l(Steps(6, 0.32, 0.9), 0.0, 0.6).l(Waves(2.5), 0.0, 0.5).l(Horn(45.0), 0.5, 0.6).at(0.8).st(2),
+        "caravel" => b("excl_bm_daniel").p(-2.0, 0.97).l(Creak(2.0), 0.0, 0.6).l(Wind(2.5), 0.0, 0.6).l(Bells(0), 0.7, 0.4).at(0.8).st(2),
+        "junk" => b("long_am_michael").p(-2.0, 0.96).l(Gong(98.0), 0.0, 0.7).l(Waves(2.5), 0.0, 0.5).at(0.6).st(2).rv(1.6, 0.24),
+        "galleon" => b("excl_am_fenrir").p(-3.0, 0.95).l(Boom(true), 0.0, 0.8).l(Creak(2.0), 0.2, 0.5).l(Waves(2.5), 0.0, 0.5).l(Crowd, 0.8, 0.4).at(0.9).st(2).oc(0.3),
+        "clipper" => b("whoa_am_adam").p(-2.0, 0.97).l(Wind(3.0), 0.0, 0.8).l(Splash, 0.6, 0.6).l(Bells(1), 0.9, 0.4).at(0.6).st(2).oc(0.25),
         // ── seas
         "jetski" => b("triple_af_jessica").p(-1.0, 1.0).l(TwoStroke(80.0, 180.0), 0.0, 0.8).l(Splash, 0.6, 0.7).at(0.5),
         "speedboat" => b("excl_am_adam").p(-2.0, 0.98).l(Engine(16), 0.0, 0.9).l(Splash, 0.8, 0.8).at(0.7).st(2),
@@ -238,6 +263,13 @@ pub fn recipe(t: u8) -> Recipe {
         "wormhole" => b("excl_am_echo").p(-4.0, 0.9).at(0.2).l(Swirl(3.2), 0.0, 0.7).l(SubDrop(2.5), 1.2, 0.6).rv(2.8, 0.36).rev_in().oc(0.4).st(2),
         "timemachine" => b("holy_am_eric").p(-3.0, 0.92).at(1.0).l(Clock, 0.0, 0.8).rv(2.6, 0.32).ec(0.3, 0.5).oc(0.35).st(2),
         "planetengine" => b("slow_am_onyx").p(-5.0, 0.9).l(Rocket(3.0), 0.0, 1.0).l(SubDrop(3.5), 0.2, 0.8).l(Thunder(3.0), 1.0, 0.5).at(0.5).rb(0.3).oc(0.5).st(3).ds(0.1),
+        // ── megastructures
+        "spaceelevator" => b("houston_am_adam").p(-2.0, 0.96).l(Whine(60.0, 900.0), 0.0, 0.7).l(Quindar(2525.0), 0.0, 0.6).l(Shimmer(1), 0.4, 0.5).at(0.5).rd(0.35).st(2).oc(0.3),
+        "oneill" => b("slow_af_nicole").p(-3.0, 0.92).l(Hover, 0.0, 0.6).l(Shimmer(2), 0.2, 0.7).at(0.4).rv(3.4, 0.4).st(3).oc(0.3),
+        "worldship" => b("slow_am_onyx").p(-4.0, 0.92).l(Rumble(3.0), 0.0, 0.7).l(Rocket(2.4), 0.2, 0.6).l(Choir(6, 5.0), 0.4, 0.5).at(0.5).rv(3.0, 0.36).st(3).oc(0.4),
+        "ringworld" => b("long_am_michael").p(-4.0, 0.9).l(Swirl(3.0), 0.0, 0.6).l(Shimmer(3), 0.3, 0.7).l(SubDrop(3.0), 0.0, 0.5).at(0.4).rv(3.4, 0.4).st(3).oc(0.4),
+        "dysonsphere" => b("houston_am_onyx").p(-4.0, 0.9).l(Fire(4.0), 0.0, 0.7).l(SubDrop(3.0), 0.2, 0.6).l(Choir(4, 5.0), 0.4, 0.6).at(0.5).rv(3.4, 0.4).st(3).oc(0.45),
+        "stellarengine" => b("slow_am_onyx").p(-5.0, 0.9).l(Rocket(3.2), 0.0, 1.0).l(Fire(5.0), 0.0, 0.7).l(Thunder(4.0), 1.2, 0.6).l(SubDrop(3.5), 0.3, 0.8).at(0.5).rv(3.6, 0.42).st(3).oc(0.5).ds(0.08),
         // ── rides of the gods ("Oh my GODS!")
         "mushika" => b("gods_af_jessica").p(3.0, 1.08).l(Squeak, 0.0, 0.6).l(Bells(0), 0.3, 0.5).at(0.4).rv(1.6, 0.26).ch(9, 0.4),
         "talaria" => b("gods_am_liam").p(-1.0, 1.0).l(Wings, 0.0, 0.7).l(Harp(66.0), 0.2, 0.6).at(0.5).rv(2.2, 0.3).ch(9, 0.45).st(2),
@@ -254,7 +286,10 @@ pub fn recipe(t: u8) -> Recipe {
         "pushpaka" => b("gods_am_liam").p(-3.0, 0.92).l(Shimmer(3), 0.0, 0.8).l(Bells(1), 0.4, 0.6).at(0.5).rv(3.2, 0.38).ch(10, 0.65).oc(0.4).st(3),
         "ra" => b("gods_am_onyx").p(-3.0, 0.9).at(0.5).l(Sistrum, 0.0, 0.7).l(Shimmer(2), 0.4, 0.7).rv(3.2, 0.38).ch(4, 0.65).oc(0.4).st(3),
         "helios" => b("slow_bm_george").p(-4.0, 0.9).at(0.4).l(Horn(43.0), 0.0, 0.6).l(Shimmer(3), 0.3, 0.8).l(Choir(5, 5.0), 0.2, 0.6).l(Hooves, 0.6, 0.5).rv(3.4, 0.4).ch(5, 0.7).oc(0.45).st(3),
-        // ── holy
+        // ── wonders
+        "basket" => b("slow_af_nicole").p(-2.0, 0.92).l(Waves(3.0), 0.0, 0.5).l(Harp(60.0), 0.2, 0.7).l(Choir(1, 4.0), 0.5, 0.5).at(0.8).rv(3.4, 0.4).ch(1, 0.6).oc(0.35).st(3),
+        "redsea" => b("holy_am_eric").p(-4.0, 0.9).l(Wind(4.5), 0.0, 0.8).l(Waves(4.5), 0.0, 0.8).l(Thunder(3.5), 1.4, 0.6).l(Choir(11, 5.5), 0.6, 0.7).at(1.0).rv(3.8, 0.42).ch(11, 0.7).oc(0.5).st(3),
+        "arkcovenant" => b("gods_bm_george").p(-4.0, 0.9).l(Shofar(2.2, 62.0), 0.0, 0.8).l(Shimmer(4), 0.4, 0.7).l(Choir(1, 5.5), 0.5, 0.7).at(1.4).rv(3.8, 0.42).ch(1, 0.72).oc(0.5).st(3),
         "ark" => b("holy_am_eric").p(-3.0, 0.93).l(Thunder(3.5), 0.0, 0.7).l(Waves(4.0), 0.0, 0.6).l(Horn(40.0), 0.5, 0.5).at(0.8).rv(3.4, 0.4).ch(11, 0.6).oc(0.45).st(3),
         "jonah" => b("slow_af_nicole").p(-3.0, 0.9).l(Whale, 0.0, 0.9).l(Waves(3.5), 0.0, 0.4).at(0.8).rv(3.6, 0.42).ch(1, 0.6).oc(0.4).st(3),
         "eagles" => b("gods_bm_george").p(-4.0, 0.9).l(Wings, 0.0, 0.8).l(Shofar(1.8, 62.0), 0.6, 0.8).at(1.0).rv(3.6, 0.42).ch(1, 0.65).oc(0.45).st(3),
@@ -262,6 +297,9 @@ pub fn recipe(t: u8) -> Recipe {
         "kfitzat" => b("slow_am_onyx").p(-4.0, 0.9).l(Warp(2.0), 0.0, 0.6).l(Bells(1), 1.6, 0.6).at(0.4).rv(3.6, 0.42).ch(1, 0.65).oc(0.5).st(3).rev_in(),
         "pillar" => b("slow_bm_george").p(-4.0, 0.9).l(Fire(5.0), 0.0, 0.85).l(Wind(4.0), 0.0, 0.6).l(Choir(11, 5.5), 0.4, 0.7).at(0.7).rv(3.8, 0.42).ch(11, 0.7).oc(0.5).st(3),
         "elijah" => { let mut r = b("slow_am_onyx").p(-4.0, 0.9).at(0.7).l(Fire(5.0), 0.0, 0.85).l(Hooves, 0.3, 0.6).l(Thunder(3.5), 0.6, 0.8).l(Choir(11, 5.5), 0.4, 0.7).rv(3.6, 0.42).ch(11, 0.75); r.octave = 0.5; r.stack = 3; r }
+        // ── the heavens
+        "enoch" => b("slow_bm_george").p(-4.0, 0.88).l(Steps(5, 0.5, 0.2), 0.0, 0.5).l(Harp(55.0), 0.4, 0.7).l(Choir(11, 6.0), 0.6, 0.75).at(1.2).rv(4.0, 0.45).ch(11, 0.75).oc(0.5).st(3),
+        "cloudchariot" => b("gods_am_onyx").p(-5.0, 0.88).l(Wind(5.0), 0.0, 0.85).l(Thunder(4.5), 0.6, 0.8).l(Wings, 0.3, 0.6).l(Choir(7, 6.0), 0.6, 0.75).at(1.0).rv(4.0, 0.45).ch(7, 0.75).oc(0.5).st(3),
         "merkavah" => b("gods_am_onyx").p(-5.0, 0.88).l(Gong(73.0), 0.0, 0.8).l(Swirl(4.0), 0.2, 0.5).l(Choir(7, 6.0), 0.5, 0.75).l(Wings, 1.0, 0.5).at(0.9).rv(4.0, 0.45).ch(7, 0.75).oc(0.5).st(3),
         "cherub" => b("sep_bm_george").p(-5.0, 0.88).l(Wings, 0.0, 0.8).l(Shimmer(4), 0.3, 0.8).l(Choir(1, 6.0), 0.5, 0.75).at(1.4).rv(4.0, 0.45).ch(1, 0.78).oc(0.5).st(3),
         "donkey" => { let mut r = b("sep_bm_george").p(-5.0, 0.88).at(2.1).l(Shofar(2.3, 62.0), 0.0, 0.95).l(Bells(1), 2.0, 0.6).l(Choir(1, 6.0), 1.9, 0.7).rv(3.8, 0.42).ch(1, 0.75); r.octave = 0.5; r.stack = 3; r }
@@ -345,6 +383,12 @@ fn layer(sr: f32, fx: Fx, seed: u32) -> St {
         Wind(d) => wind(sr, d, seed),
         Rumble(d) => rumble(sr, d, seed),
         Coins => coins(sr),
+        Bray => bray(sr, seed),
+        Neigh(d) => neigh(sr, d, seed),
+        Howl => howl(sr, seed),
+        Siren(d) => siren(sr, d),
+        Beeper(n) => beeper(sr, n as usize),
+        Creak(d) => creak(sr, d, seed),
     }
 }
 

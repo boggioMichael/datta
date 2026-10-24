@@ -13,29 +13,29 @@ impl Mode {
 pub struct ModeInfo { pub key: &'static str, pub icon: &'static str, pub he: &'static str, pub en: &'static str, pub dhe: &'static str, pub den: &'static str }
 pub static MODES: [ModeInfo; N_MODES] = [
     ModeInfo { key: "classic", icon: "🏁", he: "קלאסי", en: "Classic",
-        dhe: "תמיד מתחילים מזחילה. נגיעה מפילה עוד אחד, גרירה מטה את הכבידה. כמה זמן ייקח לך להגיע לאלוהים?",
-        den: "Every run starts with a crawl. Tap to drop one more, drag to tilt gravity. How fast can you reach God?" },
+        dhe: "הגבעול שופך לבועה רק תינוקות זוחלים. נגיעה שופכת עוד אחד, גרירה מערבבת ומטה את הכבידה, נגיעה בדופן דוחפת, צביטה מתקרבת. כמה זמן ייקח לך להגיע לאלוהים?",
+        den: "The stem pours nothing but crawling babies into the bubble. Tap to pour one more, drag to stir and tilt, tap the wall to poke, pinch to zoom. How fast can you reach God?" },
     ModeInfo { key: "watch", icon: "🍿", he: "צפייה", en: "Watch",
         dhe: "סימולציה אוטומטית כמו ברילז. לשבת, להקליט ולשמוע את ה־OMG מתעצם.",
         den: "A hands-off simulation, like the reel. Sit back, record, and let the OMGs escalate." },
     ModeInfo { key: "chaos", icon: "🌪️", he: "כאוס", en: "Chaos",
-        dhe: "פי שניים טפטוף, פורטלים בתוך הטבעת ופריטים מדרגות שונות.",
-        den: "Double the drip, portals inside the ring and mixed tiers." },
+        dhe: "שפיכה כפולה, פורטלים בתוך המיכל ופריטים מדרגות שונות.",
+        den: "Double the pour, portals inside the vessel and mixed tiers." },
     ModeInfo { key: "mega", icon: "🌌", he: "מגה", en: "Mega",
-        dhe: "טבעת ענקית, מאות כדורים, מבול מהפיה. מורכבות מטורפת.",
-        den: "A gigantic ring, hundreds of balls, a flood from the spout. Insane complexity." },
+        dhe: "בועה עצומה, מאות תאים, מבול של תינוקות. מורכבות מטורפת.",
+        den: "A colossal bubble, hundreds of cells, a flood of babies. Insane complexity." },
     ModeInfo { key: "trampoline", icon: "🏀", he: "טרמפולינה", en: "Trampoline",
         dhe: "הכול קופץ כמעט בלי לאבד אנרגיה. הדופן בועטת חזרה.",
         den: "Everything bounces with almost no energy loss. The wall kicks back." },
     ModeInfo { key: "blackhole", icon: "🕳️", he: "חור שחור", en: "Black Hole",
-        dhe: "הכבידה מושכת למרכז הטבעת. הכול מתנגש באמצע.",
-        den: "Gravity pulls to the centre of the ring. Everything collides in the middle." },
+        dhe: "הכבידה מושכת למרכז הבועה. הכול מתנגש באמצע.",
+        den: "Gravity pulls to the centre of the bubble. Everything collides in the middle." },
     ModeInfo { key: "timeattack", icon: "⏱️", he: "נגד השעון", en: "Time Attack",
         dhe: "‏120 שניות. כמה גבוה אפשר להגיע?",
         den: "120 seconds. How high can you climb?" },
     ModeInfo { key: "sandbox", icon: "🧪", he: "ארגז חול", en: "Sandbox",
-        dhe: "בוחרים כל דרגה שכבר פתחת ומפילים בנגיעה בכל מקום בטבעת.",
-        den: "Pick any tier you've unlocked and tap anywhere in the ring to drop it." },
+        dhe: "בוחרים כל דרגה שכבר פתחת ומפילים בנגיעה בכל מקום בבועה. המצלמה מתקרבת ומתרחקת לגודל שלה.",
+        den: "Pick any tier you've unlocked and tap anywhere in the bubble to drop it. The camera zooms to its size." },
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -44,9 +44,9 @@ pub enum Tool { Shake = 0, Magnet = 1, Bomb = 2, SlowMo = 3, Flip = 4, Upgrade =
 pub const N_TOOLS: usize = 6;
 pub struct ToolInfo { pub key: &'static str, pub icon: &'static str, pub he: &'static str, pub en: &'static str, pub dhe: &'static str, pub den: &'static str, pub cooldown: f32, pub duration: f32 }
 pub static TOOLS: [ToolInfo; N_TOOLS] = [
-    ToolInfo { key: "shake", icon: "🫨", he: "ניעור", en: "Shake", dhe: "מקפיץ את כל הטבעת", den: "Kicks everything in the ring", cooldown: 4.0, duration: 0.0 },
+    ToolInfo { key: "shake", icon: "🫨", he: "ניעור", en: "Shake", dhe: "מקפיץ את כל מה שבבועה", den: "Kicks everything in the bubble", cooldown: 4.0, duration: 0.0 },
     ToolInfo { key: "magnet", icon: "🧲", he: "מגנט", en: "Magnet", dhe: "זהים נמשכים זה לזה ל־4 שניות", den: "Twins pull together for 4 s", cooldown: 12.0, duration: 4.0 },
-    ToolInfo { key: "bomb", icon: "💣", he: "פצצה", en: "Bomb", dhe: "מפוצץ את הדרגה הנמוכה בטבעת", den: "Blows up the lowest tier in the ring", cooldown: 18.0, duration: 0.0 },
+    ToolInfo { key: "bomb", icon: "💣", he: "פצצה", en: "Bomb", dhe: "מפוצץ את הדרגה הנמוכה בבועה", den: "Blows up the lowest tier in the bubble", cooldown: 18.0, duration: 0.0 },
     ToolInfo { key: "slowmo", icon: "🐢", he: "הילוך איטי", en: "Slow-mo", dhe: "רבע מהירות ל־3 שניות", den: "Quarter speed for 3 s", cooldown: 10.0, duration: 3.0 },
     ToolInfo { key: "flip", icon: "🙃", he: "היפוך", en: "Flip", dhe: "הכבידה מתהפכת לשנייה", den: "Gravity flips for a second", cooldown: 8.0, duration: 1.1 },
     ToolInfo { key: "upgrade", icon: "⏫", he: "שדרוג", en: "Upgrade", dhe: "נוגעים בפריט והוא עולה דרגה (מטען כל 45 שניות)", den: "Tap an item to lift it one tier (one charge per 45 s)", cooldown: 45.0, duration: 0.0 },
@@ -58,9 +58,9 @@ pub enum Opt {
     Speed = 0, DropRate, Gap, HardMode, Combo, Events,
     Gravity, Bounce, Magnet, RingSize, SizeGrow, RingSpin, AutoTilt, DeviceTilt,
     VolMaster, VolVoice, VolSfx, VolMusic, VoiceStyle, Music, Notes, VolNotes,
-    Drama, Theme, Scenery, Stars, BallStyle, Particles, ScreenShake, Flashes, Labels, Trails, Ladder, Timer, Caption, Haptics,
+    Drama, Camera, Theme, Scenery, Stars, BallStyle, Particles, ScreenShake, Flashes, Labels, Trails, Ladder, Timer, Caption, Haptics,
 }
-pub const N_OPTS: usize = 36;
+pub const N_OPTS: usize = 37;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind { Choice, Range, Toggle }
@@ -89,24 +89,24 @@ pub static OPTS: [OptDef; N_OPTS] = [
     // ── game
     ch("speed", 0, "מהירות סימולציה", "Simulation speed", "לא משנה את שעון השיא — הוא סופר זמן משחק", "Doesn't affect records — the clock counts game time",
        &[("×0.5", "×0.5", 0.5), ("×1", "×1", 1.0), ("×2", "×2", 2.0), ("×4", "×4", 4.0), ("×8", "×8", 8.0)], 1.0),
-    ch("droprate", 0, "קצב טפטוף", "Drip rate", "כמה מהר הפיה מפילה", "How fast the spout drops",
+    ch("droprate", 0, "קצב השפיכה", "Pour rate", "כמה מהר התינוקות נשפכים מהפיה", "How fast the babies pour from the spout",
        &[("איטי", "Slow", 0.6), ("רגיל", "Normal", 1.0), ("מהיר", "Fast", 1.6), ("מטורף", "Insane", 2.6), ("מבול", "Flood", 4.0)], 1.0),
-    ch("gap", 0, "אורך המסע", "Journey length", "כמה דרגות מעל הפיה בונים לפני שהפיה משתדרגת. ארוך = יותר כדורים ויותר זמן", "How many tiers above the spout you build before the spout upgrades. Longer = more balls, more time",
+    ch("gap", 0, "אורך המסע", "Journey length", "כמה דרגות בונים בתוך המיכל לפני שהמשפך מתחיל לגבש את התינוקות לכדור גדול יותר. ארוך = יותר כדורים ויותר זמן", "How many tiers you build in the vessel before the funnel starts clumping the babies into a bigger ball. Longer = more balls, more time",
        &[("קצר", "Short", 2.0), ("רגיל", "Normal", 3.0), ("ארוך", "Long", 4.0), ("אפי", "Epic", 5.0)], 3.0),
-    tg("hard", 0, "מצב קשה", "Hard mode", "אם הטבעת מתמלאת עד הפיה — המשחק נגמר", "If the ring fills up to the spout, the game is over", 0.0),
+    tg("hard", 0, "מצב קשה", "Hard mode", "אם הבועה מתמלאת עד הגבעול — המשחק נגמר", "If the bubble fills up to the stem, the game is over", 0.0),
     tg("combo", 0, "קומבו", "Combos", "מיזוגים ברצף בונים מונה קומבו", "Back-to-back merges build a combo counter", 1.0),
     tg("events", 0, "אירועים אקראיים", "Random events", "שעת עומס, רעידת אדמה, רוח צד, אפס כבידה וסערה מגנטית", "Rush hour, earthquakes, crosswinds, zero-g and magnetic storms", 1.0),
     // ── physics
     ch("gravity", 1, "כוח משיכה", "Gravity", "", "",
        &[("ירח", "Moon", 0.45), ("נמוך", "Low", 0.7), ("כדור הארץ", "Earth", 1.0), ("כבד", "Heavy", 1.45), ("צדק", "Jupiter", 2.1)], 1.0),
     rg("bounce", 1, "קפיציות", "Bounciness", "כמה אנרגיה נשארת בכל קפיצה", "How much energy each bounce keeps", 0.0, 0.97, 0.01, 0.8),
-    ch("magnet", 1, "עזרת מגנט", "Magnet assist", "זהים נמשכים זה לזה בעדינות כדי שהטבעת לא תיתקע", "Twins drift together gently so the ring never jams",
+    ch("magnet", 1, "עזרת מגנט", "Magnet assist", "זהים נמשכים זה לזה בעדינות כדי שהבועה לא תיתקע", "Twins drift together gently so the bubble never jams",
        &[("כבוי", "Off", 0.0), ("עדין", "Gentle", 1.0), ("חזק", "Strong", 2.2)], 1.0),
-    ch("ringsize", 1, "גודל המיכל", "Container size", "כמה הטבעת גדולה ביחס לכדורים", "How big the ring is compared to the balls",
-       &[("קלאסי", "Classic", 0.72), ("גדול", "Big", 1.0), ("ענק", "Huge", 1.3), ("עצום", "Colossal", 1.65)], 1.0),
-    ch("sizegrow", 1, "גדילה בכל מיזוג", "Growth per merge", "כמה הכדור החדש גדול מהשניים שהתמזגו", "How much bigger the new ball is than the two that merged",
-       &[("עדינה", "Subtle", 1.1), ("רגילה", "Normal", 1.16), ("דרמטית", "Dramatic", 1.24)], 1.16),
-    ch("ringspin", 1, "סיבוב הטבעת", "Ring spin", "הדופן מסובבת את מה שנוגע בה", "The wall drags whatever touches it",
+    ch("ringsize", 1, "גודל המיכל", "Vessel size", "כמה המיכל ענק ביחס לכדורים שנשפכים אליו", "How huge the vessel is compared to the balls that pour into it",
+       &[("קלאסי", "Classic", 0.06), ("גדול", "Big", 0.045), ("ענק", "Huge", 0.034), ("עצום", "Colossal", 0.025)], 0.045),
+    ch("sizegrow", 1, "גדילה בכל דרגה", "Growth per tier", "פי כמה כל דרגה רחבה מזו שמתחתיה. יותר = המצלמה מתרחקת מהר יותר", "How many times wider each tier is than the one below. More = the camera pulls back faster",
+       &[("עדינה", "Gentle", 1.5), ("גדולה", "Big", 1.75), ("ענקית", "Huge", 2.0)], 1.75),
+    ch("ringspin", 1, "סיבוב הדופן", "Wall spin", "הדופן מסובבת את מה שנוגע בה", "The wall drags whatever touches it",
        &[("כבוי", "Off", 0.0), ("לאט", "Slow", 0.35), ("מהר", "Fast", 1.0), ("הפוך", "Reverse", -0.6)], 0.0),
     tg("autotilt", 1, "הטיה אוטומטית", "Auto-tilt", "הכבידה מתנדנדת לבד כדי לערבב", "Gravity sways by itself to stir things up", 0.0),
     tg("devicetilt", 1, "הטיית הטלפון", "Phone tilt", "הטיית הטלפון מטה את הכבידה", "Tilting the phone tilts gravity", 0.0),
@@ -123,12 +123,14 @@ pub static OPTS: [OptDef; N_OPTS] = [
     // ── display
     ch("drama", 3, "דרמה", "Drama", "הילוך איטי, זום ומסכי עידן בכל דרגה חדשה", "Slow-motion, camera zoom and era title cards on every new tier",
        &[("כבוי", "Off", 0.0), ("רגיל", "Normal", 1.0), ("מקסימום", "Maximum", 2.0)], 1.0),
-    ch("theme", 3, "צבע הטבעת", "Ring colours", "", "",
-       &[("קשת", "Rainbow", 0.0), ("לפי העידן", "By era", 1.0), ("זהב", "Gold", 2.0), ("קרח", "Ice", 3.0), ("לבן", "White", 4.0), ("אש", "Fire", 5.0)], 0.0),
-    tg("scenery", 3, "נוף לכל עידן", "Era scenery", "עיר, ים, שמיים, חלל ומקדשים מאחורי הטבעת", "City, sea, sky, space and temples behind the ring", 1.0),
-    tg("stars", 3, "כוכבים", "Stars", "", "", 1.0),
+    ch("camera", 3, "מצלמה", "Camera", "אוטומטית מתחילה קרוב ומתרחקת. אפשר תמיד לצבוט, לגלול או ללחוץ על + ו־− כדי להתקרב ולהתרחק", "Auto starts close and pulls back. You can always pinch, scroll or tap + and − to zoom in and out",
+       &[("אוטומטית", "Auto", 0.0), ("כל המיכל", "Whole vessel", 1.0), ("עוקבת", "Follow", 2.0)], 0.0),
+    ch("theme", 3, "המיכל", "The vessel", "בועת חיים שקופה שגדלה עם מה שבתוכה, או טבעת ניאון כמו פעם", "A living see-through bubble that grows with what's inside it, or the old neon ring",
+       &[("בועת חיים", "Living bubble", 6.0), ("טבעת קשת", "Rainbow ring", 0.0), ("טבעת לפי העידן", "Era ring", 1.0), ("טבעת זהב", "Gold ring", 2.0), ("טבעת קרח", "Ice ring", 3.0), ("טבעת אש", "Fire ring", 5.0)], 6.0),
+    tg("scenery", 3, "עולם חי", "Living world", "לכל עידן מקום משלו, והנוף מתרחק יחד עם המצלמה", "Every era has its own place, and the land pulls back with the camera", 1.0),
+    tg("stars", 3, "עומק ואבק", "Depth & motes", "אבק, אורות, בועות וכוכבים שמרחפים ונסחפים פנימה כשהמצלמה מתרחקת", "Dust, lights, bubbles and stars that drift and stream inward as the camera pulls back", 1.0),
     ch("ballstyle", 3, "סגנון הכדורים", "Ball style", "", "",
-       &[("מדבקה", "Sticker", 0.0), ("זכוכית", "Glass", 1.0), ("ניאון", "Neon", 2.0), ("שטוח", "Flat", 3.0)], 0.0),
+       &[("תא חי", "Living cell", 4.0), ("מדבקה", "Sticker", 0.0), ("זכוכית", "Glass", 1.0), ("ניאון", "Neon", 2.0), ("שטוח", "Flat", 3.0)], 4.0),
     ch("particles", 3, "חלקיקים", "Particles", "", "",
        &[("מעט", "Low", 0.4), ("רגיל", "Normal", 1.0), ("הרבה", "Lots", 1.8)], 1.0),
     tg("shake", 3, "רעידת מסך", "Screen shake", "", "", 1.0),
@@ -180,5 +182,7 @@ mod tests {
         assert_eq!(OPTS[Opt::VolNotes as usize].key, "volnotes");
         assert_eq!(OPTS[Opt::SizeGrow as usize].key, "sizegrow");
         assert_eq!(OPTS[Opt::Events as usize].key, "events");
+        assert_eq!(OPTS[Opt::Camera as usize].key, "camera");
+        assert_eq!(OPTS[Opt::RingSize as usize].key, "ringsize");
     }
 }

@@ -1,9 +1,10 @@
 //! OH MY GOD — a merge game from a crawling baby to the God of Israel.
 //!
 //! Everything that decides what happens lives here: physics, merge rules, the
-//! 124-tier ladder, modes, tools, options, progression, the draw list (scenery
-//! included) and the sound engine. The browser shell only paints the draw list, plays the PCM this
-//! crate renders and forwards input.
+//! 155-tier ladder, the zoom, modes, tools, options, progression, the draw list
+//! (the living world, the bubble and the Genesis ending included) and the sound
+//! engine. The browser shell only paints the draw list, plays the PCM this crate
+//! renders and forwards input.
 #![cfg_attr(target_arch = "wasm32", no_std)]
 
 extern crate alloc;
@@ -13,7 +14,9 @@ pub mod tiers;
 pub mod opts;
 pub mod game;
 pub mod render;
-pub mod scenery;
+pub mod world;
+pub mod vessel;
+pub mod story;
 pub mod ui;
 pub mod save;
 pub mod audio;
@@ -143,7 +146,7 @@ pub extern "C" fn omg_tool_state(i: u32, field: u32) -> f32 {
 pub extern "C" fn omg_set_opt(i: u32, v: f32) {
     let gm = g();
     gm.opts.set(i as usize, v);
-    if i as usize == Opt::RingSize as usize && !gm.started { gm.ring_r = gm.opts.get(Opt::RingSize); }
+    let _ = Opt::RingSize;
     gm.dirty_save = 0.4;
 }
 #[unsafe(no_mangle)]
@@ -164,21 +167,46 @@ pub extern "C" fn omg_set_caption(p: *const u8, n: usize) {
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_set_sandbox_tier(t: u32) {
     let gm = g(); let t = (t as u8).min(tiers::GOD - 1);
-    if gm.unlocked & game::bit(t) != 0 {
+    if gm.unlocked.has(t) {
         gm.sandbox_tier = t;
-        if gm.mode == opts::Mode::Sandbox { gm.spout = t; gm.base = t as f32; gm.cat = tiers::cat_of(t); }
+        // the camera zooms to the new size (see Game::step)
+        if gm.mode == opts::Mode::Sandbox { gm.spout = t; gm.cat = tiers::cat_of(t); }
+    }
+}
+/// Camera: op 0 zoom by `a` around screen point (b, c); 1 pan by screen delta (a, b); 2 back to automatic.
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_view(op: u32, a: f32, b: f32, c: f32) {
+    let gm = g();
+    match op { 0 => gm.view_zoom(a, b, c), 1 => gm.view_pan_by(a, b), _ => gm.view_auto() }
+}
+/// The narration's playback position in seconds (negative: no narration, the story keeps its own clock).
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_story_time(t: f32) { let gm = g(); if gm.story_on && t.is_finite() { gm.story_ext = t; } }
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_story_skip() { let gm = g(); if gm.story_on { gm.end_story(); } }
+/// Testing hooks: 1 jump the run to tier `a`; 2 start the Genesis story at time `a`; 3 set the story's time to `a`.
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_debug(op: u32, a: f32) {
+    let gm = g();
+    match op {
+        1 => gm.debug_jump((a.max(0.0) as u8).min(tiers::GOD - 1)),
+        2 => gm.debug_story(a),
+        3 => { if gm.story_on { gm.story_t = a.max(0.0); } }
+        4 => gm.debug_god(),
+        _ => {}
     }
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_device_tilt(rad: f32) { if rad.is_finite() { g().device_tilt = m::clamp(rad, -0.65, 0.65); } }
 #[unsafe(no_mangle)]
-pub extern "C" fn omg_unlocked(t: u32) -> u32 { if (t as usize) < tiers::N_TIERS && g().unlocked & game::bit(t as u8) != 0 { 1 } else { 0 } }
+pub extern "C" fn omg_unlocked(t: u32) -> u32 { if (t as usize) < tiers::N_TIERS && g().unlocked.has(t as u8) { 1 } else { 0 } }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_reset_progress() {
     let gm = g();
-    gm.unlocked = 1; gm.stats = game::Stats::default(); gm.dirty_save = 0.1;
+    gm.unlocked = game::Mask::ONE; gm.stats = game::Stats::default(); gm.dirty_save = 0.1;
 }
-/// 0 started, 1 paused, 2 finished, 3 over, 4 mode, 5 run_max, 6 time, 7 spout, 8 merges(run), 9 drops(run), 10 ta_left, 11 god_t, 12 voice busy, 13 bodies, 14 era
+/// 0 started, 1 paused, 2 finished, 3 over, 4 mode, 5 run_max, 6 time, 7 spout, 8 merges(run), 9 drops(run), 10 ta_left, 11 god_t,
+/// 12 voice busy, 13 bodies, 14 era, 15 log10(babies poured), 16 log10(zoom-out factor), 17 story on, 18 story time, 19 view manual, 20 view zoom
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_info(f: u32) -> f32 {
     let gm = g();
@@ -187,6 +215,12 @@ pub extern "C" fn omg_info(f: u32) -> f32 {
         4 => gm.mode as u32 as f32, 5 => gm.run_max as f32, 6 => gm.time, 7 => gm.spout as f32,
         8 => gm.run_merges as f32, 9 => gm.run_drops as f32, 10 => gm.ta_left, 11 => gm.god_t, 12 => gm.voice_playing() as u32 as f32,
         13 => gm.bodies.len() as f32, 14 => gm.cat as f32,
+        15 => if gm.babies > 0.0 { m::log10_64(gm.babies) as f32 } else { -1.0 },
+        16 => m::log10_64(gm.zoom_factor()) as f32,
+        17 => gm.story_on as u32 as f32, 18 => gm.story_t,
+        19 => gm.view_manual as u32 as f32, 20 => gm.cam().0,
+        21..=28 => story::beat_times(story::track(gm.story_he))[(f - 21) as usize],
+        29 => gm.story_hold as u32 as f32, 30 => gm.story_beat as f32, 31 => gm.story_marks.len() as f32,
         _ => 0.0,
     }
 }

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<g stroke="#15152A" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+<g transform="translate(-10 28)">
+<rect x="130" y="110" width="12" height="86" rx="5" fill="#8E5523"/>
+<rect x="262" y="60" width="14" height="184" rx="6" fill="#8E5523"/>
+<rect x="370" y="136" width="12" height="110" rx="5" fill="#8E5523"/>
+<path fill="#FFF3DC" d="M98 100 Q76 140 104 178 Q140 186 176 176 Z"/>
+<path fill="#EADBB8" stroke="none" d="M94 160 L160 160 L176 176 Q140 186 104 178 Z"/>
+<path fill="none" d="M98 100 Q76 140 104 178 Q140 186 176 176 Z"/>
+<path fill="#FFF3DC" d="M168 72 Q140 156 188 232 Q272 244 356 226 Z"/>
+<path fill="#EADBB8" stroke="none" d="M176 210 L336 210 L356 226 Q272 244 188 232 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.5" d="M172 96 Q160 132 166 170 Q176 130 198 108 Z"/>
+<path fill="none" d="M168 72 Q140 156 188 232 Q272 244 356 226 Z"/>
+<path fill="#FFF3DC" d="M322 134 Q304 186 338 236 Q388 244 438 226 Z"/>
+<path fill="#EADBB8" stroke="none" d="M326 214 L423 214 L438 226 Q388 244 338 236 Z"/>
+<path fill="none" d="M322 134 Q304 186 338 236 Q388 244 438 226 Z"/>
+<path fill="none" stroke-width="16" d="M186 182 L92 94 M366 232 L160 64 M446 232 L314 126 M420 232 L468 202"/>
+<path fill="none" stroke="#B9773A" stroke-width="7" d="M186 182 L92 94 M366 232 L160 64 M446 232 L314 126 M420 232 L468 202"/>
+<path fill="#FF5A4E" stroke-width="8" d="M276 60 Q302 56 326 66 Q302 72 276 76 Z"/>
+<path fill="#D08A45" d="M92 186 L156 186 L162 236 L366 242 Q414 242 446 218 Q446 270 412 306 Q330 336 196 334 Q122 330 104 296 Q94 256 92 186 Z"/>
+<path fill="#A0612C" stroke="none" d="M100 290 Q256 320 434 262 Q424 290 412 302 Q330 332 196 330 Q124 326 104 296 Z"/>
+<path fill="#EDB173" stroke="none" d="M166 245 L366 251 Q406 251 436 233 L434 243 Q406 262 366 262 L166 256 Z"/>
+<path fill="none" stroke-width="6" d="M100 270 Q256 300 440 246"/>
+<path fill="none" d="M92 186 L156 186 L162 236 L366 242 Q414 242 446 218 Q446 270 412 306 Q330 336 196 334 Q122 330 104 296 Q94 256 92 186 Z"/>
+<path fill="#FFE08A" stroke-width="6" d="M104 200 L120 200 L120 214 L104 214 Z M128 200 L144 200 L144 214 L128 214 Z"/>
+</g>
+<path fill="#3DA5FF" d="M80 358 Q102 344 124 358 T168 358 T212 358 T256 358 T300 358 T344 358 T388 358 T432 358 Q446 360 442 374 Q434 400 408 402 L104 402 Q78 400 70 374 Q66 360 80 358 Z"/>
+<path fill="#2A86E0" stroke="none" d="M72 380 L440 380 Q430 397 408 397 L104 397 Q82 397 72 380 Z"/>
+<path fill="#FFFFFF" stroke="none" opacity="0.45" d="M130 368 L176 368 Q182 372 176 376 L130 376 Q124 372 130 368 Z M300 368 L346 368 Q352 372 346 376 L300 376 Q294 372 300 368 Z"/>
+</g>
+</svg>

@@ -17,6 +17,8 @@ unsafe extern "C" {
     fn log10f(x: f32) -> f32;
     fn asinf(x: f32) -> f32;
     fn tanf(x: f32) -> f32;
+    #[link_name = "pow"] fn pow_f64(x: f64, y: f64) -> f64;
+    #[link_name = "log10"] fn log10_f64(x: f64) -> f64;
 }
 
 #[inline] pub fn sin(x: f32) -> f32 { unsafe { sinf(x) } }
@@ -34,6 +36,9 @@ unsafe extern "C" {
 #[inline] pub fn tanh(x: f32) -> f32 { unsafe { tanhf(x) } }
 #[inline] pub fn fmod(x: f32, y: f32) -> f32 { unsafe { fmodf(x, y) } }
 #[inline] pub fn asin(x: f32) -> f32 { unsafe { asinf(x.clamp(-1.0, 1.0)) } }
+#[inline] pub fn log2f(x: f32) -> f32 { ln(x) * core::f32::consts::LOG2_E }
+#[inline] pub fn libm_pow64(x: f64, y: f64) -> f64 { unsafe { pow_f64(x, y) } }
+#[inline] pub fn log10_64(x: f64) -> f64 { unsafe { log10_f64(x) } }
 #[inline] pub fn abs(x: f32) -> f32 { if x < 0.0 { -x } else { x } }
 #[inline] pub fn clamp(x: f32, a: f32, b: f32) -> f32 { if x < a { a } else if x > b { b } else { x } }
 #[inline] pub fn lerp(a: f32, b: f32, t: f32) -> f32 { a + (b - a) * t }

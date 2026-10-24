@@ -1,11 +1,20 @@
 //! Game state, physics and rules.
 //!
-//! World units: the inside of the ring has radius `ring_r` (1 by default), centred
-//! on the origin, y pointing down. The chute is a vertical channel of half-width
-//! CHUTE_W that meets the ring at its top. Every run starts by dropping crawling
-//! babies; when you've built `gap` tiers above the spout, the spout upgrades.
-//! A ball's size depends on its tier: one merge makes it visibly bigger, and the
-//! whole ladder grows from tiny babies to huge chariots and the God of Israel.
+//! World units: the inside of the ring has radius `ring_r` (1), centred on the
+//! origin, y pointing down. The chute is a vertical channel of half-width CHUTE_W
+//! that meets the ring at its top.
+//!
+//! Sizes are absolute: every tier is `grow` times wider than the one below it, so
+//! Hermes' sandals really are a million times the size of the Space Shuttle. The
+//! world can't fit that, so the camera zooms out: `base` is how many tiers the
+//! world has zoomed out so far, and a ball's radius on the table is
+//! `seed_r · grow^(tier − base)`. When the zoom moves, everything in the ring is
+//! scaled around the bottom of the vessel, exactly like a camera pulling back.
+//!
+//! The spout only ever pours crawling babies. Two babies make a walker, two
+//! walkers a runner… Once the zoom has left the babies too small to see, they
+//! clump together in the funnel on the way in (otherwise reaching God would take
+//! 2^154 drops), and the ball that falls is whatever that many babies make.
 
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -14,15 +23,25 @@ use crate::m::*;
 use crate::opts::*;
 use crate::tiers::*;
 
-/// Size of the spout's ball at the start and at the end of the ladder (world units).
-pub const A0: f32 = 0.05;
-pub const A1: f32 = 0.13;
-pub const GOD_R: f32 = 0.42;
-pub const CHUTE_W: f32 = 0.14;
+pub const CHUTE_W: f32 = 0.09;
 pub const BASE_G: f32 = 4.2;
-pub const MAX_BODIES: usize = 300;
-pub const MAX_BODIES_MEGA: usize = 460;
+pub const MAX_BODIES: usize = 340;
+pub const MAX_BODIES_MEGA: usize = 520;
 pub const SUB_HZ: f32 = 480.0;
+/// The biggest ball on the table never gets wider than this (ring radii).
+pub const MAX_BALL: f32 = 0.3;
+/// Below this radius (ring radii) a ball is dust: it fades away.
+pub const DUST_R: f32 = 0.0075;
+/// Starting zoom of the camera, close on the first babies.
+pub const INTRO_Z: f32 = 2.1;
+pub const VIEW_MAX: f32 = 7.0;
+pub const FOLLOW_Z: f32 = 2.2;
+/// In the sandbox the chosen tier sits this many tiers above the seed size.
+pub const SANDBOX_LIFT: f32 = 2.0;
+/// Seconds after God appears when the simulation stops and the story begins.
+pub const STORY_AT: f32 = 8.4;
+/// …and when the bubble of life, strained by the light, bursts.
+pub const BURST_AT: f32 = 5.6;
 
 // sound ids: 0..=GOD are the tiers' OMGs
 pub const S_DROP: u32 = 200;
@@ -44,8 +63,14 @@ pub const S_ERA: u32 = 215;
 pub const S_HIT: u32 = 216;
 pub const S_COMBO: u32 = 217;
 pub const S_BOING: u32 = 218;
+pub const S_FUNNEL: u32 = 219;
+pub const S_ZOOM: u32 = 220;
+pub const S_BURST: u32 = 221;
+pub const S_POKE: u32 = 222;
+pub const S_DRONE: u32 = 223;
+pub const S_CREATE: u32 = 224;
 pub const S_NOTE0: u32 = 230; // + timbre (0..=4)
-pub const S_MUSIC0: u32 = 240; // + era
+pub const S_MUSIC0: u32 = 240; // + era (0..=19)
 
 // event opcodes (5 floats each: op, a, b, c, d)
 pub const EV_SOUND: f32 = 1.0; // id, gain, pan, rate
@@ -60,6 +85,42 @@ pub const EV_DUCK: f32 = 9.0;
 pub const EV_TOOLS: f32 = 10.0;
 pub const EV_MUSIC: f32 = 11.0;
 pub const EV_NOTE: f32 = 12.0; // timbre, midi, gain, pan
+pub const EV_STORY: f32 = 13.0; // 1 start the narration (b: Hebrew, c: from second), 0 stop, 2 hold at second a, 3 go on from second a
+
+/// A set of tiers (the ladder is longer than 128).
+#[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
+pub struct Mask(pub [u64; 4]);
+impl Mask {
+    pub const ONE: Mask = Mask([1, 0, 0, 0]);
+    pub fn all() -> Mask { let mut m = Mask::default(); for t in 0..N_TIERS { m.set(t as u8); } m }
+    #[inline] pub fn has(&self, t: u8) -> bool { let t = t as usize; t < 256 && self.0[t >> 6] >> (t & 63) & 1 == 1 }
+    #[inline] pub fn set(&mut self, t: u8) { let t = t as usize; self.0[t >> 6] |= 1u64 << (t & 63); }
+    pub fn count(&self) -> u32 { self.0.iter().map(|w| w.count_ones()).sum() }
+    /// Lowercase hex, most significant digit first, no leading zeros.
+    pub fn hex(&self) -> String {
+        let mut s = String::new();
+        let mut started = false;
+        for w in (0..4).rev() {
+            for k in (0..16).rev() {
+                let d = (self.0[w] >> (k * 4)) & 15;
+                if d != 0 { started = true; }
+                if started { s.push(core::char::from_digit(d as u32, 16).unwrap_or('0')); }
+            }
+        }
+        if s.is_empty() { s.push('0'); }
+        s
+    }
+    pub fn from_hex(v: &str) -> Option<Mask> {
+        let v = v.trim();
+        if v.is_empty() || v.len() > 64 { return None; }
+        let mut m = Mask::default();
+        for (i, c) in v.bytes().rev().enumerate() {
+            let d = match c { b'0'..=b'9' => c - b'0', b'a'..=b'f' => c - b'a' + 10, b'A'..=b'F' => c - b'A' + 10, _ => return None } as u64;
+            m.0[i / 16] |= d << ((i % 16) * 4);
+        }
+        Some(m)
+    }
+}
 
 #[derive(Clone, Copy, Default)]
 pub struct Body {
@@ -89,7 +150,7 @@ pub struct Body {
 
 #[derive(Clone, Copy, Default)]
 pub struct Particle {
-    /// 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti, 7 smoke, 8 droplet, 9 shock
+    /// 0 dot, 1 streak, 2 wave, 3 coin, 4 flame, 5 star, 6 confetti, 7 smoke, 8 droplet, 9 shock, 10 goo
     pub kind: u8,
     pub p: V2,
     pub v: V2,
@@ -144,11 +205,58 @@ pub struct Game {
     pub opts: Options,
     pub lay: Layout,
     pub ring_r: f32,
+    /// tier the funnel delivers (made of 2^spout babies)
     pub spout: u8,
+    /// how many tiers the world has zoomed out (smoothly follows `spout`)
     pub base: f32,
     pub run_max: u8,
-    pub run_seen: u128,
-    pub unlocked: u128,
+    pub run_seen: Mask,
+    pub unlocked: Mask,
+    /// babies poured this run
+    pub babies: f64,
+    /// 0..1: how full the funnel's next ball is
+    pub form: f32,
+    pub form_tier: u8,
+    // ── view camera (zoom in / zoom out)
+    pub view_manual: bool,
+    pub view_z: f32,
+    pub view_pan: V2,
+    pub intro_k: f32,
+    pub follow_p: V2,
+    // ── the Genesis ending
+    pub story_on: bool,
+    pub story_t: f32,
+    /// story clock reported by the narration player (< 0: none, run our own clock)
+    pub story_ext: f32,
+    pub story_end_sent: bool,
+    /// the narration's language (fixed when the story starts)
+    pub story_he: bool,
+    // ── the living world
+    /// extra phase for the motes streaming inward (a rush on every new era)
+    pub warp: f32,
+    pub warp_v: f32,
+    /// seconds since the bubble burst (< 0: whole)
+    pub burst_t: f32,
+    /// a finger stirring the fluid: where, how fast it moves (world units/s), how fresh
+    pub stir_p: V2,
+    pub stir_v: V2,
+    pub stir_k: f32,
+    pub poke_cd: f32,
+    // ── the creation, played by the player
+    /// the next moment of creation the story will wait for
+    pub story_beat: usize,
+    /// the story is holding its breath, waiting for the player's touch
+    pub story_hold: bool,
+    pub story_wait: f32,
+    /// where each moment happened (stage fractions)
+    pub story_pos: [(f32, f32); crate::story::N_BEATS],
+    pub story_ptr_down: bool,
+    pub story_ptr_x: f32, pub story_ptr_y: f32, pub story_ptr_x0: f32, pub story_ptr_y0: f32, pub story_ptr_t0: f32,
+    pub story_marks: Vec<crate::story::Mark>,
+    pub story_fx: Vec<crate::story::Spark>,
+    pub story_shake: f32,
+    pub story_notes: u32,
+    pub story_touch_cd: f32,
     pub time: f32,
     pub real: f32,
     pub drop_t: f32,
@@ -254,7 +362,6 @@ pub static EVENTS: [(&str, &str, u32); 6] = [
     ("סערה מגנטית!", "Magnetic storm!", 0x7CFFB2),
 ];
 
-#[inline] pub fn bit(t: u8) -> u128 { 1u128 << (t as u32) }
 
 impl Game {
     pub fn new(seed: u32) -> Game {
@@ -274,8 +381,39 @@ impl Game {
             spout: 0,
             base: 0.0,
             run_max: 0,
-            run_seen: 0,
-            unlocked: 1,
+            run_seen: Mask::ONE,
+            unlocked: Mask::ONE,
+            babies: 0.0,
+            form: 0.0,
+            form_tier: 0,
+            view_manual: false,
+            view_z: 1.0,
+            view_pan: V2::default(),
+            intro_k: 0.0,
+            follow_p: V2::default(),
+            story_on: false,
+            story_t: 0.0,
+            story_ext: -1.0,
+            story_end_sent: false,
+            story_he: true,
+            warp: 0.0,
+            warp_v: 0.0,
+            burst_t: -1.0,
+            stir_p: V2::default(),
+            stir_v: V2::default(),
+            stir_k: 0.0,
+            poke_cd: 0.0,
+            story_beat: 0,
+            story_hold: false,
+            story_wait: 0.0,
+            story_pos: crate::story::DEFAULT_POS,
+            story_ptr_down: false,
+            story_ptr_x: 0.0, story_ptr_y: 0.0, story_ptr_x0: 0.0, story_ptr_y0: 0.0, story_ptr_t0: 0.0,
+            story_marks: Vec::with_capacity(64),
+            story_fx: Vec::with_capacity(256),
+            story_shake: 0.0,
+            story_notes: 0,
+            story_touch_cd: 0.0,
             time: 0.0,
             real: 0.0,
             drop_t: 0.3,
@@ -347,7 +485,7 @@ impl Game {
             text: String::with_capacity(4096),
             dirty_save: 0.0,
             merge_age: 0.6,
-            drop_base: 0.07,
+            drop_base: 0.24,
             orphan_alone: 8.0,
             orphan_max: 20.0,
             ev_next: 30.0,
@@ -398,12 +536,26 @@ impl Game {
         self.order.clear();
         self.parts.clear();
         self.bolts.clear();
-        self.ring_r = self.opts.get(Opt::RingSize) * if mode == Mode::Mega { 1.55 } else { 1.0 };
-        // every run starts from the very bottom of the ladder
+        self.ring_r = 1.0;
+        // every run starts from the very bottom of the ladder, zoomed in on the first baby
         self.spout = 0;
         self.base = 0.0;
         self.run_max = 0;
-        self.run_seen = bit(0);
+        self.run_seen = Mask::ONE;
+        self.babies = 0.0;
+        self.form = 0.0;
+        self.form_tier = 0;
+        self.view_manual = false;
+        self.view_z = 1.0;
+        self.view_pan = V2::default();
+        self.intro_k = if mode == Mode::Sandbox { 0.0 } else { 1.0 };
+        self.story_on = false;
+        self.story_t = 0.0;
+        self.story_ext = -1.0;
+        self.story_end_sent = false;
+        self.warp_v = 0.0;
+        self.burst_t = -1.0;
+        self.stir_k = 0.0;
         self.time = 0.0;
         self.drop_t = 0.25;
         self.spout_cd = 0.0;
@@ -445,10 +597,10 @@ impl Game {
         self.stats.runs += 1;
         if mode == Mode::Sandbox {
             let st = self.sandbox_tier.min(GOD - 1);
-            let st = if self.unlocked & bit(st) != 0 { st } else { 0 };
+            let st = if self.unlocked.has(st) { st } else { 0 };
             self.sandbox_tier = st;
             self.spout = st;
-            self.base = st as f32;
+            self.base = st as f32 - SANDBOX_LIFT;
             self.cat = cat_of(st);
             self.prev_cat = self.cat;
         } else {
@@ -464,20 +616,28 @@ impl Game {
     pub fn gap(&self) -> u8 { self.opts.get(Opt::Gap) as u8 }
     fn max_bodies(&self) -> usize { if self.mode == Mode::Mega { MAX_BODIES_MEGA } else { MAX_BODIES } }
 
-    /// Ball radius for a tier: a merge is visibly bigger, and the spout's own ball
-    /// grows from a tiny baby to a big chariot over the whole ladder.
-    pub fn radius_for(&self, t: u8) -> f32 {
-        if t == GOD { return GOD_R; }
-        if self.mode == Mode::Sandbox {
-            // any tier can sit next to any other: a gentler, absolute curve
-            let k = t as f32 / (GOD as f32 - 1.0);
-            return clamp(1.45 * A0 * pow(A1 / A0, k) * (1.0 + 0.35 * k), 0.03, 0.4);
-        }
-        let g = self.opts.get(Opt::SizeGrow);
-        let k = clamp(self.base / (GOD as f32 - 1.0), 0.0, 1.0);
-        let a = A0 * pow(A1 / A0, k);
-        clamp(a * pow(g, t as f32 - self.base), 0.02, 0.56)
+    /// How much wider each tier is than the one below it.
+    #[inline] pub fn grow(&self) -> f32 { self.opts.get(Opt::SizeGrow) }
+    /// Radius of the ball the funnel drops (ring radii). The vessel option picks
+    /// it; a long journey shrinks it so the biggest ball still fits.
+    pub fn seed_r(&self) -> f32 {
+        let mut r = self.opts.get(Opt::RingSize);
+        if self.mode == Mode::Mega { r *= 0.74; }
+        let span = pow(self.grow(), self.gap() as f32);
+        r.min(MAX_BALL / span)
     }
+    /// The camera has zoomed out by this factor since the first baby.
+    pub fn zoom_factor(&self) -> f64 { libm_pow64(self.grow() as f64, self.base.max(0.0) as f64) }
+
+    /// Ball radius for a tier: absolute size, seen through the current zoom.
+    pub fn radius_for(&self, t: u8) -> f32 {
+        let k = t as f32 - self.base;
+        let r = self.seed_r() * pow(self.grow(), k);
+        if t == GOD { return r.max(0.12); }
+        clamp(r, 0.0005, 0.9)
+    }
+    /// Absolute width of a tier, in babies.
+    pub fn babies_wide(grow: f32, t: u8) -> f64 { libm_pow64(grow as f64, t as f64) }
 
     fn new_body_ex(&mut self, t: u8, p: V2, v: V2, force: bool) -> Option<usize> {
         if !force && self.bodies.len() >= self.max_bodies() { return None; }
@@ -496,10 +656,28 @@ impl Game {
 
     // ───────────────────────────────────────────── geometry helpers
     #[inline] pub fn join_y(&self) -> f32 { -sqrt(self.ring_r * self.ring_r - CHUTE_W * CHUTE_W) }
-    /// Camera: zoom `z` around focus `f` (the focus keeps its screen position).
-    #[inline] pub fn cam(&self) -> (f32, V2) {
-        let z = 1.0 + self.cam_k;
-        (z, self.cam_f * (1.0 - 1.0 / z))
+    /// Camera as (zoom, pan): screen = centre + (p − pan)·scale·zoom.
+    /// Automatic: close on the first babies, pulling back as the pile grows, plus a
+    /// punch-zoom on every new tier. Manual: wherever the player pinched, scrolled or dragged.
+    #[inline] pub fn cam(&self) -> (f32, V2) { self.cam_with(1.0 + self.cam_k) }
+    fn cam_with(&self, punch: f32) -> (f32, V2) {
+        if self.view_manual { return (self.view_z * (1.0 + (punch - 1.0) * 0.5), self.view_pan); }
+        match self.opts.get(Opt::Camera) as u8 {
+            1 => return (1.0, V2::default()),
+            2 if !self.story_on => {
+                // follow the biggest ball, without ever looking past the vessel
+                let z = FOLLOW_Z * (1.0 + (punch - 1.0) * 0.5);
+                let m = self.ring_r * (1.0 - 1.0 / FOLLOW_Z);
+                return (z, V2::new(clamp(self.follow_p.x, -m, m), clamp(self.follow_p.y, -m - 0.3, m + 0.05)));
+            }
+            _ => {}
+        }
+        let zi = 1.0 + (INTRO_Z - 1.0) * smooth(self.intro_k);
+        let fi = V2::new(0.0, self.ring_r * 0.42);
+        let cf = fi + (self.cam_f - fi) * zi;
+        let p0 = cf * (1.0 - punch) + fi * ((1.0 - zi) * punch);
+        let z = zi * punch;
+        (z, p0 * (-1.0 / z))
     }
     pub fn to_screen(&self, p: V2) -> (f32, f32) {
         let (z, pan) = self.cam();
@@ -508,6 +686,35 @@ impl Game {
     pub fn to_world(&self, x: f32, y: f32) -> V2 {
         let (z, pan) = self.cam();
         V2::new((x - self.lay.cx) / (self.lay.scale * z) + pan.x, (y - self.lay.cy) / (self.lay.scale * z) + pan.y)
+    }
+    /// Zoom the view by `k` around screen point (x, y) — pinch, wheel or the +/− buttons.
+    pub fn view_zoom(&mut self, k: f32, x: f32, y: f32) {
+        if !k.is_finite() || k <= 0.0 || self.story_on { return; }
+        if !self.view_manual {
+            let (z, pan) = self.cam_with(1.0);
+            self.view_manual = true; self.view_z = z; self.view_pan = pan;
+        }
+        let s0 = self.lay.scale * self.view_z;
+        let w = V2::new((x - self.lay.cx) / s0 + self.view_pan.x, (y - self.lay.cy) / s0 + self.view_pan.y);
+        self.view_z = clamp(self.view_z * k, 1.0, VIEW_MAX);
+        let s = self.lay.scale * self.view_z;
+        self.view_pan = V2::new(w.x - (x - self.lay.cx) / s, w.y - (y - self.lay.cy) / s);
+        self.clamp_view();
+    }
+    /// Move the zoomed-in view by a screen-space delta.
+    pub fn view_pan_by(&mut self, dx: f32, dy: f32) {
+        if !self.view_manual || self.story_on { return; }
+        let s = self.lay.scale * self.view_z;
+        self.view_pan = V2::new(self.view_pan.x - dx / s, self.view_pan.y - dy / s);
+        self.clamp_view();
+    }
+    /// Back to the automatic camera.
+    pub fn view_auto(&mut self) { self.view_manual = false; }
+    fn clamp_view(&mut self) {
+        let m = self.ring_r * (1.0 - 1.0 / self.view_z);
+        let k = 1.0 - 1.0 / self.view_z;
+        self.view_pan.x = clamp(self.view_pan.x, -m - 0.1 * k, m + 0.1 * k);
+        self.view_pan.y = clamp(self.view_pan.y, -m - 0.6 * k, m + 0.1 * k);
     }
 
     pub fn resize(&mut self, w: f32, h: f32, dpr: f32) {
@@ -521,7 +728,7 @@ impl Game {
         let hud_y = sy + 60.0 * u;
         let ladder_y = sy + 110.0 * u;
         let timer_y = sy + 126.0 * u;
-        let chute_top_px = sy + 136.0 * u;
+        let chute_top_px = sy + 152.0 * u;
         let tools_y = sy + sh - 18.0 * u - 50.0 * u;
         let caption_y = tools_y - 36.0 * u;
         let y_bot = caption_y - 30.0 * u;
@@ -562,15 +769,29 @@ impl Game {
 
     // ───────────────────────────────────────────── input
     pub fn pointer(&mut self, kind: u32, x: f32, y: f32) {
+        if self.story_on { self.ptr.down = false; self.story_pointer(kind, x, y); return; }
         match kind {
             0 => { self.ptr = Pointer { down: true, x0: x, y0: y, x, y, t0: self.real, dragging: false }; }
             1 => {
                 if !self.ptr.down { return; }
+                let (px, py) = (self.ptr.x, self.ptr.y);
                 self.ptr.x = x; self.ptr.y = y;
                 let dx = x - self.ptr.x0; let dy = y - self.ptr.y0;
                 if !self.ptr.dragging && dx * dx + dy * dy > 14.0 * 14.0 { self.ptr.dragging = true; }
-                if self.ptr.dragging && self.mode != Mode::Watch {
-                    self.tilt_target = clamp(dx / (self.lay.sw * 0.45), -1.0, 1.0) * 0.62;
+                if self.ptr.dragging {
+                    // zoomed in: a drag looks around; otherwise it tilts gravity and stirs the fluid
+                    if self.view_manual && self.view_z > 1.02 { self.view_pan_by(x - px, y - py); }
+                    else if self.mode != Mode::Watch {
+                        self.tilt_target = clamp(dx / (self.lay.sw * 0.45), -1.0, 1.0) * 0.62;
+                        if crate::vessel::on(self) {
+                            let (w0, w1) = (self.to_world(px, py), self.to_world(x, y));
+                            let vel = (w1 - w0) * 60.0;
+                            let vel = if vel.len() > 6.0 { vel * (6.0 / vel.len()) } else { vel };
+                            self.stir_v = self.stir_v * 0.5 + vel * 0.5;
+                            self.stir_p = w1;
+                            self.stir_k = 1.0;
+                        }
+                    }
                 }
             }
             _ => {
@@ -591,12 +812,20 @@ impl Game {
                 let dir = if code == 1 { -1.0 } else { 1.0 };
                 self.tilt_target = if down { dir * 0.5 } else { 0.0 };
             }
+            3 if self.story_on => if down && self.story_hold {
+                let (fx, fy) = crate::story::DEFAULT_POS[self.story_beat.min(crate::story::N_BEATS - 1)];
+                let (x, y) = (self.lay.sx + self.lay.sw * fx, self.lay.sy + self.lay.sh * fy);
+                self.answer(x, y);
+            },
             3 => if down {
                 let jx = self.rng.sym() * 0.3;
                 let (x, y) = if self.mode == Mode::Sandbox { self.to_screen(V2::new(jx, -0.5)) } else { (self.lay.cx, self.lay.cy) };
                 self.tap(x, y);
             },
             4..=9 => if down { self.tool((code - 4) as usize); },
+            10 => if down { let (x, y) = (self.lay.cx, self.lay.cy); self.view_zoom(1.5, x, y); },
+            11 => if down { let (x, y) = (self.lay.cx, self.lay.cy); self.view_zoom(1.0 / 1.5, x, y); },
+            12 => if down { self.view_auto(); },
             _ => {}
         }
     }
@@ -604,6 +833,12 @@ impl Game {
     fn tap(&mut self, x: f32, y: f32) {
         if !self.started || self.paused || self.finished || self.over { return; }
         let w = self.to_world(x, y);
+        // a tap on the bubble's wall pokes it
+        if crate::vessel::on(self) && self.mode != Mode::Watch && !self.upgrade_armed {
+            let d = w.len();
+            let inner = if self.mode == Mode::Sandbox { 0.98 } else { 0.88 };
+            if d > self.ring_r * inner && d < self.ring_r * 1.16 { self.poke(w); return; }
+        }
         if self.upgrade_armed {
             if let Some(i) = self.pick(w) { self.upgrade_body(i); return; }
             self.upgrade_armed = false;
@@ -625,6 +860,25 @@ impl Game {
             }
             _ => { if self.tap_cd <= 0.0 && self.spawn_from_spout(true) { self.tap_cd = 0.1; } }
         }
+    }
+
+    /// Poke the membrane at `w`: it wobbles, and whatever is near the spot gets pushed inward.
+    fn poke(&mut self, w: V2) {
+        if self.poke_cd > 0.0 { return; }
+        self.poke_cd = 0.12;
+        let dir = w.norm();
+        let at = dir * self.ring_r;
+        for b in self.bodies.iter_mut() {
+            if !b.alive || b.dying > 0.0 || b.tier == GOD { continue; }
+            let d = (b.p - at).len();
+            let reach = 0.5 + b.r;
+            if d < reach { b.v += -dir * (2.2 * (1.0 - d / reach) / (1.0 + b.r * 4.0)); }
+        }
+        self.ring_wob = self.ring_wob.max(0.85);
+        self.wave(at, 0.18, 0xFFFFFF);
+        let rate = 0.9 + 0.2 * self.rng.f();
+        self.sound_rate(S_POKE, 0.7, clamp(dir.x, -1.0, 1.0) * 0.6, rate);
+        self.haptic(15.0);
     }
 
     fn pick(&self, w: V2) -> Option<usize> {
@@ -714,6 +968,14 @@ impl Game {
     }
 
     // ───────────────────────────────────────────── spawning
+    /// Where the funnel's ball forms, just under the spout.
+    pub fn funnel_p(&self) -> V2 { V2::new(0.0, self.lay.chute_top + 0.16) }
+
+    fn poured(&mut self, t: u8) {
+        self.run_drops += 1; self.stats.drops += 1;
+        self.babies += libm_pow64(2.0, t as f64);
+    }
+
     fn spawn_from_spout(&mut self, manual: bool) -> bool {
         if self.mode == Mode::Sandbox || self.finished || self.over { return false; }
         let mut t = self.spout;
@@ -728,20 +990,27 @@ impl Game {
                 let p = V2::new(cos(a) * d, sin(a) * d);
                 if self.free_at(p, r * 1.05) && self.new_body(t, p, V2::new(0.0, 0.0)).is_some() {
                     self.portal_fx(p, r);
-                    self.run_drops += 1; self.stats.drops += 1;
+                    self.poured(t);
                     return true;
                 }
             }
         }
         if self.mode == Mode::Mega && !manual && self.rng.chance(0.6) && self.rain() { return true; }
         let room = (CHUTE_W - r).max(0.0);
-        let jitter = self.rng.sym() * room * 0.95;
-        let p = V2::new(jitter, self.lay.chute_top + r + 0.02);
+        let jitter = self.rng.sym() * room * 0.6;
+        let f = self.funnel_p();
+        let p = V2::new(jitter, f.y);
         if !self.free_at(p, r * 1.02) { return false; }
-        let vx = self.rng.sym() * 0.2;
-        if self.new_body(t, p, V2::new(vx, 2.0)).is_some() {
-            self.run_drops += 1; self.stats.drops += 1;
-            if self.drop_snd_cd <= 0.0 { self.sound(S_DROP, 0.3, 0.0); self.drop_snd_cd = 0.09; }
+        let vx = self.rng.sym() * 0.15;
+        if self.new_body(t, p, V2::new(vx, 0.6)).is_some() {
+            self.poured(t);
+            if t > 0 {
+                // the babies clump into this ball in the funnel
+                let c = tier(t).color;
+                self.sparkle(p, 5, c);
+                let rate = 0.9 + 0.2 * self.rng.f();
+                if self.drop_snd_cd <= 0.0 { self.sound_rate(S_FUNNEL, 0.22, 0.0, rate); self.drop_snd_cd = 0.12; }
+            } else if self.drop_snd_cd <= 0.0 { self.sound(S_DROP, 0.3, 0.0); self.drop_snd_cd = 0.09; }
             return true;
         }
         false
@@ -796,6 +1065,12 @@ impl Game {
         self.toast_t -= pdt;
         self.cat_mix = (self.cat_mix + pdt * 0.45).min(1.0);
         self.hue += pdt * (0.08 + 0.3 * self.ring_pulse);
+        // the world rushes past on a new era, then settles
+        self.warp += self.warp_v * pdt;
+        self.warp_v *= exp(-pdt * 2.2);
+        if self.burst_t >= 0.0 { self.burst_t += pdt; }
+        self.poke_cd -= real_dt;
+        self.stir_k = (self.stir_k - pdt * 3.0).max(0.0);
         // camera spring
         if pdt > 0.0 {
             let sub = 4;
@@ -811,7 +1086,10 @@ impl Game {
         for (k, b) in self.bolts.iter_mut().enumerate() { b.t -= pdt; if b.t <= 0.0 { dead.push(k); } }
         for k in dead.into_iter().rev() { self.bolts.swap_remove(k); }
         if self.dirty_save > 0.0 { self.dirty_save -= real_dt; if self.dirty_save <= 0.0 { self.ev(EV_SAVE, 0.0, 0.0, 0.0, 0.0); } }
-        if dt > 0.0 {
+        // the Genesis ending runs on the narration's clock (or real time without sound),
+        // and holds its breath at each moment of creation until the player answers
+        if self.story_on { self.story_clock(real_dt, live); }
+        if dt > 0.0 && !self.story_on {
             // the same rules at every simulation speed: step in slices of at most 1/60 s
             let dt = dt.min(16.0 / 60.0);
             let chunks = ceil(dt * 60.0 - 1e-4).max(1.0) as usize;
@@ -851,24 +1129,47 @@ impl Game {
             if self.ta_left <= 0.0 { self.ta_left = 0.0; self.end_time_attack(); }
         }
         self.update_events(dt);
+        // the follow camera tracks the biggest ball
+        let mut best: Option<(u8, V2)> = None;
+        for b in &self.bodies { if b.alive && b.dying <= 0.0 && best.map_or(true, |(t, _)| b.tier > t) { best = Some((b.tier, b.p)); } }
+        if let Some((_, p)) = best { self.follow_p += (p - self.follow_p) * approach(dt, 0.6); }
+        // the camera pulls back from the first babies as the pile grows
+        let intro_target = if self.run_max >= 4 || self.time > 45.0 { 0.0 } else { 1.0 - self.run_max as f32 / 4.5 };
+        self.intro_k += (intro_target - self.intro_k) * approach(dt, 1.6);
         // spout
         if !self.finished && !self.over && self.mode != Mode::Sandbox {
             self.update_fill();
             let mut interval = self.drop_base / self.opts.get(Opt::DropRate);
-            if self.ev_burst > 0 { interval = interval.min(0.035); }
-            if self.mode == Mode::Chaos { interval *= 0.5; }
-            if self.mode == Mode::Mega { interval *= 0.45; }
+            // the very first babies come one at a time
+            interval *= 1.0 + 1.3 * (1.0 - smooth(self.run_drops as f32 / 30.0));
+            if self.ev_burst > 0 { interval = interval.min(0.06); }
+            if self.mode == Mode::Chaos { interval *= 0.55; }
+            if self.mode == Mode::Mega { interval *= 0.5; }
             if self.fill > 0.56 { interval *= 1.0 + (self.fill - 0.56) * 9.0; }
             self.drop_t -= dt;
             if self.drop_t <= 0.0 {
                 if self.fill < 0.72 && self.spawn_from_spout(false) {
                     self.drop_t = interval;
                     if self.ev_burst > 0 { self.ev_burst -= 1; }
-                } else { self.drop_t = if self.ev_burst > 0 { 0.03 } else { 0.1 }; }
+                } else { self.drop_t = if self.ev_burst > 0 { 0.04 } else { 0.1 }; }
             }
+            self.form = clamp(1.0 - self.drop_t / interval.max(1e-3), 0.0, 1.0);
+            self.form_tier = self.spout;
             self.spout_cd -= dt;
             self.check_spout();
             self.check_jam(dt);
+        }
+        // a finger stirring the fluid drags what's near it along
+        if self.stir_k > 0.0 {
+            let (sp, sv, k) = (self.stir_p, self.stir_v, self.stir_k);
+            for b in self.bodies.iter_mut() {
+                if !b.alive || b.dying > 0.0 || b.tier == GOD { continue; }
+                let l = (b.p - sp).len();
+                let reach = 0.26 + b.r;
+                if l > reach { continue; }
+                let f = (1.0 - l / reach) * k;
+                b.v += (sv - b.v) * clamp(f * 7.0 * dt / (1.0 + b.r * 5.0), 0.0, 0.5);
+            }
         }
         // magnet (once per frame)
         self.magnet();
@@ -877,9 +1178,14 @@ impl Game {
         let n = clamp(ceil(dt * SUB_HZ), 1.0, 48.0) as usize;
         let h = dt / n as f32;
         for _ in 0..n { self.substep(h); }
-        // per-body bookkeeping
+        // the zoom follows the funnel: everything in the vessel scales around its bottom
         let spout = self.spout;
-        self.base += (spout as f32 - self.base) * approach(dt, 0.9);
+        let target = if self.mode == Mode::Sandbox { spout as f32 - SANDBOX_LIFT } else { spout as f32 };
+        let old = self.base;
+        if !self.finished { self.base += (target - self.base) * approach(dt, 0.9); }
+        let db = self.base - old;
+        if abs(db) > 1e-7 { self.zoom_world(db); }
+        // per-body bookkeeping
         let mut dissolve: Vec<usize> = Vec::new();
         let mut tier_count = [0u8; N_TIERS];
         for b in &self.bodies { if b.alive && b.dying <= 0.0 { tier_count[b.tier as usize] = tier_count[b.tier as usize].saturating_add(1); } }
@@ -908,6 +1214,8 @@ impl Game {
                 b.orphan_t += dt;
                 let alone = tier_count[b.tier as usize] < 2;
                 if (alone && b.orphan_t > self.orphan_alone) || b.orphan_t > self.orphan_max { b.dying = 0.45; }
+                // zoomed out so far it's dust now
+                if b.r < DUST_R { b.dying = 0.3; }
             } else { b.orphan_t = 0.0; }
         }
         for i in dissolve {
@@ -925,6 +1233,32 @@ impl Game {
             self.order.clear();
             for i in 0..self.bodies.len() { self.order.push(i as u16); }
         }
+    }
+
+    /// The world zoomed by `db` tiers: scale everything in the vessel around the
+    /// point things settle on, like a camera pulling back (or pushing in).
+    fn zoom_world(&mut self, db: f32) {
+        let f = pow(self.grow(), -db);
+        let jy = self.join_y();
+        let a = if self.mode == Mode::BlackHole { V2::default() } else { V2::new(0.0, self.ring_r).rot(-self.tilt) };
+        let sc = |p: V2| a + (p - a) * f;
+        for b in self.bodies.iter_mut() {
+            if !b.alive { continue; }
+            b.r *= f;
+            if b.p.y < jy && abs(b.p.x) < CHUTE_W + b.r { continue; } // still in the funnel
+            b.p = sc(b.p);
+            b.v = b.v * f;
+            for k in 0..4 { b.trail[k] = sc(b.trail[k]); }
+        }
+        for q in self.parts.iter_mut() {
+            q.p = sc(q.p); q.v = q.v * f;
+            if matches!(q.kind, 2 | 7 | 9 | 10) { q.size *= f; }
+        }
+        for bo in self.bolts.iter_mut() { bo.a = sc(bo.a); bo.b = sc(bo.b); }
+        self.combo_p = sc(self.combo_p);
+        self.sl_p = sc(self.sl_p);
+        self.cam_f = sc(self.cam_f);
+        if self.view_manual { self.view_pan = sc(self.view_pan); self.clamp_view(); }
     }
 
     fn update_events(&mut self, dt: f32) {
@@ -972,7 +1306,7 @@ impl Game {
             let p = V2::new(cos(a) * d, sin(a) * d);
             let vx = self.rng.sym() * 0.5;
             if self.free_at(p, r * 1.05) && self.new_body(t, p, V2::new(vx, 0.6)).is_some() {
-                self.run_drops += 1; self.stats.drops += 1;
+                self.poured(t);
                 self.wave(p, r * 1.6, tier(t).color);
                 return true;
             }
@@ -1019,13 +1353,15 @@ impl Game {
         if self.spout_cd > 0.0 || self.mode == Mode::Sandbox { return; }
         let mut maxp = 0u8;
         for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.tier > maxp { maxp = b.tier; } }
-        let gap = self.gap();
-        if maxp >= self.spout + gap && self.spout + 1 + gap <= GOD {
+        // the very first babies get one extra tier of room before they start clumping
+        let gap = self.gap() + if self.spout == 0 { 1 } else { 0 };
+        if maxp >= self.spout + gap && self.spout + 1 + self.gap() <= GOD {
             self.spout += 1;
             self.spout_cd = 0.6;
-            self.sound(S_SPOUT, 0.45, 0.0);
-            let p = V2::new(0.0, self.join_y());
-            self.burst(p, tier(self.spout).color, 12, 0.6);
+            // the funnel now clumps twice as many babies, and the camera pulls back
+            self.sound(S_ZOOM, 0.32, 0.0);
+            let p = self.funnel_p();
+            self.burst(p, tier(self.spout).color, 8, 0.4);
         }
     }
 
@@ -1323,23 +1659,26 @@ impl Game {
         let n = ((8.0 + 46.0 * lvl) * parts) as usize;
         self.burst(p, tt.color, n, 0.6 + 1.4 * lvl);
         self.wave(p, r * (1.5 + 1.0 * lvl), tt.color);
+        // two cells fuse: droplets of membrane splash out and settle
+        if crate::vessel::on(self) { self.goo(p, r, (3.0 + 4.0 * parts) as usize, tt.color); }
         match tt.cat {
             Cat::Foot => self.confetti(p, (6.0 * parts) as usize, true),
-            Cat::Motors | Cat::Cars | Cat::Monsters => self.smoke(p, (3.0 * parts) as usize + 1, 0x9A9AA6, r * 1.4),
+            Cat::Rides => self.smoke(p, (3.0 * parts) as usize + 1, 0xC8A878, r * 1.3),
+            Cat::Motors | Cat::Cars | Cat::Monsters | Cat::Workers => self.smoke(p, (3.0 * parts) as usize + 1, 0x9A9AA6, r * 1.4),
             Cat::Premium | Cat::Super | Cat::Hyper => { self.coins(p, (1.0 + 2.0 * parts) as usize); }
             Cat::Rails => self.smoke(p, (4.0 * parts) as usize + 1, 0xF2F2F2, r * 1.6),
-            Cat::Seas => self.droplets(p, (10.0 * parts) as usize, 0x7FD8FF),
+            Cat::Seas | Cat::Sails => self.droplets(p, (10.0 * parts) as usize, 0x7FD8FF),
             Cat::Skies => self.smoke(p, (4.0 * parts) as usize + 1, 0xFFFFFF, r * 1.8),
-            Cat::Space | Cat::SciFi => self.sparkle(p, (8.0 * parts) as usize, tt.color),
-            Cat::Myth | Cat::Holy | Cat::God => { self.flames(p, (6.0 + 18.0 * lvl) as usize, tt.color); self.sparkle(p, (6.0 * parts) as usize, 0xFFF2C8); }
+            Cat::Space | Cat::SciFi | Cat::Mega => self.sparkle(p, (8.0 * parts) as usize, tt.color),
+            Cat::Myth | Cat::Wonders | Cat::Heavens | Cat::God => { self.flames(p, (6.0 + 18.0 * lvl) as usize, tt.color); self.sparkle(p, (6.0 * parts) as usize, 0xFFF2C8); }
         }
-        if self.run_seen & bit(t) == 0 { self.wave(p, r * (2.4 + 1.6 * lvl), 0xFFFFFF); }
+        if !self.run_seen.has(t) { self.wave(p, r * (2.4 + 1.6 * lvl), 0xFFFFFF); }
         if self.opts.on(Opt::ScreenShake) { self.shake = self.shake.max(0.06 + 0.7 * lvl * lvl); }
-        if t >= 6 && self.run_seen & bit(t) == 0 { self.add_flash(tt.color, 0.08 + 0.3 * lvl * lvl); }
+        if t >= 6 && !self.run_seen.has(t) { self.add_flash(tt.color, 0.08 + 0.3 * lvl * lvl); }
         self.ring_pulse = self.ring_pulse.max(0.25 + 0.6 * lvl);
         self.ring_wob = self.ring_wob.max(0.15 + 0.5 * lvl);
         self.ring_col = tt.color;
-        if (tt.cat == Cat::Myth || tt.cat == Cat::Holy) && self.drama() > 0.0 && self.bolts.len() < 6 {
+        if matches!(tt.cat, Cat::Myth | Cat::Wonders | Cat::Heavens) && self.drama() > 0.0 && self.bolts.len() < 6 {
             // lightning from the ring to the merge
             let a = self.rng.range(0.0, TAU);
             let from = V2::new(cos(a), sin(a)) * self.ring_r;
@@ -1364,12 +1703,12 @@ impl Game {
     }
 
     fn on_new_tier(&mut self, t: u8, p: V2) {
-        let first_in_run = self.run_seen & bit(t) == 0;
-        self.run_seen |= bit(t);
+        let first_in_run = !self.run_seen.has(t);
+        self.run_seen.set(t);
         if t > self.run_max { self.run_max = t; }
-        let first_ever = self.unlocked & bit(t) == 0;
+        let first_ever = !self.unlocked.has(t);
         if first_ever {
-            self.unlocked |= bit(t);
+            self.unlocked.set(t);
             self.ev(EV_UNLOCK, t as f32, 0.0, 0.0, 0.0);
             self.dirty_save = 0.3;
         }
@@ -1404,6 +1743,8 @@ impl Game {
                 self.era_t = if dr > 0.0 && t != GOD { 2.6 } else { 0.0 };
                 self.add_flash(CATS[c as usize].accent, 0.45);
                 self.ring_pulse = 1.0;
+                // the camera rushes back into the new world
+                if dr > 0.0 && t != GOD { self.warp_v = self.warp_v.max(0.55 * if dr > 1.5 { 1.4 } else { 1.0 }); self.ring_wob = self.ring_wob.max(1.0); }
                 if t != GOD { self.sound(S_ERA, 0.9, 0.0); }
                 self.ev(EV_CATEGORY, c as f32, 0.0, 0.0, 0.0);
                 self.ev(EV_MUSIC, c as f32, 0.0, 0.0, 0.0);
@@ -1423,6 +1764,209 @@ impl Game {
             self.shake = 1.2;
             self.dirty_save = 0.2;
         }
+    }
+
+    /// Testing: carry the run to tier `t` (fresh balls of the tiers just below it).
+    pub fn debug_jump(&mut self, t: u8) {
+        if !self.started || self.finished { return; }
+        self.bodies.clear(); self.order.clear();
+        let gap = self.gap();
+        self.spout = t.saturating_sub(gap);
+        self.base = self.spout as f32;
+        for k in self.spout..=t { self.run_seen.set(k); self.unlocked.set(k); }
+        self.run_max = t;
+        self.cat = cat_of(t); self.prev_cat = self.cat; self.cat_mix = 1.0;
+        self.intro_k = 0.0;
+        self.time += 3.0 * t as f32;
+        for (i, k) in (self.spout..=t).rev().enumerate() {
+            let r = self.radius_for(k);
+            let x = if i % 2 == 0 { -0.3 } else { 0.3 } * (1.0 - r);
+            let _ = self.new_body_ex(k, V2::new(x * (i as f32 * 0.3 + 0.2).min(1.0), 0.9 - r - i as f32 * 0.05), V2::default(), true);
+        }
+        self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
+    }
+    /// Testing: two of the last tier meet and God is born.
+    pub fn debug_god(&mut self) {
+        if !self.started || self.finished { return; }
+        self.debug_jump(GOD - 1);
+        let r = self.radius_for(GOD - 1);
+        let a = self.new_body_ex(GOD - 1, V2::new(-r * 1.02, 0.95 - r * 2.2), V2::default(), true);
+        let b = self.new_body_ex(GOD - 1, V2::new(r * 1.02, 0.95 - r * 2.2), V2::default(), true);
+        if let (Some(i), Some(j)) = (a, b) { self.bodies[i].age = 5.0; self.bodies[j].age = 5.0; self.merge(i, j); }
+    }
+    /// Testing: skip straight to the Genesis story.
+    pub fn debug_story(&mut self, at: f32) {
+        self.finished = true;
+        self.god_t = STORY_AT + 1.0;
+        self.burst_t = 1.0;
+        self.begin_story(at);
+    }
+
+    /// The simulation stops and God begins to tell (at story second `at`; moments
+    /// before it count as already created where the story would have put them).
+    pub fn begin_story(&mut self, at: f32) {
+        self.story_on = true;
+        self.story_t = at.max(0.0);
+        self.story_ext = -1.0;
+        self.story_end_sent = false;
+        self.story_he = self.lang_he;
+        self.story_hold = false;
+        self.story_wait = 0.0;
+        self.story_pos = crate::story::DEFAULT_POS;
+        let bt = crate::story::beat_times(crate::story::track(self.story_he));
+        self.story_beat = bt.iter().position(|&b| b - crate::story::LEAD > self.story_t).unwrap_or(crate::story::N_BEATS);
+        self.story_ptr_down = false;
+        self.story_marks.clear();
+        self.story_fx.clear();
+        self.story_shake = 0.0;
+        self.story_notes = 0;
+        self.bodies.clear(); self.order.clear(); self.parts.clear(); self.bolts.clear();
+        self.ev(EV_STORY, 1.0, if self.lang_he { 1.0 } else { 0.0 }, self.story_t, 0.0);
+        self.ev(EV_MUSIC, -1.0, 0.0, 0.0, 0.0);
+    }
+
+    fn story_clock(&mut self, real_dt: f32, live: bool) {
+        use crate::story::*;
+        let tr = track(self.story_he);
+        let bt = beat_times(tr);
+        if self.story_hold {
+            if live { self.story_wait += real_dt; }
+            let k = self.story_beat.min(N_BEATS - 1);
+            if KINDS[k] == G_HOLD && self.story_ptr_down && self.real - self.story_ptr_t0 >= HOLD_S {
+                let (x, y) = (self.story_ptr_x, self.story_ptr_y);
+                self.answer(x, y);
+            } else if self.story_wait > if self.mode == Mode::Watch { 2.5 } else { TIMEOUT } {
+                // creation goes on by itself
+                let (fx, fy) = DEFAULT_POS[k];
+                let (x, y) = (self.lay.sx + self.lay.sw * fx, self.lay.sy + self.lay.sh * fy);
+                self.answer(x, y);
+            }
+        } else {
+            let t_new = if self.story_ext >= 0.0 { self.story_ext } else if live { self.story_t + real_dt } else { self.story_t };
+            if self.story_beat < N_BEATS && t_new >= bt[self.story_beat] - LEAD {
+                self.story_t = bt[self.story_beat] - LEAD;
+                self.story_hold = true;
+                self.story_wait = 0.0;
+                self.ev(EV_STORY, 2.0, self.story_t, 0.0, 0.0);
+            } else {
+                self.story_t = t_new;
+            }
+        }
+        if self.story_t >= len(self.story_he) && !self.story_end_sent { self.end_story(); }
+        // sparks of creation
+        let dt = if live { real_dt } else { 0.0 };
+        for p in self.story_fx.iter_mut() {
+            p.life -= dt;
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            p.vx *= 1.0 - clamp(1.8 * dt, 0.0, 0.9); p.vy = p.vy * (1.0 - clamp(1.8 * dt, 0.0, 0.9)) + 20.0 * dt;
+        }
+        self.story_fx.retain(|p| p.life > 0.0);
+        self.story_shake = (self.story_shake - dt * 1.6).max(0.0);
+        self.story_touch_cd -= real_dt;
+    }
+
+    /// The player answered the moment of creation the story was waiting for (screen point).
+    pub fn answer(&mut self, x: f32, y: f32) {
+        use crate::story::*;
+        if !self.story_hold || self.story_beat >= N_BEATS { return; }
+        let k = self.story_beat;
+        let lay = self.lay;
+        let fx = clamp((x - lay.sx) / lay.sw.max(1.0), 0.04, 0.96);
+        let fy = clamp((y - lay.sy) / lay.sh.max(1.0), 0.04, 0.96);
+        self.story_pos[k] = (fx, fy);
+        self.story_hold = false;
+        self.story_beat += 1;
+        self.story_ptr_down = false;
+        self.ev(EV_STORY, 3.0, self.story_t, 0.0, 0.0);
+        // a burst of light where it happened
+        let col = [0xFFF4D8u32, 0xBFE4FF, 0xC8E6A0, 0xFFE27A, 0x9FE8FF, 0xF2C488, 0xFFD9C2, 0xFFE2A2][k];
+        let u = lay.u;
+        self.story_fx.push(Spark { x, y, vx: 0.0, vy: 0.0, life: 0.9, max: 0.9, size: lay.sw * 0.9, col: 0xFFFFFF, ring: true });
+        self.story_fx.push(Spark { x, y, vx: 0.0, vy: 0.0, life: 1.2, max: 1.2, size: lay.sw * 0.6, col, ring: true });
+        for _ in 0..46 {
+            let a = self.rng.range(0.0, TAU); let sp = self.rng.range(60.0, 420.0) * u;
+            let life = self.rng.range(0.6, 1.5);
+            let c = if self.rng.chance(0.4) { 0xFFFFFF } else { col };
+            self.story_fx.push(Spark { x, y, vx: cos(a) * sp, vy: sin(a) * sp, life, max: life, size: self.rng.range(2.0, 5.0) * u, col: c, ring: false });
+        }
+        self.story_shake = 0.6;
+        let pan = clamp((fx - 0.5) * 1.6, -0.8, 0.8);
+        self.sound(S_CREATE, 0.5, pan);
+        self.haptic(40.0);
+    }
+
+    /// Touches during the story: answer the moment it waits for, or create freely.
+    pub fn story_pointer(&mut self, kind: u32, x: f32, y: f32) {
+        use crate::story::*;
+        let u = self.lay.u;
+        match kind {
+            0 => {
+                self.story_ptr_down = true;
+                self.story_ptr_x = x; self.story_ptr_y = y; self.story_ptr_x0 = x; self.story_ptr_y0 = y;
+                self.story_ptr_t0 = self.real;
+                if self.story_hold {
+                    if KINDS[self.story_beat.min(N_BEATS - 1)] == G_TAP { self.answer(x, y); }
+                } else {
+                    self.create_at(x, y);
+                }
+            }
+            1 => {
+                if !self.story_ptr_down { return; }
+                self.story_ptr_x = x; self.story_ptr_y = y;
+                if self.story_hold && KINDS[self.story_beat.min(N_BEATS - 1)] == G_SWIPE && self.story_ptr_y0 - y > 40.0 * u {
+                    let (x0, y0) = (self.story_ptr_x0, self.story_ptr_y0);
+                    self.answer(x0, y0);
+                }
+            }
+            _ => {
+                if !self.story_ptr_down { return; }
+                self.story_ptr_down = false;
+                // a plain tap answers a swipe too: nobody should get stuck
+                if self.story_hold && KINDS[self.story_beat.min(N_BEATS - 1)] == G_SWIPE && kind == 2 {
+                    let (x0, y0) = (self.story_ptr_x0, self.story_ptr_y0);
+                    self.answer(x0, y0);
+                }
+            }
+        }
+    }
+
+    /// Free creation: a touch makes a tree, a star, a fish, a bird or a beast, by the day.
+    fn create_at(&mut self, x: f32, y: f32) {
+        use crate::story::*;
+        if self.story_touch_cd > 0.0 { return; }
+        let lay = self.lay;
+        let fx = clamp((x - lay.sx) / lay.sw.max(1.0), 0.02, 0.98);
+        let fy = clamp((y - lay.sy) / lay.sh.max(1.0), 0.02, 0.98);
+        let Some(kind) = touch_kind(self.story_he, self.story_t, fy, self.story_notes) else { return; };
+        self.story_touch_cd = 0.12;
+        let seed = self.rng.next_u32();
+        if self.story_marks.len() >= 60 { self.story_marks.remove(0); }
+        self.story_marks.push(Mark { kind, x: fx, y: fy, t: self.story_t, seed });
+        let u = lay.u;
+        for _ in 0..12 {
+            let a = self.rng.range(0.0, TAU); let sp = self.rng.range(30.0, 160.0) * u;
+            let life = self.rng.range(0.4, 0.9);
+            self.story_fx.push(Spark { x, y, vx: cos(a) * sp, vy: sin(a) * sp, life, max: life, size: self.rng.range(1.5, 3.5) * u, col: 0xFFF4D8, ring: false });
+        }
+        self.story_fx.push(Spark { x, y, vx: 0.0, vy: 0.0, life: 0.6, max: 0.6, size: 60.0 * u, col: 0xFFF4D8, ring: true });
+        // each touch plays the next note of a rising tune in D
+        const SCALE: [f32; 12] = [62.0, 64.0, 66.0, 69.0, 71.0, 74.0, 76.0, 78.0, 81.0, 83.0, 86.0, 88.0];
+        let n = self.story_notes as usize;
+        let midi = SCALE[(n % 12).min(11)] - if (n / 12) % 2 == 1 { 12.0 } else { 0.0 };
+        let timbre = if kind == K_STAR || kind == K_LIGHT { 4.0 } else { 2.0 };
+        self.ev(EV_NOTE, timbre, midi, 0.55, clamp((fx - 0.5) * 1.6, -0.8, 0.8));
+        self.story_notes += 1;
+        self.haptic(10.0);
+    }
+
+    /// The story is over (or skipped): show the ending screen.
+    pub fn end_story(&mut self) {
+        if self.story_end_sent { return; }
+        self.story_end_sent = true;
+        self.story_hold = false;
+        self.story_t = self.story_t.max(crate::story::len(self.story_he));
+        self.ev(EV_STORY, 0.0, 0.0, 0.0, 0.0);
+        self.ev(EV_END, self.time, self.run_merges as f32, self.run_drops as f32, self.mode as u32 as f32);
     }
 
     fn end_time_attack(&mut self) {
@@ -1452,9 +1996,32 @@ impl Game {
         }
         if before < 0.05 && gt >= 0.05 { self.ring_pulse = 1.0; }
         if before < 3.6 && gt >= 3.6 { self.sound(S_IAM, 1.0, 0.0); }
-        if before < 6.8 && gt >= 6.8 {
-            self.ev(EV_END, self.time, self.run_merges as f32, self.run_drops as f32, self.mode as u32 as f32);
+        // the bubble strains around the light, then bursts
+        if gt > 2.6 && self.burst_t < 0.0 { self.ring_pulse = self.ring_pulse.max(smooth((gt - 2.6) / 2.4)); }
+        if before < BURST_AT && gt >= BURST_AT && self.burst_t < 0.0 && crate::vessel::on(self) {
+            self.burst_t = 0.0;
+            let n = 64;
+            for k in 0..n {
+                let a = k as f32 / n as f32 * TAU + self.rng.sym() * 0.05;
+                let d = V2::new(cos(a), sin(a));
+                let life = self.rng.range(0.9, 1.8);
+                let col = if k % 3 == 0 { 0xFFFFFF } else { 0xFFF0C8 };
+                self.parts.push(Particle { kind: 10, p: d * self.ring_r, v: d * self.rng.range(1.2, 3.4), life, max: life, size: self.rng.range(0.012, 0.04), color: col, drag: 1.1, grav: 0.4, angle: self.rng.range(0.0, TAU), spin: 0.0 });
+            }
+            for k in 0..40 {
+                let a = k as f32 / 40.0 * TAU;
+                let d = V2::new(cos(a), sin(a));
+                self.parts.push(Particle { kind: 1, p: d * self.ring_r, v: d * self.rng.range(3.0, 6.0), life: 0.5, max: 0.5, size: 2.5, color: 0xFFFFFF, drag: 1.5, grav: 0.0, angle: 0.0, spin: 0.0 });
+            }
+            self.parts.push(Particle { kind: 9, p: V2::default(), v: V2::default(), life: 1.0, max: 1.0, size: self.ring_r * 2.6, color: 0xFFF4D8, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
+            self.add_flash(0xFFFFFF, 1.0);
+            self.shake = self.shake.max(1.3);
+            self.hitstop = self.hitstop.max(0.25);
+            self.sound(S_BURST, 1.0, 0.0);
+            self.haptic(120.0);
         }
+        // the simulation stops, the light fills everything, and God tells the story
+        if before < STORY_AT && gt >= STORY_AT && !self.story_on { self.begin_story(0.0); }
         if gt < 4.0 && self.rng.chance(0.6) {
             let a = self.rng.range(0.0, TAU);
             let rr = self.ring_r * self.rng.range(0.8, 1.6);
@@ -1472,10 +2039,12 @@ impl Game {
     fn cap(&self) -> usize { (2200.0 * clamp(self.opts.get(Opt::Particles), 0.3, 2.0) / 1.8) as usize }
     fn push_part(&mut self, q: Particle) { if self.parts.len() < self.cap() { self.parts.push(q); } }
     pub fn burst(&mut self, p: V2, col: u32, n: usize, power: f32) {
+        // mostly soft glowing spores; a few sharp streaks for the punch
+        let soft = crate::vessel::on(self);
         for k in 0..n {
             let a = self.rng.range(0.0, TAU);
             let s = self.rng.range(0.3, 1.0) * power * 1.6;
-            let streak = k % 3 != 0;
+            let streak = if soft { k % 4 == 0 } else { k % 3 != 0 };
             let white = self.rng.chance(0.25);
             let life = self.rng.range(0.35, 0.9) * (0.7 + power * 0.3);
             let size = self.rng.range(1.2, 3.2) * (0.8 + power * 0.25);
@@ -1538,6 +2107,16 @@ impl Game {
             self.push_part(q);
         }
     }
+    /// Droplets of membrane thrown out by a fusion.
+    fn goo(&mut self, p: V2, r: f32, n: usize, col: u32) {
+        for _ in 0..n {
+            let a = self.rng.range(0.0, TAU);
+            let s = self.rng.range(0.4, 1.3) * (0.5 + r * 2.0);
+            let life = self.rng.range(0.45, 0.9);
+            let q = Particle { kind: 10, p: p + V2::new(cos(a), sin(a)) * (r * 0.8), v: V2::new(cos(a) * s, sin(a) * s - 0.3), life, max: life, size: r * self.rng.range(0.1, 0.22), color: col, drag: 2.4, grav: 1.6, angle: self.rng.range(0.0, TAU), spin: 0.0 };
+            self.push_part(q);
+        }
+    }
     fn portal_fx(&mut self, p: V2, r: f32) {
         self.wave(p, r * 2.2, 0xFF52DC);
         self.wave(p, r * 1.4, 0x14E8FF);
@@ -1565,15 +2144,16 @@ impl Game {
 pub fn voice_len(t: u8) -> f32 {
     if t == GOD { return 11.0; }
     match tier(t).cat {
-        Cat::Foot => 0.6, Cat::Motors => 0.9, Cat::Cars => 1.1, Cat::Premium => 1.3, Cat::Super => 1.5, Cat::Hyper => 1.8,
-        Cat::Monsters => 2.0, Cat::Rails => 2.1, Cat::Seas => 2.2, Cat::Skies => 2.3, Cat::Space => 2.7, Cat::SciFi => 2.9,
-        Cat::Myth => 3.5, Cat::Holy => 4.6, Cat::God => 11.0,
+        Cat::Foot => 0.6, Cat::Rides => 0.8, Cat::Motors => 0.9, Cat::Cars => 1.1, Cat::Premium => 1.3, Cat::Super => 1.5, Cat::Hyper => 1.8,
+        Cat::Workers => 1.9, Cat::Monsters => 2.0, Cat::Rails => 2.1, Cat::Sails => 2.1, Cat::Seas => 2.2, Cat::Skies => 2.3, Cat::Space => 2.7,
+        Cat::SciFi => 2.9, Cat::Mega => 3.2, Cat::Myth => 3.5, Cat::Wonders => 4.2, Cat::Heavens => 4.8, Cat::God => 11.0,
     }
 }
 
 #[cfg(test)]
 mod sim {
     use super::*;
+    #[allow(dead_code)]
     pub struct R { pub god: bool, pub time: f32, pub top: u8, pub max_b: usize, pub frames: u32, pub jams: u32, pub avg_b: f32 }
     pub fn run(mode: Mode, gap: f32, speed: f32, max_game_s: f32, seed: u32, verbose: bool) -> R {
         let mut g = Game::new(seed);
@@ -1666,22 +2246,117 @@ mod sim {
     fn runs_start_at_the_bottom() {
         let mut g = Game::new(3);
         g.resize(390.0, 844.0, 2.0);
-        g.unlocked = u128::MAX;
+        g.unlocked = Mask::all();
         g.start(Mode::Classic);
         assert_eq!(g.spout, 0);
-        for _ in 0..20 { g.frame(1.0 / 60.0); }
-        assert!(!g.bodies.is_empty() && g.bodies.iter().all(|b| b.tier == 0), "only babies at the start");
-        for _ in 0..100 { g.frame(1.0 / 60.0); }
+        for _ in 0..240 { g.frame(1.0 / 60.0); g.events.clear(); }
+        // four seconds in: nothing but crawling babies, poured one at a time, no zoom yet
+        assert!(!g.bodies.is_empty());
         assert_eq!(g.spout, 0);
-        // bigger tiers get bigger balls, wherever the spout is
-        for base in [0.0f32, 40.0, 90.0, 119.0] {
+        assert!(g.bodies.iter().all(|b| b.tier <= 2));
+        assert_eq!(g.babies, g.run_drops as f64);
+        assert!(g.run_drops <= 12, "pours slowly at the start ({} drops)", g.run_drops);
+        assert!(g.intro_k > 0.5, "the camera starts close on the babies");
+    }
+
+    #[test]
+    fn sizes_are_absolute() {
+        let mut g = Game::new(3);
+        g.resize(390.0, 844.0, 2.0);
+        let idx = |k: &str| TIERS.iter().position(|t| t.key == k).unwrap() as u8;
+        let (shuttle, sandals) = (idx("shuttle"), idx("talaria"));
+        for base in [0.0f32, 40.0, 90.0, 140.0] {
             g.base = base;
-            for t in (base as u8)..((base as u8 + 8).min(GOD - 1)) { assert!(g.radius_for(t + 1) > g.radius_for(t), "base {base} tier {t}"); }
-            // and the spout's own ball keeps growing along the journey
-            if base > 0.0 { let b0 = g.base; g.base = base - 1.0; let lo = g.radius_for(base as u8 - 1); g.base = b0; assert!(g.radius_for(base as u8) > lo); }
+            for t in 0..GOD { assert!(g.radius_for(t + 1) >= g.radius_for(t), "base {base} tier {t}"); }
         }
-        g.base = (GOD - 5) as f32;
-        assert!(g.radius_for(GOD) > g.radius_for(GOD - 1));
+        // the zoom never changes how two tiers compare
+        g.base = 98.0;
+        let k1 = g.radius_for(shuttle + 1) / g.radius_for(shuttle);
+        g.base = 97.0;
+        let k2 = g.radius_for(shuttle + 1) / g.radius_for(shuttle);
+        assert!((k1 - k2).abs() < 1e-4 && (k1 - g.grow()).abs() < 1e-3);
+        // Hermes' sandals are far, far wider than the Space Shuttle
+        let ratio = Game::babies_wide(g.grow(), sandals) / Game::babies_wide(g.grow(), shuttle);
+        println!("sandals / shuttle = {ratio:.3e}, God is {:.3e} babies wide", Game::babies_wide(g.grow(), GOD));
+        assert!(ratio > 1e5);
+    }
+
+    #[test]
+    fn zooming_out_scales_the_picture() {
+        let mut g = Game::new(4);
+        g.resize(390.0, 844.0, 2.0);
+        g.start(Mode::Classic);
+        let a = g.new_body_ex(3, V2::new(-0.3, 0.5), V2::default(), true).unwrap();
+        let b = g.new_body_ex(3, V2::new(0.2, 0.7), V2::default(), true).unwrap();
+        let (pa, pb, ra) = (g.bodies[a].p, g.bodies[b].p, g.bodies[a].r);
+        g.zoom_world(1.0);
+        let f = 1.0 / g.grow();
+        let d0 = (pb - pa).len(); let d1 = (g.bodies[b].p - g.bodies[a].p).len();
+        assert!((d1 - d0 * f).abs() < 1e-5, "distances shrink with the zoom");
+        assert!((g.bodies[a].r - ra * f).abs() < 1e-6, "so do the balls");
+        // the bottom of the vessel stays where it is
+        let bottom = V2::new(0.0, g.ring_r);
+        assert!(((g.bodies[a].p - bottom).len() - (pa - bottom).len() * f).abs() < 1e-5);
+    }
+
+    #[test]
+    fn creation_waits_for_the_player() {
+        use crate::story::*;
+        let mut g = Game::new(5);
+        g.resize(390.0, 844.0, 2.0);
+        g.start(Mode::Classic);
+        g.debug_story(0.0);
+        let bt = beat_times(track(g.story_he));
+        // runs on its own clock (no narration) up to the first moment, then holds
+        for _ in 0..(60 * 40) { g.frame(1.0 / 60.0); if g.story_hold { break; } }
+        assert!(g.story_hold && g.story_beat == B_LIGHT);
+        assert!((g.story_t - (bt[B_LIGHT] - LEAD)).abs() < 1e-3);
+        let t_held = g.story_t;
+        for _ in 0..60 { g.frame(1.0 / 60.0); }
+        assert_eq!(g.story_t, t_held, "time stands still while it waits");
+        // a touch lights it, where the finger was
+        g.pointer(0, 100.0, 200.0); g.pointer(2, 100.0, 200.0);
+        assert!(!g.story_hold && g.story_beat == B_SKY);
+        assert!((g.story_pos[B_LIGHT].0 - 100.0 / g.lay.sw).abs() < 0.01);
+        // the sky waits for a swipe up; a short one is not enough, a long one is
+        for _ in 0..(60 * 60) { g.frame(1.0 / 60.0); if g.story_hold { break; } }
+        assert!(g.story_hold && g.story_beat == B_SKY);
+        g.pointer(0, 200.0, 600.0); g.pointer(1, 200.0, 590.0);
+        assert!(g.story_hold);
+        g.pointer(1, 200.0, 520.0);
+        assert!(!g.story_hold && g.story_beat == B_LAND);
+        g.pointer(2, 200.0, 520.0);
+        // nobody answers the land: it rises by itself after the timeout
+        for _ in 0..(60 * 60) { g.frame(1.0 / 60.0); if g.story_hold { break; } }
+        assert!(g.story_hold && g.story_beat == B_LAND);
+        for _ in 0..(60 * (TIMEOUT as usize + 1)) { g.frame(1.0 / 60.0); }
+        assert!(g.story_beat > B_LAND);
+        // free creation on the third day: touching the land plants a tree
+        let c_plants = { let tr = track(g.story_he); tr.verses[10].t0 + 1.0 };
+        while g.story_t < c_plants && !g.story_end_sent { g.frame(1.0 / 60.0); if g.story_hold { let (x, y) = (195.0, 300.0); g.pointer(0, x, y); g.pointer(2, x, y); } }
+        let before = g.story_marks.len();
+        let y_land = g.lay.sy + g.lay.sh * (HORIZON + 0.1);
+        g.pointer(0, 150.0, y_land); g.pointer(2, 150.0, y_land);
+        assert_eq!(g.story_marks.len(), before + 1);
+        assert!(matches!(g.story_marks.last().unwrap().kind, K_TREE | K_FLOWER));
+        // the breath of life needs a long press
+        let mut guard = 0;
+        while g.story_beat < B_PEOPLE && guard < 60 * 600 {
+            g.frame(1.0 / 60.0); guard += 1;
+            if g.story_hold { let (x, y) = (195.0, 500.0); g.pointer(0, x, y); g.pointer(2, x, y); }
+        }
+        for _ in 0..(60 * 60) { g.frame(1.0 / 60.0); if g.story_hold { break; } }
+        assert!(g.story_hold && g.story_beat == B_PEOPLE);
+        g.pointer(0, 195.0, 560.0);
+        for _ in 0..30 { g.frame(1.0 / 60.0); }
+        assert!(g.story_hold, "half a second is not enough");
+        for _ in 0..50 { g.frame(1.0 / 60.0); }
+        assert!(!g.story_hold && g.story_beat == B_CANDLES);
+        g.pointer(2, 195.0, 560.0);
+        // and the story ends after the last moment
+        let mut guard = 0;
+        while !g.story_end_sent && guard < 60 * 600 { g.frame(1.0 / 60.0); guard += 1; if g.story_hold { g.pointer(0, 200.0, 500.0); g.pointer(2, 200.0, 500.0); } }
+        assert!(g.story_end_sent);
     }
 
     #[test]
@@ -1690,7 +2365,7 @@ mod sim {
         let mut g = Game::new(5);
         g.resize(390.0, 844.0, 2.0);
         g.opts.set(Opt::Drama as usize, 0.0);
-        g.unlocked = u128::MAX;
+        g.unlocked = Mask::all();
         g.sandbox_tier = 20;
         g.start(Mode::Sandbox);
         g.new_body_ex(20, V2::new(0.0, -0.6), V2::default(), true);
