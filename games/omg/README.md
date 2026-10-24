@@ -20,8 +20,17 @@ the time, drops and bursts of every era. `OMG_NOISE` and `OMG_SLOP` make it a le
 OMG_DIFF=1 OMG_SEED=3 OMG_NOISE=0.06 OMG_SLOP=0.1 cargo test --release journey_calibrate -- --ignored --nocapture
 ```
 
+A reel is a Watch run (or another automatic mode) that the shell records: it opens with the fast start, babies
+pouring in from `kickoff` points on the bubble's wall, and the engine sets the simulation speed so God is born
+on time for the chosen length, reading how far along the run is from `ERA_CLOCK`. It sends `EV_REEL` a few
+seconds into God's story, and the shell stops recording. `watch_length` prints how long a run or a reel takes:
+
+```sh
+OMG_REEL=90 OMG_KICK=5 cargo test --release watch_length -- --ignored --nocapture   # OMG_REEL=-1: a plain Watch run
+```
+
 The browser shell (`public/omg/host.js`) only paints the draw list, forwards input, builds the menus
-from the schema the engine exports, plays the PCM that a second instance of the engine renders in
+from the schema the engine exports, records reels (H.264 MP4 where the browser can make it), plays the PCM that a second instance of the engine renders in
 `public/omg/audio-worker.js`, and streams the Genesis narration (pausing it when the story waits).
 
 - `src/game.rs` — bodies, the bubble-and-stem physics (480 Hz sub-steps, sweep-and-prune), merges and chain

@@ -64,7 +64,7 @@ a { color: inherit; }
 .sb.on { border-color: var(--accent); background: rgba(255,213,79,.12); }
 .sb canvas { width: 100%; height: 100%; display: block; }
 
-#rec-badge { position: absolute; top: calc(60 * var(--u)); inset-inline-start: calc(14 * var(--u)); display: flex; align-items: center; gap: 6px; font: 600 12px "IBM Plex Mono", monospace; color: #ff6b6b; }
+#rec-badge { display: flex; align-items: center; gap: 6px; padding: 5px 10px; margin-inline-end: calc(2 * var(--u)); border-radius: 999px; background: rgba(10,12,24,.55); font: 600 12px "IBM Plex Mono", monospace; color: #ff6b6b; white-space: nowrap; direction: ltr; pointer-events: none; }
 #rec-badge i { width: 9px; height: 9px; border-radius: 50%; background: #ff3b3b; animation: pulse 1s infinite; }
 
 /* ── screens */
@@ -202,4 +202,11 @@ html[lang="he"] #end-evo .evo-h { font-family: inherit; font-weight: 600; font-s
 .diff-desc { margin: 0; max-width: 34ch; text-align: center; font-size: 13px; line-height: 1.35; color: var(--fg-2); }
 .tool.empty { opacity: .42; }
 #end.burst h2 { color: #ff8a80; }
+#rec-sheet h2 { margin: 0; font-size: 30px; font-weight: 800; }
+#rec-sheet .sub { color: var(--fg-2); font-size: 16px; font-weight: 600; }
+.rec-opt { display: grid; gap: 8px; justify-items: center; width: 100%; }
+.rec-opt .chips { justify-content: center; }
+.rec-label { font-size: 13px; font-weight: 700; color: var(--fg-3); letter-spacing: .02em; }
+.rec-note { margin: 0; max-width: 34ch; font-size: 13px; line-height: 1.4; color: var(--fg-2); }
+.video-info { margin: -6px 0 0; font: 500 12px "IBM Plex Mono", monospace; color: var(--fg-2); direction: ltr; }
 #end-record.mercy { max-width: 34ch; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--fg-2); text-align: center; }

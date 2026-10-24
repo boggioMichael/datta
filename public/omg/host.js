@@ -1156,6 +1156,7 @@
         case 10: toolsUI(true); break;
         case 11: audio.setMusic(a | 0); break;
         case 12: audio.note(a | 0, b, c, d); break;
+        case 14: if (rec.on && rec.reel) rec.stop(); break;
         case 13:
           if (a > 2.5) story.release(b);
           else if (a > 1.5) story.hold(b);
@@ -1189,7 +1190,7 @@
     render();
     const p2 = performance.now();
     perf.sim += p1 - p0; perf.draw += p2 - p1; perf.n++;
-    if (rec.on) rec.frame();
+    if (rec.on) rec.frame(ts);
     toolsTick += dt;
     if (toolsTick > 0.1) { toolsTick = 0; toolsUI(false); }
     requestAnimationFrame(loop);
@@ -1347,6 +1348,7 @@
   }
   function setLang(isHe) { he = isHe; X.omg_set_lang(he ? 1 : 0); applyLang(); persist(); }
   function goHome() {
+    if (rec.on) rec.stop();
     closeMenu(true); running = false; story.stop(); X.omg_pause(1); persist();
     $('#start').hidden = false; document.body.classList.add('home');
     buildLadder(); buildModes(); toolsUI(false); sandboxUI();
@@ -1704,59 +1706,196 @@
   }
 
   // ───────────────────────── reel recording
+  // The video is the 9:16 heart of the stage, copied 30 times a second into a canvas of its own, with the game's sound.
+  const UA = navigator.userAgent || '';
+  const WEBKIT = /AppleWebKit/.test(UA) && !/Chrome|Chromium|Edg\/|OPR\//.test(UA);
+  const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   const rec = {
-    on: false, mr: null, chunks: [], cv: null, cx: null, mime: '',
+    on: false, reel: false, mr: null, chunks: [], cv: null, cx: null, mime: '', last: 0, t0: 0, dur: 0, url: '',
+    // H.264 + AAC in MP4 opens everywhere: phones, editors, every app. WebM only where MP4 can't be made.
     pick() {
-      const types = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
-      for (const ty of types) if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(ty)) return ty;
-      return '';
+      if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
+      const ok = (ty) => { try { return MediaRecorder.isTypeSupported(ty); } catch { return false; } };
+      // Safari, and every browser on an iPhone, makes H.264 + AAC for plain MP4
+      if (WEBKIT && ok('video/mp4')) return 'video/mp4';
+      // elsewhere plain MP4 may hold VP9, which phones won't play: ask for H.264 by name
+      for (const ty of ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1.4d4028,mp4a.40.2', 'video/mp4;codecs=avc1.42e028,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1.640028,opus', 'video/mp4;codecs=avc1,opus']) if (ok(ty)) return ty;
+      for (const ty of ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']) if (ok(ty)) return ty;
+      return ok('video/mp4') ? 'video/mp4' : '';
     },
-    start() {
-      if (this.on) return this.stop();
+    start(reel) {
+      if (this.on) { this.stop(); return false; }
       audio.unlock();
-      if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { toast(t('record_unsupported')); return; }
-      this.cv = document.createElement('canvas'); this.cv.width = 1080; this.cv.height = 1920;
-      this.cx = this.cv.getContext('2d');
-      this.frame();
-      const vs = this.cv.captureStream(30);
-      const tracks = [...vs.getVideoTracks()];
+      if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { toast(t('record_unsupported')); return false; }
+      const small = !!navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+      const cv = document.createElement('canvas'); cv.width = small ? 720 : 1080; cv.height = small ? 1280 : 1920;
+      // Safari only records a canvas that is part of the page
+      cv.setAttribute('aria-hidden', 'true');
+      cv.style.cssText = 'position:fixed;left:-9999px;top:0;width:4px;height:4px;opacity:0;pointer-events:none';
+      document.body.appendChild(cv);
+      this.cv = cv; this.cx = cv.getContext('2d', { alpha: false }) || cv.getContext('2d');
+      this.last = 0; this.frame(performance.now(), true);
+      const tracks = [...cv.captureStream(30).getVideoTracks()];
       if (audio.recDest) tracks.push(...audio.recDest.stream.getAudioTracks());
       this.mime = this.pick();
-      try { this.mr = new MediaRecorder(new MediaStream(tracks), this.mime ? { mimeType: this.mime, videoBitsPerSecond: 8_000_000 } : undefined); } catch { toast(t('record_unsupported')); return; }
-      this.chunks = [];
-      this.mr.ondataavailable = (e) => { if (e.data && e.data.size) this.chunks.push(e.data); };
-      this.mr.onstop = () => this.done();
-      this.mr.start(500);
-      this.on = true; this.t0 = performance.now();
+      const o = { videoBitsPerSecond: small ? 5_000_000 : 8_000_000, audioBitsPerSecond: 160_000 };
+      let mr = null;
+      try { mr = new MediaRecorder(new MediaStream(tracks), this.mime ? { ...o, mimeType: this.mime } : o); } catch { try { mr = new MediaRecorder(new MediaStream(tracks)); } catch { mr = null; } }
+      if (!mr) { toast(t('record_unsupported')); this.drop(); return false; }
+      this.mr = mr; this.chunks = [];
+      mr.ondataavailable = (e) => { if (e.data && e.data.size) this.chunks.push(e.data); };
+      mr.onstop = () => this.done();
+      mr.onerror = () => { toast(t('record_failed')); this.stop(); };
+      // Safari hands over the whole file at the end; elsewhere it comes in one-second pieces
+      try { if (WEBKIT) mr.start(); else mr.start(1000); } catch { toast(t('record_unsupported')); this.mr = null; this.drop(); return false; }
+      this.on = true; this.reel = !!reel; this.t0 = performance.now();
       $('#btn-rec').classList.add('on'); $('#rec-badge').hidden = false;
-      toast(t('recording'));
+      return true;
     },
-    frame() {
+    frame(now, force) {
       if (!this.cx) return;
+      // the recording keeps 30 frames a second; drawing more would only take time from the game
+      if (!force && now - this.last < 1000 / 31) return;
+      this.last = now;
+      const W = this.cv.width, H = this.cv.height;
       const cw = stage.w, ch = Math.min(stage.h, cw * 16 / 9);
       const top = Math.max(stage.y, Math.min(stage.y + stage.h - ch, (stage.cy || stage.y + stage.h / 2) - ch * 0.47));
-      this.cx.fillStyle = '#000'; this.cx.fillRect(0, 0, 1080, 1920);
-      this.cx.drawImage(canvas, stage.x * DPR, top * DPR, cw * DPR, ch * DPR, 0, 0, 1080, 1920);
-      if (this.on) { const s = (performance.now() - this.t0) / 1000; $('#rec-badge span').textContent = `REC ${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; }
+      this.cx.fillStyle = '#000'; this.cx.fillRect(0, 0, W, H);
+      this.cx.drawImage(canvas, stage.x * DPR, top * DPR, cw * DPR, ch * DPR, 0, 0, W, H);
+      if (this.on) {
+        const len = this.reel ? X.omg_info(50) : 0;
+        $('#rec-badge span').textContent = `REC ${clock((now - this.t0) / 1000)}${len > 0 ? ` / ~${clock(len)}` : ''}`;
+      }
     },
-    stop() { if (this.mr && this.mr.state !== 'inactive') this.mr.stop(); this.on = false; $('#btn-rec').classList.remove('on'); $('#rec-badge').hidden = true; },
-    done() {
-      const type = (this.mr && this.mr.mimeType) || this.mime || 'video/webm';
-      const blob = new Blob(this.chunks, { type });
-      const url = URL.createObjectURL(blob);
+    stop() {
+      if (this.reel) { try { X.omg_reel(-1); } catch { /* */ } }
+      this.reel = false;
+      const mr = this.mr;
+      if (this.on) this.dur = (performance.now() - this.t0) / 1000;
+      this.on = false; $('#btn-rec').classList.remove('on'); $('#rec-badge').hidden = true;
+      if (mr && mr.state !== 'inactive') { try { mr.stop(); } catch { this.done(); } }
+      else if (this.chunks.length) this.done();
+      else this.drop();
+    },
+    drop() { if (this.cv) this.cv.remove(); this.cv = null; this.cx = null; },
+    async done() {
+      const type = ((this.mr && this.mr.mimeType) || this.mime || 'video/webm').split(';')[0].trim() || 'video/webm';
       const ext = type.includes('mp4') ? 'mp4' : 'webm';
-      const v = $('#video-preview'); v.src = url;
-      const a = $('#video-save'); a.href = url; a.download = `oh-my-god.${ext}`;
+      let blob = new Blob(this.chunks, { type });
+      this.chunks = []; this.mr = null; this.drop();
+      if (!blob.size) { toast(t('record_failed')); return; }
+      // a recorder's WebM doesn't say how long it is, and players then can't show or seek it
+      if (ext === 'webm') { try { blob = await webmWithDuration(blob, this.dur * 1000); } catch { /* keep it as it is */ } }
+      if (this.url) URL.revokeObjectURL(this.url);
+      const url = this.url = URL.createObjectURL(blob);
+      const d = new Date(), p2 = (n) => String(n).padStart(2, '0');
+      const name = `oh-my-god-${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}.${ext}`;
+      const file = new File([blob], name, { type });
+      $('#video-preview').src = url;
+      const mb = blob.size / 1048576;
+      $('#video-info').textContent = `${clock(this.dur)} · 9:16 · ${mb.toFixed(mb < 10 ? 1 : 0)} MB · ${ext.toUpperCase()}`;
+      const a = $('#video-save'); a.href = url; a.download = name;
       a.onclick = async (e) => {
-        try {
-          const f = new File([blob], `oh-my-god.${ext}`, { type });
-          if (navigator.canShare && navigator.canShare({ files: [f] })) { e.preventDefault(); await navigator.share({ files: [f], title: 'OH MY GOD' }); }
-        } catch { /* fall back to download */ }
+        // on phones the share sheet saves straight to the photos
+        let can = false;
+        try { can = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch { can = false; }
+        if (!can) { setTimeout(() => toast(t('record_downloaded')), 400); return; } // the link downloads it
+        e.preventDefault();
+        try { await navigator.share({ files: [file] }); } catch (err) {
+          if (err && err.name === 'AbortError') return;
+          // the sheet couldn't open: download it instead
+          const l = document.createElement('a'); l.href = url; l.download = name; document.body.appendChild(l); l.click(); l.remove();
+          toast(t('record_downloaded'));
+        }
       };
       $('#video-ready').hidden = false;
-      this.cx = null;
     },
   };
+
+  // A recorder's WebM has no length in its header: write one in, so players can show and seek it.
+  async function webmWithDuration(blob, ms) {
+    const head = new Uint8Array(await blob.slice(0, Math.min(blob.size, 65536)).arrayBuffer());
+    const idAt = (i) => { const b = head[i]; let n = 1; while (n <= 4 && !(b & (0x80 >> (n - 1)))) n++; let v = 0; for (let k = 0; k < n; k++) v = v * 256 + head[i + k]; return [v, n]; };
+    const sizeAt = (i) => {
+      const b = head[i]; let n = 1; while (n <= 8 && !(b & (0x80 >> (n - 1)))) n++;
+      const mask = (0x80 >> (n - 1)) - 1; let v = b & mask, ones = v === mask;
+      for (let k = 1; k < n; k++) { v = v * 256 + head[i + k]; if (head[i + k] !== 0xff) ones = false; }
+      return [v, n, ones];
+    };
+    let [id, n] = idAt(0); if (id !== 0x1a45dfa3) return blob;
+    let [sz, m] = sizeAt(n); let i = n + m + sz;
+    [id, n] = idAt(i); if (id !== 0x18538067) return blob;
+    [sz, m] = sizeAt(i + n); i += n + m; // inside the segment
+    while (i < head.length - 12) {
+      [id, n] = idAt(i);
+      const [csz, cm, unknown] = sizeAt(i + n);
+      const body = i + n + cm;
+      if (id === 0x1549a966 && !unknown && body + csz <= head.length) { // Info
+        let j = body, scale = 1e6, at = -1, len = 0;
+        while (j < body + csz) {
+          const [kid, kn] = idAt(j); const [ksz, km] = sizeAt(j + kn); const kb = j + kn + km;
+          if (kid === 0x2ad7b1) { let v = 0; for (let q = 0; q < ksz; q++) v = v * 256 + head[kb + q]; scale = v || 1e6; }
+          if (kid === 0x4489) { at = kb; len = ksz; }
+          j = kb + ksz;
+        }
+        const val = ms * 1e6 / scale;
+        if (at >= 0) {
+          if (len !== 8 && len !== 4) return blob;
+          const out = new Uint8Array(await blob.arrayBuffer());
+          const dv = new DataView(out.buffer, at, len);
+          if (len === 8) dv.setFloat64(0, val); else dv.setFloat32(0, val);
+          return new Blob([out], { type: blob.type });
+        }
+        // add a Duration (an 8-byte float) at the end of Info, and write Info's new size on 8 bytes
+        const add = new Uint8Array(11); add.set([0x44, 0x89, 0x88]); new DataView(add.buffer).setFloat64(3, val);
+        const size8 = new Uint8Array(8); size8[0] = 0x01;
+        let x = csz + add.length; for (let k = 7; k >= 1; k--) { size8[k] = x % 256; x = Math.floor(x / 256); }
+        return new Blob([blob.slice(0, i + n), size8, blob.slice(body, body + csz), add, blob.slice(body + csz)], { type: blob.type });
+      }
+      if (unknown) break;
+      i = body + csz;
+    }
+    return blob;
+  }
+
+  // ───────────────────────── the record sheet: a reel from the start, or the screen from here
+  // the automatic modes a reel can be made of; anything else makes its reel in Watch
+  const reelMode = () => ([1, 2, 3, 4, 5].includes(mode) ? mode : 1);
+  let sheetPaused = false;
+  function openRecSheet() {
+    if (rec.on) { rec.stop(); return; }
+    audio.unlock();
+    const chipsFor = (key, box) => {
+      const i = optIndex(key), o = S.opts[i]; box.innerHTML = '';
+      o.choices.forEach((c) => {
+        const b = document.createElement('button'); b.className = 'chip' + (Math.abs(c[2] - X.omg_get_opt(i)) < 1e-3 ? ' on' : ''); b.textContent = c[he ? 0 : 1];
+        b.addEventListener('click', () => { X.omg_set_opt(i, c[2]); [...box.children].forEach((x) => x.classList.remove('on')); b.classList.add('on'); persist(); });
+        box.appendChild(b);
+      });
+    };
+    chipsFor('reel', $('#rec-len')); chipsFor('kickoff', $('#rec-kick'));
+    $('#rec-note').textContent = reelMode() === mode ? t('reel_auto') : `${t('reel_auto')} ${t('reel_watch')}`;
+    $('#btn-rec-here').hidden = !running;
+    $('#rec-sheet').hidden = false;
+    sheetPaused = running && !userPaused;
+    if (sheetPaused) X.omg_pause(1);
+  }
+  function closeRecSheet() {
+    $('#rec-sheet').hidden = true;
+    if (sheetPaused && running && !userPaused && !menuOpen) X.omg_pause(0);
+    sheetPaused = false;
+  }
+  function startReel() {
+    closeRecSheet();
+    $('#end').hidden = true; $('#video-ready').hidden = true;
+    story.unlock();
+    startGame(reelMode(), true);
+    const len = opt('reel');
+    X.omg_reel(len);
+    if (!rec.start(true)) { X.omg_reel(-1); return; }
+    toast(len > 0 ? t('reel_started').replace('{t}', clock(len)) : t('reel_started_full'));
+  }
+  function recordHere() { closeRecSheet(); if (rec.start(false)) toast(t('recording')); }
 
   let toastTimer = 0;
   function toast(msg) {
@@ -1779,10 +1918,13 @@
     $('#story-skip').addEventListener('click', () => { X.omg_story_skip(); });
     $('#btn-sound').addEventListener('click', () => { audio.unlock(); audio.toggleMute(); });
     $('#btn-pause').addEventListener('click', () => togglePause());
-    $('#btn-rec').addEventListener('click', () => rec.start());
+    $('#btn-rec').addEventListener('click', () => openRecSheet());
+    $('#btn-reel').addEventListener('click', () => startReel());
+    $('#btn-rec-here').addEventListener('click', () => recordHere());
+    $('#btn-rec-close').addEventListener('click', () => closeRecSheet());
     $('#btn-again').addEventListener('click', () => { if (endKind === 'burst') retryEra(); else startGame(X.omg_info(4) | 0, true); });
     $('#btn-stay').addEventListener('click', () => { $('#end').hidden = true; });
-    $('#btn-end-rec').addEventListener('click', () => { $('#end').hidden = true; startGame(X.omg_info(4) | 0); rec.start(); });
+    $('#btn-end-rec').addEventListener('click', () => startReel());
     $('#video-close').addEventListener('click', () => { $('#video-ready').hidden = true; });
     $('#btn-sound').classList.toggle('muted', audio.muted);
   }
@@ -1834,5 +1976,5 @@
     requestAnimationFrame(loop);
   }
   boot().catch((e) => { console.error(e); const l = $('#loading'); l.hidden = false; l.textContent = 'WebAssembly failed to load: ' + (e && e.message); });
-  window.__omg = { get X() { return X; }, get S() { return S; }, audio, story, startGame, openMenu, perf };
+  window.__omg = { get X() { return X; }, get S() { return S; }, audio, story, startGame, openMenu, perf, rec, webmWithDuration };
 })();

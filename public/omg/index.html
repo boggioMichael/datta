@@ -25,6 +25,7 @@
   <div class="topbar">
     <button class="ib" id="btn-menu" aria-label="תפריט"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <div class="spacer"></div>
+    <div id="rec-badge" hidden><i></i><span></span></div>
     <button class="ib" id="btn-rec" aria-label="הקלט"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" class="fill"/></svg></button>
     <button class="ib" id="btn-sound" aria-label="סאונד"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l4 4V6L8 10H5z" class="fill"/><path d="M15.5 9a4 4 0 010 6M18 6.5a8 8 0 010 11" class="wave"/><path d="M16 9l5 6M21 9l-5 6" class="x"/></svg></button>
     <button class="ib" id="btn-pause" aria-label="השהה"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
@@ -37,7 +38,6 @@
   <button id="story-skip" class="ghost" hidden><span data-ui="skip"></span> ⏭</button>
   <div id="sandbox-pick" hidden></div>
   <div id="tools"></div>
-  <div id="rec-badge" hidden><i></i><span></span></div>
 </div>
 
 <section id="start" class="screen">
@@ -92,10 +92,26 @@
   </div>
 </section>
 
+<section id="rec-sheet" class="screen glass" hidden>
+  <div class="end-inner">
+    <h2 data-ui="reel_title"></h2>
+    <p class="sub" data-ui="reel_sub"></p>
+    <div class="rec-opt"><span class="rec-label" data-ui="reel_len"></span><div class="chips" id="rec-len"></div></div>
+    <div class="rec-opt"><span class="rec-label" data-ui="reel_kick"></span><div class="chips" id="rec-kick"></div></div>
+    <p class="rec-note" id="rec-note"></p>
+    <div class="end-btns">
+      <button class="cta" id="btn-reel" data-ui="reel_go"></button>
+      <button class="ghost" id="btn-rec-here" data-ui="reel_here"></button>
+      <button class="ghost" id="btn-rec-close" data-ui="close"></button>
+    </div>
+  </div>
+</section>
+
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="video-ready" class="screen glass" hidden>
   <div class="end-inner">
     <h2 data-ui="record_ready"></h2>
+    <p id="video-info" class="video-info"></p>
     <video id="video-preview" playsinline controls></video>
     <div class="end-btns">
       <a class="cta" id="video-save" download="oh-my-god.mp4"><span data-ui="record_save"></span></a>

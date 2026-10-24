@@ -95,6 +95,28 @@ pub const EV_TOOLS: f32 = 10.0;
 pub const EV_MUSIC: f32 = 11.0;
 pub const EV_NOTE: f32 = 12.0; // timbre, midi, gain, pan
 pub const EV_STORY: f32 = 13.0; // 1 start the narration (b: Hebrew, c: from second), 0 stop, 2 hold at second a, 3 go on from second a
+pub const EV_REEL: f32 = 14.0; // the reel is over: stop recording
+/// The fast start pours from at most this many points on the bubble's wall…
+pub const KICK_MAX: usize = 8;
+/// …until this tier is born.
+pub const KICK_UNTIL: u8 = 5;
+/// A reel never runs the simulation faster than this.
+pub const REEL_MAX: f32 = 14.0;
+/// When each era begins in a Watch run with the default settings, in seconds (the last era is God alone), and the end.
+/// A reel reads how far along it is from this, since later eras take longer per tier.
+const ERA_CLOCK: [f32; N_CATS + 1] = [0.0, 25.0, 51.0, 77.0, 102.0, 129.0, 155.0, 182.0, 205.0, 223.0, 244.0, 269.0, 295.0, 347.0, 386.0, 428.0, 449.0, 505.0, 532.0, 562.0, 562.0];
+/// How far along a run that has reached tier `t` is (0 at the first baby, 1 at God).
+pub fn run_progress(t: u8) -> f32 {
+    let c = (cat_of(t) as usize).min(N_CATS - 1);
+    let first = (0..GOD).find(|&k| cat_of(k) as usize == c).unwrap_or(0);
+    let next = (0..=GOD).find(|&k| k == GOD || cat_of(k) as usize > c).unwrap_or(GOD);
+    let within = if next > first { (t - first) as f32 / (next - first) as f32 } else { 0.0 };
+    (ERA_CLOCK[c] + (ERA_CLOCK[c + 1] - ERA_CLOCK[c]) * within) / ERA_CLOCK[N_CATS]
+}
+/// Real seconds a reel keeps for God's birth, the burst and God's first words.
+pub const REEL_TAIL: f32 = 16.0;
+/// Seconds of God's story a reel ends on.
+pub const REEL_STORY: f32 = 6.0;
 
 /// A set of tiers (the ladder is longer than 128).
 #[derive(Clone, Copy, Default, PartialEq, Eq, Debug)]
@@ -410,6 +432,25 @@ pub struct Game {
     pub save_tick: f32,
     /// testing: play the journey with other numbers
     pub dif_ovr: Option<Diff>,
+    // ── the fast start: babies pour in from several points on the wall at once
+    pub kick_on: bool,
+    pub kick_n: u8,
+    /// how open the points are (they close when the bubble has enough to work with)
+    pub kick_k: f32,
+    kick_cd: f32,
+    kick_i: u8,
+    kick_ran: bool,
+    /// a pulse on each point as it pours
+    pub kick_fx: [f32; KICK_MAX],
+    // ── a reel: the run paced to fit a length, and the moment it's over
+    pub reel_on: bool,
+    pub reel_run: bool,
+    pub reel_len: f32,
+    pub reel_real: f32,
+    pub reel_speed: f32,
+    reel_rate: f32,
+    reel_after: f32,
+    reel_end_sent: bool,
 }
 
 pub const EV_NONE: u8 = 0;
@@ -595,6 +636,21 @@ impl Game {
             run_ckpt: None,
             save_tick: 0.0,
             dif_ovr: None,
+            kick_on: false,
+            kick_n: 0,
+            kick_k: 0.0,
+            kick_cd: 0.0,
+            kick_i: 0,
+            kick_ran: false,
+            kick_fx: [0.0; KICK_MAX],
+            reel_on: false,
+            reel_run: false,
+            reel_len: 0.0,
+            reel_real: 0.0,
+            reel_speed: 1.0,
+            reel_rate: 500.0,
+            reel_after: 0.0,
+            reel_end_sent: false,
         };
         g.tools[Tool::Upgrade as usize].charges = 1;
         g.make_stars();
@@ -699,6 +755,10 @@ impl Game {
         self.toast_t = 0.0;
         self.stats.runs += 1;
         self.era_time = [-1.0; N_CATS];
+        self.reel_on = false;
+        self.reel_run = false;
+        self.reel_speed = 1.0;
+        self.kick_open(mode == Mode::Watch);
         if mode == Mode::Sandbox {
             let st = self.sandbox_tier.min(GOD - 1);
             let st = if self.unlocked.has(st) { st } else { 0 };
@@ -728,6 +788,106 @@ impl Game {
         self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
         self.sound_rate(S_FUNNEL, 0.6, 0.0, 0.5);
         self.dirty_save = 0.5;
+    }
+
+    // ───────────────────────────────────────────── the fast start and reels
+    /// The automatic modes a reel is made of: they pour by themselves and go all the way to God.
+    pub fn reel_mode(m: Mode) -> bool { matches!(m, Mode::Watch | Mode::Chaos | Mode::Mega | Mode::Trampoline | Mode::BlackHole) }
+
+    /// Open the fast start's points on the wall, as many as the setting asks for.
+    fn kick_open(&mut self, on: bool) {
+        let n = (self.opts.get(Opt::Kickoff) as usize).min(KICK_MAX) as u8;
+        self.kick_n = n;
+        self.kick_on = on && n > 0 && Game::reel_mode(self.mode);
+        self.kick_ran = self.kick_on;
+        self.kick_k = 0.0;
+        // the bubble blooms first
+        self.kick_cd = 0.9;
+        self.kick_i = 0;
+        self.kick_fx = [0.0; KICK_MAX];
+        if self.kick_on { self.intro_k = 0.0; }
+    }
+
+    /// Where the fast start's k-th point sits: spread evenly over the upper wall, the middle one under the stem.
+    pub fn kick_angle(&self, k: usize) -> f32 {
+        let n = self.kick_n.max(1) as usize;
+        if n == 1 { return -PI * 0.5; }
+        let (a0, a1) = (-PI * 0.88, -PI * 0.12);
+        a0 + (a1 - a0) * k as f32 / (n - 1) as f32
+    }
+
+    /// The fast start: the points take turns pouring until the bubble has enough to work with.
+    fn kick_step(&mut self, dt: f32) {
+        for f in self.kick_fx.iter_mut() { *f = (*f - dt * 3.0).max(0.0); }
+        let target = if self.kick_on { 1.0 } else { 0.0 };
+        self.kick_k += (target - self.kick_k) * approach(dt, 0.35);
+        if !self.kick_on { return; }
+        if self.run_max >= KICK_UNTIL || self.fill > 0.42 || self.time > 10.0 { self.kick_on = false; return; }
+        self.kick_cd -= dt;
+        let n = self.kick_n.max(1) as usize;
+        while self.kick_cd <= 0.0 {
+            // every point pours about three babies a second
+            self.kick_cd += 0.32 / n as f32;
+            let k = self.kick_i as usize % n;
+            self.kick_i = self.kick_i.wrapping_add(1);
+            let t = self.spout;
+            let r = self.radius_for(t);
+            let d = { let a = self.kick_angle(k); V2::new(cos(a), sin(a)) };
+            let p = d * (self.ring_r - r - 0.012);
+            if !self.free_at(p, r * 1.02) { continue; }
+            let v = -d * 0.75 + V2::new(-d.y, d.x) * (self.rng.sym() * 0.2);
+            if self.new_body(t, p, v).is_some() {
+                self.poured(t);
+                self.kick_fx[k] = 1.0;
+                if self.drop_snd_cd <= 0.0 { self.sound(S_DROP, 0.26, clamp(d.x, -1.0, 1.0) * 0.5); self.drop_snd_cd = 0.07; }
+            }
+        }
+    }
+
+    /// The shell starts (len ≥ 0, seconds; 0 keeps the run's own pace) or ends (len < 0) a reel of this run.
+    pub fn reel(&mut self, len: f32) {
+        if len < 0.0 { self.reel_on = false; self.reel_speed = 1.0; return; }
+        self.reel_on = true;
+        self.reel_run = true;
+        self.reel_len = if Game::reel_mode(self.mode) { len } else { 0.0 };
+        self.reel_real = 0.0;
+        self.reel_speed = 1.0;
+        // a whole Watch run takes about this much game time at the default length
+        self.reel_rate = 500.0 * pow(2.0, self.gap() as f32 - 3.0);
+        self.reel_after = 0.0;
+        self.reel_end_sent = false;
+        // a reel from the start opens with the fast start, in every automatic mode
+        if self.run_max == 0 && self.time < 1.5 && !self.kick_on { self.kick_open(true); }
+    }
+    #[inline] pub fn paced(&self) -> bool { self.reel_on && self.reel_len > 0.0 && Game::reel_mode(self.mode) }
+    /// The simulation speed: the player's, or the reel's.
+    #[inline] pub fn sim_speed(&self) -> f32 { if self.paced() { self.reel_speed } else { self.opts.get(Opt::Speed) } }
+
+    /// A reel keeps an eye on how fast the run climbs and sets the speed so God arrives on time.
+    fn reel_tick(&mut self, real_dt: f32, live: bool) {
+        if !self.reel_on { return; }
+        if live { self.reel_real += real_dt; }
+        if self.paced() && !self.finished && !self.over {
+            // the whole run's game time: a guess at first, then what this run has shown so far
+            let f = run_progress(self.run_max).max(0.004);
+            let w = clamp(f * 4.0, 0.0, 1.0);
+            let total = self.reel_rate * (1.0 - w) + (self.time / f) * w;
+            let left = (total - self.time).max(1.0);
+            // (a little ahead of time: the last eras tend to run long)
+            let budget = ((self.reel_len - REEL_TAIL - self.reel_real) * 0.9).max(4.0);
+            // the first seconds play close to real time: the baby, the points opening
+            let want = clamp(left / budget, 1.0, REEL_MAX).min(1.0 + self.reel_real * 1.2);
+            self.reel_speed += (want - self.reel_speed) * approach(real_dt, 0.8);
+        }
+        if self.finished || self.over { self.reel_after += real_dt; }
+        // it ends a few seconds into God's story (or soon after a run that ended without God)
+        let done = (self.story_on && (self.story_t >= REEL_STORY || self.story_hold))
+            || (self.finished && self.reel_after > REEL_TAIL + 10.0)
+            || (self.over && self.reel_after > 2.5);
+        if done && !self.reel_end_sent {
+            self.reel_end_sent = true;
+            self.ev(EV_REEL, 1.0, 0.0, 0.0, 0.0);
+        }
     }
 
     // ───────────────────────────────────────────── the journey (skill mode)
@@ -1579,7 +1739,9 @@ impl Game {
         } else {
             self.ts += (1.0 - self.ts) * approach(real_dt, 0.16);
         }
-        let mut speed = self.opts.get(Opt::Speed);
+        let live0 = !self.paused && self.started;
+        self.reel_tick(real_dt, live0);
+        let mut speed = self.sim_speed();
         if self.tools[Tool::SlowMo as usize].active > 0.0 { speed *= 0.25; }
         if self.finished { speed = speed.min(1.0) * if self.god_t < 2.2 { 0.35 + 0.65 * smooth(self.god_t / 2.2) } else { 1.0 }; }
         speed *= self.ts;
@@ -1696,13 +1858,14 @@ impl Game {
         for b in &self.bodies { if b.alive && b.dying <= 0.0 && best.map_or(true, |(t, _)| b.tier > t) { best = Some((b.tier, b.p)); } }
         if let Some((_, p)) = best { self.follow_p += (p - self.follow_p) * approach(dt, 0.6); }
         // the camera pulls back from the first babies as the pile grows
-        let intro_target = if skill || self.run_max >= 4 || self.time > 45.0 { 0.0 } else { 1.0 - self.run_max as f32 / 4.5 };
+        let intro_target = if skill || self.kick_ran || self.run_max >= 4 || self.time > 45.0 { 0.0 } else { 1.0 - self.run_max as f32 / 4.5 };
         self.intro_k += (intro_target - self.intro_k) * approach(dt, 1.6);
         // spout
         if !self.finished && !self.over && skill {
             self.skill_step(dt);
         } else if !self.finished && !self.over && self.mode != Mode::Sandbox {
             self.update_fill();
+            self.kick_step(dt);
             let mut interval = self.drop_base / self.opts.get(Opt::DropRate);
             // the very first babies come one at a time
             interval *= 1.0 + 1.3 * (1.0 - smooth(self.run_drops as f32 / 30.0));
@@ -2382,17 +2545,19 @@ impl Game {
             self.ev(EV_BANNER, t as f32, 0.0, 0.0, 0.0);
             let c = cat_of(t);
             let new_era = c != self.cat;
-            if !new_era && self.era_t > 0.0 {
+            if !new_era && self.era_t > 0.0 && !self.paced() {
                 // the evolution card bows out and this name waits for it
                 self.era_t = self.era_t.min(0.6);
                 self.banner_t += self.era_t;
             }
             if dr > 0.0 {
                 // slow-motion beat + camera punch + speed lines
-                let sp = self.opts.get(Opt::Speed).max(1.0);
+                let sp = self.sim_speed().max(1.0);
                 let mut hs = (0.12 + 0.2 * lvl) * if dr > 1.5 { 1.5 } else { 1.0 };
                 if new_era { hs = 0.5 * if dr > 1.5 { 1.4 } else { 1.0 }; }
                 if t == GOD { hs = 0.9; }
+                // a reel keeps the beat for a new era and for God, and doesn't stop for every ride on the way
+                if self.paced() && !new_era && t != GOD { hs = 0.0; }
                 self.hitstop = self.hitstop.max(hs / sqrt(sp));
                 let kick = (0.9 + 0.9 * lvl) * if dr > 1.5 { 1.35 } else { 1.0 } * if new_era { 1.4 } else { 1.0 } / sqrt(sp);
                 if self.cam_k < 0.02 { self.cam_f = p; }
@@ -2432,7 +2597,7 @@ impl Game {
             self.god_id = self.next_id - 1;
             self.stats.gods += 1;
             let m = self.mode as usize;
-            if self.mode != Mode::Sandbox && self.mode != Mode::TimeAttack && (self.stats.best[m] <= 0.0 || self.time < self.stats.best[m]) {
+            if self.mode != Mode::Sandbox && self.mode != Mode::TimeAttack && !self.reel_run && !self.kick_ran && (self.stats.best[m] <= 0.0 || self.time < self.stats.best[m]) {
                 self.stats.best[m] = self.time;
             }
             self.add_flash(0xFFFFFF, 1.0);
@@ -2899,6 +3064,39 @@ mod sim {
         R { god: g.finished, time: g.time, top: g.run_max, max_b, frames, jams, avg_b: sum_b as f32 / frames.max(1) as f32 }
     }
 
+    /// A reel of a run, in real seconds at 60 frames a second: when it hit each era, when God was born and when it ended.
+    pub struct Reel { pub real: f32, pub god_at: f32, pub ended: bool, pub top: u8, pub drops: u32, pub max_speed: f32, pub marks: alloc::string::String }
+    pub fn reel_run(mode: Mode, seed: u32, len: f32, kick: f32) -> Reel {
+        let mut g = Game::new(seed);
+        g.resize(390.0, 844.0, 3.0);
+        g.opts.set(Opt::Kickoff as usize, kick);
+        g.start(mode);
+        if len >= 0.0 { g.reel(len); }
+        let (mut real, mut god_at, mut ended, mut max_speed) = (0.0f32, -1.0f32, false, 0.0f32);
+        let mut cat = 255u8;
+        let mut marks = alloc::string::String::new();
+        while real < 1500.0 {
+            g.frame(1.0 / 60.0);
+            real += 1.0 / 60.0;
+            max_speed = max_speed.max(g.sim_speed());
+            for b in &g.bodies { assert!(b.p.x.is_finite() && b.p.y.is_finite() && b.v.x.is_finite(), "NaN body in a reel"); }
+            if g.events.chunks(5).any(|e| e[0] == EV_REEL) { ended = true; }
+            g.events.clear();
+            if g.cat != cat { cat = g.cat; marks.push_str(&alloc::format!(" e{}@{:.0}", cat, real)); }
+            if g.finished && god_at < 0.0 { god_at = real; }
+            if ended || (len < 0.0 && g.finished && g.god_t > 0.5) { break; }
+        }
+        Reel { real, god_at, ended, top: g.run_max, drops: g.run_drops, max_speed, marks }
+    }
+    /// How long a run or a reel takes. OMG_REEL: seconds (−1: no reel), OMG_KICK: fast-start points.
+    #[test]
+    #[ignore]
+    fn watch_length() {
+        let env = |k: &str, d: f32| std::env::var(k).ok().and_then(|v| v.parse().ok()).unwrap_or(d);
+        let r = reel_run(Mode::from(env("OMG_MODE", 1.0) as u32), env("OMG_SEED", 5.0) as u32, env("OMG_REEL", -1.0), env("OMG_KICK", 5.0));
+        println!("reel: real={:.0}s god_at={:.0}s ended={} top={} drops={} max_speed={:.1} |{}", r.real, r.god_at, r.ended, r.top + 1, r.drops, r.max_speed, r.marks);
+    }
+
     #[test]
     #[ignore]
     fn tune() {
@@ -3194,6 +3392,7 @@ mod sim {
         let mut g = Game::new(3);
         g.resize(390.0, 844.0, 2.0);
         g.unlocked = Mask::all();
+        g.opts.set(Opt::Kickoff as usize, 0.0);
         g.start(Mode::Watch);
         assert_eq!(g.spout, 0);
         for _ in 0..240 { g.frame(1.0 / 60.0); g.events.clear(); }
@@ -3204,6 +3403,41 @@ mod sim {
         assert_eq!(g.babies, g.run_drops as f64);
         assert!(g.run_drops <= 12, "pours slowly at the start ({} drops)", g.run_drops);
         assert!(g.intro_k > 0.5, "the camera starts close on the babies");
+    }
+
+    #[test]
+    fn fast_start_fills_the_bubble() {
+        let mut g = Game::new(3);
+        g.resize(390.0, 844.0, 2.0);
+        g.opts.set(Opt::Kickoff as usize, 5.0);
+        g.start(Mode::Watch);
+        assert!(g.kick_on && g.kick_n == 5 && g.intro_k == 0.0, "Watch opens with the points on the wall, the whole bubble in view");
+        // the points sit on the upper wall, mirror images of each other
+        for k in 0..5 { let (a, b) = (g.kick_angle(k), g.kick_angle(4 - k)); assert!(a < 0.0 && a > -PI && abs((a + PI * 0.5) + (b + PI * 0.5)) < 1e-4); }
+        for _ in 0..240 { g.frame(1.0 / 60.0); g.events.clear(); }
+        assert!(g.run_drops >= 25, "four seconds in, the bubble is filling ({} drops)", g.run_drops);
+        for _ in 0..600 { g.frame(1.0 / 60.0); g.events.clear(); }
+        assert!(!g.kick_on, "the points close once the rides are fusing");
+        // the journey and the sandbox never open them
+        for m in [Mode::Classic, Mode::Sandbox, Mode::TimeAttack] { g.start(m); assert!(!g.kick_on); }
+    }
+
+    #[test]
+    fn reels_fit_their_length() {
+        for (len, lo, hi) in [(90.0, 70.0, 115.0), (180.0, 150.0, 215.0)] {
+            let r = reel_run(Mode::Watch, 5, len, 5.0);
+            assert!(r.ended && r.top == GOD, "a {len} s reel reaches God and ends by itself");
+            assert!(r.real > lo && r.real < hi, "a {len} s reel took {:.0} s", r.real);
+            assert!(r.real - r.god_at > 8.0, "the reel keeps God's birth and first words");
+        }
+        // a reel of a mode that can't be paced keeps its own pace
+        let mut g = Game::new(4);
+        g.resize(390.0, 844.0, 2.0);
+        g.start(Mode::Classic);
+        g.reel(90.0);
+        assert!(g.reel_on && !g.paced() && g.sim_speed() == g.opts.get(Opt::Speed));
+        g.reel(-1.0);
+        assert!(!g.reel_on);
     }
 
     #[test]

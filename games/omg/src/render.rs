@@ -334,6 +334,9 @@ pub fn build(g: &mut Game) {
     // ── the bubble's wall, in front of what it holds
     if bubble { crate::vessel::membrane(g, &to, sc, white, 1.0); }
 
+    // ── the fast start: the points on the wall the babies pour in from
+    if g.kick_k > 0.01 && g.started && !g.finished { kick_points(g, &to, sc); }
+
     // ── particles
     for i in 0..g.parts.len() {
         let q = g.parts[i];
@@ -771,6 +774,25 @@ fn evo_helix(g: &mut Game, x: f32, y: f32, rr: f32, col: (f32, f32, f32), left: 
             let r = u * (1.5 + 1.9 * near);
             circle(g, bx, by, r, (c.0, c.1, c.2, v), (col.0 * 0.5, col.1 * 0.5, col.2 * 0.5, 0.55 * v), u * 0.7, false);
         }
+    }
+}
+
+/// The fast start's points on the wall: soft pores that light up as each one pours, then close.
+fn kick_points(g: &mut Game, to: &dyn Fn(V2) -> (f32, f32), sc: f32) {
+    let u = g.lay.u;
+    let open = g.kick_k * crate::vessel::birth(g);
+    let col = rgb(tier(g.spout).color);
+    for k in 0..(g.kick_n as usize).min(KICK_MAX) {
+        let a = g.kick_angle(k);
+        // the one under the stem pours through the stem's own pore
+        if abs(a + PI * 0.5) < 0.06 { continue; }
+        let d = V2::new(cos(a), sin(a));
+        let (x, y) = to(d * g.ring_r);
+        let f = g.kick_fx[k];
+        let r = (0.034 * sc).max(5.0 * u) * (0.55 + 0.45 * open) * (1.0 + 0.35 * f);
+        cmd(g, OP_GLOW, &[x, y, r * 3.4, col.0, col.1, col.2, (0.3 + 0.5 * f) * open]);
+        circle(g, x, y, r, (1.0, 1.0, 1.0, 0.16 * open), (1.0, 1.0, 1.0, (0.65 + 0.35 * f) * open), (1.6 * u).max(1.0), false);
+        circle(g, x, y, r * 0.42, (1.0, 0.98, 0.9, (0.45 + 0.55 * f) * open), NONE, 0.0, true);
     }
 }
 

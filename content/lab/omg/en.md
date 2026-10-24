@@ -20,7 +20,7 @@ Four difficulties: Relaxed (about two hours to God), Normal (four to five hours 
 
 ## Options
 
-Eight modes (the Journey, Watch, Chaos, Mega, Trampoline, Black Hole, Time Attack, Sandbox) — in every mode but the Journey the stem pours by itself, and you can poke the bubble's wall, stir its fluid with a finger and tilt gravity — six tools (shake, magnet, bomb, slow-motion, gravity flip, upgrade), a manual camera, and 38 settings: the journey's difficulty, speed up to ×8, pour rate up to a flood, gravity from the Moon to Jupiter, bounciness, vessel size, growth per tier, journey length, random events, chain combos, a bounce melody, voice styles, drama level, cell styles, the living world, depth and motes, the old neon rings for nostalgia, flashes, labels, trails, phone tilt and an editable reel-style caption. A collection keeps every tier you have reached, with its sound.
+Eight modes (the Journey, Watch, Chaos, Mega, Trampoline, Black Hole, Time Attack, Sandbox) — in every mode but the Journey the stem pours by itself, and you can poke the bubble's wall, stir its fluid with a finger and tilt gravity — six tools (shake, magnet, bomb, slow-motion, gravity flip, upgrade), a manual camera, and 40 settings: the journey's difficulty, a fast start from several points, reel length, speed up to ×8, pour rate up to a flood, gravity from the Moon to Jupiter, bounciness, vessel size, growth per tier, run length, random events, chain combos, a bounce melody, voice styles, drama level, cell styles, the living world, depth and motes, the old neon rings for nostalgia, flashes, labels, trails, phone tilt and an editable reel-style caption. A collection keeps every tier you have reached, with its sound.
 
 ## How it is built
 

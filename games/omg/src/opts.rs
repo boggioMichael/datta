@@ -55,12 +55,12 @@ pub static TOOLS: [ToolInfo; N_TOOLS] = [
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum Opt {
-    Speed = 0, Difficulty, DropRate, Gap, HardMode, Combo, Events,
+    Speed = 0, Difficulty, DropRate, Gap, HardMode, Combo, Events, Kickoff, ReelLen,
     Gravity, Bounce, Magnet, RingSize, SizeGrow, RingSpin, AutoTilt, DeviceTilt,
     VolMaster, VolVoice, VolSfx, VolMusic, VoiceStyle, Music, Notes, VolNotes,
     Drama, Camera, Theme, Scenery, Stars, BallStyle, Particles, ScreenShake, Flashes, Labels, Trails, Ladder, Timer, Caption, Haptics,
 }
-pub const N_OPTS: usize = 38;
+pub const N_OPTS: usize = 40;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind { Choice, Range, Toggle }
@@ -93,11 +93,15 @@ pub static OPTS: [OptDef; N_OPTS] = [
        &[("רגוע", "Relaxed", 0.0), ("רגיל", "Normal", 1.0), ("קשה", "Hard", 2.0), ("אפי", "Epic", 3.0)], 1.0),
     ch("droprate", 0, "קצב השפיכה", "Pour rate", "כמה מהר התינוקות נשפכים (במצבים האוטומטיים)", "How fast the babies pour (in the automatic modes)",
        &[("איטי", "Slow", 0.6), ("רגיל", "Normal", 1.0), ("מהיר", "Fast", 1.6), ("מטורף", "Insane", 2.6), ("מבול", "Flood", 4.0)], 1.0),
-    ch("gap", 0, "אורך המסע", "Journey length", "כמה דרגות בונים בתוך המיכל לפני שהמשפך מתחיל לגבש את התינוקות לכדור גדול יותר. ארוך = יותר כדורים ויותר זמן", "How many tiers you build in the vessel before the funnel starts clumping the babies into a bigger ball. Longer = more balls, more time",
+    ch("gap", 0, "אורך הסיבוב", "Run length", "במצבים האוטומטיים: כמה דרגות בונים בתוך המיכל לפני שהמשפך מתחיל לגבש את התינוקות לכדור גדול יותר. ארוך = יותר כדורים ויותר זמן", "In the automatic modes: how many tiers you build in the vessel before the funnel starts clumping the babies into a bigger ball. Longer = more balls, more time",
        &[("קצר", "Short", 2.0), ("רגיל", "Normal", 3.0), ("ארוך", "Long", 4.0), ("אפי", "Epic", 5.0)], 3.0),
     tg("hard", 0, "מצב קשה (מצבים אוטומטיים)", "Hard mode (automatic modes)", "אם הבועה מתמלאת עד הגבעול — המשחק נגמר", "If the bubble fills up to the stem, the game is over", 0.0),
     tg("combo", 0, "קומבו", "Combos", "מיזוגים ברצף בונים מונה קומבו", "Back-to-back merges build a combo counter", 1.0),
     tg("events", 0, "אירועים אקראיים", "Random events", "שעת עומס, רעידת אדמה, רוח צד, אפס כבידה וסערה מגנטית", "Rush hour, earthquakes, crosswinds, zero-g and magnetic storms", 1.0),
+    ch("kickoff", 0, "התחלה מהירה", "Fast start", "בצפייה וברילז: בהתחלה התינוקות נכנסים לבועה מכמה מוקדים בבת אחת, והיא מתמלאת מהר", "In Watch and reels: at the start, babies pour into the bubble from several points at once, so it fills fast",
+       &[("כבוי", "Off", 0.0), ("3 מוקדים", "3 points", 3.0), ("5 מוקדים", "5 points", 5.0), ("8 מוקדים", "8 points", 8.0)], 5.0),
+    ch("reel", 0, "אורך רילז", "Reel length", "רילז מההתחלה מאיץ את הסימולציה כך שכל הדרך עד אלוהים נכנסת בזמן הזה, ונעצר לבד אחרי שאלוהים נולד", "A reel from the start speeds the simulation up so the whole way to God fits in this time, and stops by itself after God is born",
+       &[("דקה", "1 min", 60.0), ("דקה וחצי", "1½ min", 90.0), ("3 דקות", "3 min", 180.0), ("בלי קיצור", "Full length", 0.0)], 90.0),
     // ── physics
     ch("gravity", 1, "כוח משיכה", "Gravity", "", "",
        &[("ירח", "Moon", 0.45), ("נמוך", "Low", 0.7), ("כדור הארץ", "Earth", 1.0), ("כבד", "Heavy", 1.45), ("צדק", "Jupiter", 2.1)], 1.0),
@@ -188,5 +192,8 @@ mod tests {
         assert_eq!(OPTS[Opt::RingSize as usize].key, "ringsize");
         assert_eq!(OPTS[Opt::Difficulty as usize].key, "difficulty");
         assert_eq!(OPTS[Opt::DropRate as usize].key, "droprate");
+        assert_eq!(OPTS[Opt::Kickoff as usize].key, "kickoff");
+        assert_eq!(OPTS[Opt::ReelLen as usize].key, "reel");
+        assert_eq!(OPTS[Opt::Gravity as usize].key, "gravity");
     }
 }

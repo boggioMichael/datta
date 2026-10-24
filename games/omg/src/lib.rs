@@ -154,6 +154,9 @@ pub extern "C" fn omg_continue() -> u32 { g().continue_run() as u32 }
 /// The journey: after a burst, back to the beginning of the era.
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_retry() { g().retry(); }
+/// A reel of this run: `len` seconds to fit the way to God in (0 keeps its own pace); below 0 ends the reel.
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_reel(len: f32) { g().reel(len); }
 /// The journey kept to continue: 0 there is one, 1 era, 2 game seconds, 3 difficulty, 4 highest tier, 5 bursts
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_run_info(f: u32) -> f32 {
@@ -256,6 +259,7 @@ pub extern "C" fn omg_info(f: u32) -> f32 {
         36 => gm.hold_k, 37 => gm.diff as f32, 38 => gm.queue[0].0 as f32, 39 => gm.queue[0].1 as f32,
         40 => gm.aim_x, 41 => gm.hold_x, 42 => gm.line_y(), 43 => gm.fail_t,
         44 => gm.mercy(), 45 => (gm.era_tries <= skill::MERCY_MAX) as u32 as f32,
+        46 => gm.reel_on as u32 as f32, 47 => gm.sim_speed(), 48 => gm.kick_on as u32 as f32, 49 => gm.reel_real, 50 => gm.reel_len,
         _ => 0.0,
     }
 }

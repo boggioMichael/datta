@@ -2,6 +2,14 @@
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
 - date: 2026-10-24
   project: lab/omg
+  title: { en: "OH MY GOD: reels that fit in a minute", he: "OH MY GOD: רילז שנכנס בדקה" }
+  text:
+    en: "A reel now starts from the first baby with babies pouring in from several points on the bubble's wall, speeds the run up so the whole way to God fits into one, one and a half or three minutes, and stops by itself after God is born. The video is an H.264 MP4 wherever the browser can make one, and on a phone Save video opens the share sheet, which saves it straight to the photos."
+    he: "רילז מתחיל עכשיו מהתינוק הראשון, כשהתינוקות נכנסים מכמה מוקדים בדופן הבועה, מאיץ את הסיבוב כך שכל הדרך עד אלוהים נכנסת בדקה, דקה וחצי או שלוש דקות, ונעצר לבד אחרי שאלוהים נולד. הסרטון נשמר כ-MP4 בכל דפדפן שיודע להכין כזה, ובטלפון ״שמור סרטון״ פותח את חלון השיתוף, ששומר אותו ישר לתמונות."
+  link: https://boggiomichael.github.io/datta/omg/
+
+- date: 2026-10-24
+  project: lab/omg
   title: { en: "OH MY GOD: the journey, a game of skill that takes hours", he: "OH MY GOD: המסע, משחק של מיומנות שלוקח שעות" }
   text:
     en: "The stem no longer pours by itself: you aim every cell, see the next two, and decide when it falls. A pile that stays above the strain line bursts the bubble and sends you back to the start of the era, every era brings a law of nature to understand — rush hour, crosswinds, tides, thin air, antimatter, the narrow way — and six abilities unlock along the way, charged by chain reactions. Four difficulties, from Relaxed (about two hours) to Epic; at Normal a good player needs four to five hours to reach God. The journey saves itself, so you can stop and carry on later; Watch still plays on its own."
