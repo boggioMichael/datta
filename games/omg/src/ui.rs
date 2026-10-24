@@ -9,7 +9,7 @@ use crate::tiers::*;
 pub static UI: &[(&str, &str, &str)] = &[
     ("title", "OH MY GOD", "OH MY GOD"),
     ("subtitle", "מזחילה עד אלוהים", "From Crawling to God"),
-    ("tagline", "בועת חיים אחת, תינוק זוחל אחד, ומסע עד אלוהים. כל שני זהים מתמזגים למשהו גדול יותר, העולם מתרחק עד קצה היקום, וה־OMG רק מתחזק.", "One bubble of life, one crawling baby, and a journey all the way to God. Every two twins fuse into something bigger, the world pulls back to the edge of the universe, and the OMG only gets louder."),
+    ("tagline", "בועת חיים אחת, תינוק זוחל אחד, ומסע של שעות עד אלוהים. מכוונים כל תא, מתאחדים זהים, שורדים את חוקי הטבע של כל עידן — והבועה לא סולחת.", "One bubble of life, one crawling baby, and a journey of hours to God. Aim every cell, fuse the twins, survive each era's law of nature — and the bubble doesn't forgive."),
     ("play", "שחק", "Play"),
     ("resume", "המשך", "Resume"),
     ("restart", "מהתחלה", "Restart"),
@@ -63,9 +63,9 @@ pub static UI: &[(&str, &str, &str)] = &[
     ("over_time", "נגמר הזמן", "Time's up"),
     ("over_reached", "הגעת עד", "You reached"),
     ("how", "איך משחקים", "How to play"),
-    ("how1", "הגבעול שופך לבועה רק תינוקות זוחלים. שני תאים זהים שנוגעים מתמזגים לדרגה הבאה, ותא גדול יותר קופץ החוצה.", "The stem pours nothing but crawling babies into the bubble. Two identical cells that touch fuse into the next tier, and a bigger one bounces out."),
-    ("how2", "נגיעה שופכת עוד תינוק, ונגיעה בדופן הבועה דוחפת פנימה. גרירה בתוך הבועה מערבבת את הנוזל ומטה את כוח המשיכה. צביטה, גלגלת או + ו־− מתקרבים ומתרחקים.", "Tap to pour another baby; tap the bubble's wall to poke it. Drag inside the bubble to stir the fluid and tilt gravity. Pinch, scroll or + and − zoom in and out."),
-    ("how3", "כל דרגה רחבה הרבה יותר מזו שמתחתיה, אז העולם סביב הבועה מתרחק כל הזמן, ומאחוריה כבר מרחפים הענקים שעוד יבואו. כשהתינוקות קטנים מדי לראות, הם מתגבשים בגבעול לתא אחד, וכך עד אלוהים. ואז הבועה מתפוצצת, ואלוהים מספר איך הכול התחיל, ובכל רגע של בריאה מחכה לנגיעה שלך.", "Every tier is much wider than the one below, so the world around the bubble keeps pulling back, and the giants still to come already float behind it. Once the babies are too small to see, they clump in the stem into one cell, and on it goes to God. Then the bubble bursts, God tells how it all began, and every moment of creation waits for your touch."),
+    ("how1", "במסע הגבעול נותן תא אחד בכל פעם, ובתוכו רואים את שני הבאים. גררו כדי לכוון ושחררו כדי להפיל (במחשב: עכבר, או חצים ורווח). שני תאים זהים שנוגעים מתאחדים לדרגה הבאה, וכשהתינוקות כבר קטנים מדי לראות, כל תא שווה הרבה תינוקות.", "On the journey the stem gives one cell at a time, and you can see the next two inside it. Drag to aim and let go to drop (on a computer: the mouse, or the arrows and space). Two identical cells that touch fuse into the next tier, and once the babies are too small to see, every cell is worth many babies."),
+    ("how2", "בבועה יש קו לחץ: ערימה שנשארת מעליו מפוצצת את הבועה, וחוזרים לתחילת העידן — כל עידן נשמר, וכל התפוצצות מחזקת את הבועה לניסיון הבא. כל עידן מביא חוק טבע שצריך להבין ויכולת חדשה, ותגובות שרשרת טוענות את היכולות. אפשר לסגור ולהמשיך אחר כך.", "The bubble has a strain line: a pile that stays above it bursts the bubble and sends you back to the start of the era — every era is saved, and every burst makes the bubble tougher for the next try. Each era brings a law of nature to understand and a new ability, and chain reactions charge the abilities. You can close the game and continue later."),
+    ("how3", "כל דרגה רחבה יותר מזו שמתחתיה, אז העולם סביב הבועה מתרחק כל הזמן, ומאחוריה כבר מרחפים הענקים שעוד יבואו. כשהתינוקות קטנים מדי לראות, הם מתגבשים בגבעול לתא אחד, וכך עד אלוהים. ואז הבועה מתפוצצת, ואלוהים מספר איך הכול התחיל, ובכל רגע של בריאה מחכה לנגיעה שלך.", "Every tier is wider than the one below, so the world around the bubble keeps pulling back, and the giants still to come already float behind it. Once the babies are too small to see, they clump in the stem into one cell, and on it goes to God. Then the bubble bursts, God tells how it all began, and every moment of creation waits for your touch."),
     ("sandbox_pick", "מה ליפול?", "What to drop?"),
     ("tools", "כלים", "Tools"),
     ("credits", "קרדיטים", "Credits"),
@@ -85,6 +85,21 @@ pub static UI: &[(&str, &str, &str)] = &[
     ("end_babies", "תינוקות", "Babies"),
     ("end_zoom", "זום", "Zoom"),
     ("end_story", "הייתם שם כשהעולם נברא", "You were there when the world was made"),
+    ("continue", "המשך את המסע", "Continue the journey"),
+    ("new_journey", "מסע חדש", "New journey"),
+    ("new_journey_q", "בטוח? המסע הנוכחי יימחק", "Sure? Your journey will be lost"),
+    ("difficulty", "קושי", "Difficulty"),
+    ("burst_title", "הבועה התפוצצה", "The bubble burst"),
+    ("burst_sub", "חוזרים לתחילת העידן", "Back to the start of the era"),
+    ("retry", "שוב מתחילת העידן", "Try the era again"),
+    ("attempt", "ניסיון", "Attempt"),
+    ("mercy", "הבועה מתחזקת: בניסיון הבא קו הלחץ עולה קצת והיא תחזיק מעמד מעליו יותר זמן, ולכל יכולת שכבר נפתחה תהיה לפחות טעינה אחת.", "The bubble toughens: next try the strain line rises a little and the bubble holds out longer above it, and every ability you have will have at least one charge."),
+    ("mercy_max", "הבועה כבר חזקה כמה שאפשר, ולכל יכולת שכבר נפתחה תהיה לפחות טעינה אחת.", "The bubble is as tough as it gets, and every ability you have will have at least one charge."),
+    ("bursts", "התפוצצויות", "Bursts"),
+    ("s_journey", "שיא המסע", "Journey record"),
+    ("laws", "חוקי הטבע של המסע", "The journey's laws of nature"),
+    ("law_era", "בעידן", "In the era of"),
+    ("saved_note", "המסע נשמר אוטומטית", "The journey saves itself"),
 ];
 
 fn js(out: &mut String, s: &str) {
@@ -109,7 +124,7 @@ fn num(out: &mut String, x: f32) {
 
 pub fn schema() -> String {
     let mut o = String::with_capacity(32 * 1024);
-    let _ = write!(o, "{{\"version\":\"3.0\",\"god\":{},\"n\":{},\"ncats\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{},\"sfx1\":{}}},\"tiers\":[", GOD, N_TIERS, N_CATS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP, crate::game::S_STRAIN);
+    let _ = write!(o, "{{\"version\":\"3.0\",\"god\":{},\"n\":{},\"ncats\":{},\"sounds\":{{\"iam\":{},\"note0\":{},\"music0\":{},\"sfx0\":{},\"sfx1\":{}}},\"tiers\":[", GOD, N_TIERS, N_CATS, crate::game::S_IAM, crate::game::S_NOTE0, crate::game::S_MUSIC0, crate::game::S_DROP, crate::game::S_HEART);
     for (i, t) in TIERS.iter().enumerate() {
         if i > 0 { o.push(','); }
         o.push_str("{\"key\":"); js(&mut o, t.key);
@@ -157,6 +172,27 @@ pub fn schema() -> String {
         o.push_str(",\"dhe\":"); js(&mut o, t.dhe);
         o.push_str(",\"den\":"); js(&mut o, t.den);
         o.push_str(",\"cd\":"); num(&mut o, t.cooldown);
+        o.push('}');
+    }
+    o.push_str("],\"diffs\":[");
+    for (i, d) in crate::skill::DIFFS.iter().enumerate() {
+        if i > 0 { o.push(','); }
+        o.push_str("{\"key\":"); js(&mut o, d.key);
+        o.push_str(",\"he\":"); js(&mut o, d.he);
+        o.push_str(",\"en\":"); js(&mut o, d.en);
+        o.push_str(",\"dhe\":"); js(&mut o, d.dhe);
+        o.push_str(",\"den\":"); js(&mut o, d.den);
+        o.push('}');
+    }
+    o.push_str("],\"laws\":[");
+    for (i, l) in crate::skill::LAWS.iter().enumerate() {
+        if i > 0 { o.push(','); }
+        o.push_str("{\"icon\":"); js(&mut o, l.icon);
+        o.push_str(",\"he\":"); js(&mut o, l.he);
+        o.push_str(",\"en\":"); js(&mut o, l.en);
+        o.push_str(",\"dhe\":"); js(&mut o, l.dhe);
+        o.push_str(",\"den\":"); js(&mut o, l.den);
+        let _ = write!(o, ",\"tool\":{}", l.tool);
         o.push('}');
     }
     o.push_str("],\"groups\":[");

@@ -1,15 +1,23 @@
 # OH MY GOD — the engine
 
 A merge game from a crawling baby to the God of Israel. This crate is the whole game: physics, rules,
-the 155-tier ladder in 19 eras (`src/tiers.rs`), modes, tools and settings (`src/opts.rs`), progression
-and saves, the per-frame draw list, the living world, the bubble, the interactive Genesis ending and the
+the 155-tier ladder in 19 eras (`src/tiers.rs`), the journey (`src/skill.rs`), modes, tools and settings
+(`src/opts.rs`), progression and saves, the per-frame draw list, the living world, the bubble, the interactive Genesis ending and the
 sound engine. It has no dependencies and builds to a single `omg.wasm` used by `public/omg/`.
 
 ```sh
 rustup target add wasm32-unknown-unknown   # once
 ./build.sh                                 # → public/omg/omg.wasm
 python3 tools/bundle_icons.py              # → public/omg/icons/all.json (one request for all 168 pictures)
-cargo test --release                       # headless runs: every mode reaches God; creation waits for the player
+cargo test --release                       # headless runs: every mode reaches God, a bot plays the journey, creation waits for the player
+```
+
+The journey is tuned by a bot that plays all of it at a difficulty (0 Relaxed, 1 Normal, 2 Hard, 3 Epic) and prints
+the time, drops and bursts of every era. `OMG_NOISE` and `OMG_SLOP` make it a less precise player; `OMG_LINE`,
+`OMG_GAP`, `OMG_GROW`, `OMG_MAXB`, `OMG_STRAIN`, `OMG_HAZ`, `OMG_LIT` and `OMG_E` override the difficulty's numbers.
+
+```sh
+OMG_DIFF=1 OMG_SEED=3 OMG_NOISE=0.06 OMG_SLOP=0.1 cargo test --release journey_calibrate -- --ignored --nocapture
 ```
 
 The browser shell (`public/omg/host.js`) only paints the draw list, forwards input, builds the menus
@@ -17,8 +25,10 @@ from the schema the engine exports, plays the PCM that a second instance of the 
 `public/omg/audio-worker.js`, and streams the Genesis narration (pausing it when the story waits).
 
 - `src/game.rs` — bodies, the bubble-and-stem physics (480 Hz sub-steps, sweep-and-prune), merges and chain
-  reactions, absolute sizes and the world zoom, the spout and its funnel, poking and stirring, random events,
+  reactions, the journey's aiming, strain line, bursts, checkpoints and laws of nature, absolute sizes and the world zoom, the spout and its funnel, poking and stirring, random events,
   tools, hit-stop and camera, the birth of God and the bubble bursting, and the story's clock and gestures
+- `src/skill.rs` — the journey: the four difficulties, the law of nature of every era and the ability it unlocks,
+  the next cells, where a dropped cell will land, and the snapshot a journey is saved and continued from
 - `src/render.rs` — 16-float draw commands + a UTF-8 text buffer + a polygon buffer; the HUD and its helix ladder,
   the evolution card (the road of every era from the baby to God) and the double helix that winds around every new ride
 - `src/world.rs` — the living world: a place for every era in hazy layers that pull back with the camera,
@@ -38,4 +48,5 @@ from the schema the engine exports, plays the PCM that a second instance of the 
 
 Every run starts at the bottom of the ladder. Sizes are absolute: each tier is `grow` times wider than the
 one below, so the camera keeps pulling back; once the babies are too small to see, the funnel clumps them
-into the ball they would make.
+into the ball they would make. On the journey that only happens when the biggest cell is `gap` tiers above the
+stem, so every new tier takes about 2^(gap−1) cells — that and the strain line are what make it a game of hours.

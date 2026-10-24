@@ -65,6 +65,7 @@ pub fn render_id(snd: &mut Snd, id: u32) -> St {
         223 => m(sfx::drone(sr, seed), -22.0, 0.0),
         224 => m(sfx::creation(sr, seed), -15.0, 0.15),
         225 => m(sfx::strain(sr, seed), -17.0, 0.1),
+        226 => m(sfx::heart(sr), -15.0, 0.0),
         230..=234 => m(sfx::mallet(sr, (id - 230) as u8), -20.0, 0.0),
         240..=259 => music::render(sr, (id - 240) as u8),
         _ => St::new(1),
@@ -177,7 +178,7 @@ mod tests {
         let out = std::env::var("OMG_RENDER_DIR").unwrap_or_else(|_| "target/render".into());
         std::fs::create_dir_all(&out).unwrap();
         let only: Option<Vec<u32>> = std::env::var("OMG_IDS").ok().map(|v| v.split(',').filter_map(|x| x.parse().ok()).collect());
-        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=GOD as u32).chain(200..=225).chain(230..=234).chain(240..=259).collect());
+        let ids: Vec<u32> = only.unwrap_or_else(|| (0..=GOD as u32).chain(200..=226).chain(230..=234).chain(240..=259).collect());
         for id in ids {
             let t = std::time::Instant::now();
             let snd = s();

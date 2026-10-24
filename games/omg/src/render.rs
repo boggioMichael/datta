@@ -74,6 +74,13 @@ pub fn text(g: &mut Game, s: &str, x: f32, y: f32, size: f32, align: f32, font: 
 
 fn fmt_time(buf: &mut alloc::string::String, t: f32) {
     let t = t.max(0.0);
+    if t >= 3600.0 {
+        let h = (t / 3600.0) as u32;
+        let m = ((t - h as f32 * 3600.0) / 60.0) as u32;
+        let s = (t - h as f32 * 3600.0 - m as f32 * 60.0) as u32;
+        let _ = write!(buf, "{}:{:02}:{:02}", h, m, s.min(59));
+        return;
+    }
     let m = (t / 60.0) as u32;
     let s = t - m as f32 * 60.0;
     let _ = write!(buf, "{}:{:02}.{}", m, s as u32, ((s - floor(s)) * 10.0) as u32 % 10);
@@ -314,8 +321,12 @@ pub fn build(g: &mut Game) {
         let tilt = 0.32 * sin(b.angle);
         // living cells breathe
         if bubble { rp *= 1.0 + 0.014 * sin(g.real * 1.7 + b.id as f32 * 1.3); }
-        cmd(g, OP_ITEM, &[b.tier as f32, x, y, rp, tilt, b.flash, alpha, la, glow, b.orphan_t.min(1.0), hl, if he { 1.0 } else { 0.0 }, b.squash, b.squash_a, style]);
+        let (ti, la, hl) = if b.kind != crate::skill::K_CELL { (1000.0 + b.kind as f32, 0.0, 0.0) } else { (b.tier as f32, la, hl) };
+        cmd(g, OP_ITEM, &[ti, x, y, rp, tilt, b.flash, alpha, la, glow, b.orphan_t.min(1.0), hl, if he { 1.0 } else { 0.0 }, b.squash, b.squash_a, style]);
     }
+
+    // ── the journey: the strain line, the cell in hand and where it will land
+    if g.skill() && g.started && !g.finished { skill_layer(g, &to, sc); }
 
     // ── …and the near half in front
     evo_pass(g, &to, sc, lay.u, true);
@@ -470,6 +481,7 @@ pub fn build(g: &mut Game) {
             let bx = if he { lay.sx + lay.sw * 0.08 } else { lay.sx + lay.sw * 0.92 };
             text(g, &buf, bx, lay.timer_y + 17.0 * s, 12.0 * s, if he { 1.0 } else { 2.0 }, F_MONO, 0xFFD54F, 0.9, 0.0, 0.0, 2.0);
         }
+        if g.skill() && !g.finished { skill_hud(g); }
     }
 
     // ── combo counter
@@ -536,8 +548,8 @@ pub fn build(g: &mut Game) {
     }
 
     // ── an evolution: the new era's name over the track of every era from the first baby to God
-    if g.era_t > 0.0 && g.drama() > 0.0 {
-        let life = ERA_CARD;
+    if g.era_t > 0.0 && (g.drama() > 0.0 || g.skill()) {
+        let life = if g.skill() { ERA_CARD_SKILL } else { ERA_CARD };
         let age = life - g.era_t;
         let a = clamp(age / 0.25, 0.0, 1.0) * clamp(g.era_t / 0.6, 0.0, 1.0);
         let c = g.era_card as usize;
@@ -547,11 +559,14 @@ pub fn build(g: &mut Game) {
         let x = lay.sx + lay.sw * 0.5;
         // a soft band of shade and a glow of the new world's light
         cmd(g, crate::story::OP_VGRAD, &[y - 100.0 * s, y, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.52 * a, 0.0, lay.w]);
-        cmd(g, crate::story::OP_VGRAD, &[y, y + 150.0 * s, 0.0, 0.0, 0.0, 0.52 * a, 0.0, 0.0, 0.0, 0.0, 0.0, lay.w]);
+        let band = if g.skill() { 250.0 } else { 150.0 };
+        cmd(g, crate::story::OP_VGRAD, &[y, y + band * s, 0.0, 0.0, 0.0, 0.52 * a, 0.0, 0.0, 0.0, 0.0, 0.0, lay.w]);
         let acc_ = rgb(ci.accent);
         cmd(g, OP_GLOW, &[x, y, lay.sw * 0.7, acc_.0, acc_.1, acc_.2, 0.22 * a]);
         let mut buf = alloc::string::String::new();
-        if he { let _ = write!(buf, "אבולוציה · עידן {} מתוך {}", c + 1, N_CATS - 1); } else { let _ = write!(buf, "EVOLUTION · ERA {} OF {}", c + 1, N_CATS - 1); }
+        if g.skill() && g.card_retry {
+            if he { let _ = write!(buf, "ניסיון {} · מתחילים את העידן מחדש", g.era_tries); } else { let _ = write!(buf, "ATTEMPT {} · THE ERA BEGINS AGAIN", g.era_tries); }
+        } else if he { let _ = write!(buf, "אבולוציה · עידן {} מתוך {}", c + 1, N_CATS - 1); } else { let _ = write!(buf, "EVOLUTION · ERA {} OF {}", c + 1, N_CATS - 1); }
         // the era's colour, lifted toward white so it reads over its own world
         let lift = |k: f32| -> u32 { let c = mix_rgb(acc_, (1.0, 1.0, 1.0), k); ((c.0 * 255.0) as u32) << 16 | ((c.1 * 255.0) as u32) << 8 | (c.2 * 255.0) as u32 };
         text(g, &buf, x - slide * 0.4, y - 40.0 * s, 12.0 * s, 0.0, F_MONO, lift(0.3), a, 0.0, 0.0, dir);
@@ -607,16 +622,40 @@ pub fn build(g: &mut Game) {
             cmd(g, OP_ICON, &[first as f32, nx, ty, 12.0 * s * k, a]);
             if pop < 1.0 { cmd(g, OP_WAVE, &[nx, ty, (15.0 + 30.0 * pop) * s, (3.0 - 2.0 * pop) * s, acc_.0, acc_.1, acc_.2, (1.0 - pop) * a]); }
         }
+        // the journey: the law of this era, and the ability it brings
+        if g.skill() && c < N_CATS - 1 {
+            let law = &crate::skill::LAWS[c];
+            let la = a * smooth((age - 0.5) / 0.4);
+            let ly = ty + 48.0 * s;
+            let mut head = alloc::string::String::new();
+            head.push_str(law.icon); head.push_str("  ");
+            head.push_str(if he { law.he } else { law.en });
+            text(g, &head, x, ly, 17.0 * s, 0.0, F_SANS, 0xFFFFFF, la, 0.8, lay.sw * 0.9, dir);
+            let desc = if he { law.dhe } else { law.den };
+            let lines = crate::story::wrap(desc, if he { 40 } else { 44 });
+            for (i, line) in lines.iter().enumerate() {
+                text(g, line, x, ly + (24.0 + 18.0 * i as f32) * s, 13.0 * s, 0.0, F_LIGHT, 0xE6EEF8, la * 0.95, 0.5, lay.sw * 0.92, dir);
+            }
+            if law.tool >= 0 {
+                let ti = law.tool as usize;
+                let mut ab = alloc::string::String::new();
+                ab.push_str(if he { "יכולת חדשה: " } else { "New ability: " });
+                ab.push_str(TOOLS[ti].icon); ab.push(' ');
+                ab.push_str(if he { TOOLS[ti].he } else { TOOLS[ti].en });
+                let yy = ly + (28.0 + 18.0 * lines.len() as f32) * s;
+                text(g, &ab, x, yy, 13.5 * s, 0.0, F_SANS, 0x7CFFB2, la, 0.6, lay.sw * 0.9, dir);
+            }
+        }
     }
 
     // ── random-event toast
-    if g.toast_t > 0.0 && !g.toast.0.is_empty() {
+    if g.toast_t > 0.0 && (!g.toast.0.is_empty() || !g.toast_dyn.is_empty()) {
         let a = clamp(g.toast_t / 0.4, 0.0, 1.0) * clamp((2.2 - g.toast_t) / 0.15, 0.0, 1.0);
         let age = 2.2 - g.toast_t;
         let pop = 1.0 + 0.4 * (1.0 - ease_out(age / 0.2));
-        let msg = if he { g.toast.0 } else { g.toast.1 };
+        let msg: alloc::string::String = if g.toast.0.is_empty() { g.toast_dyn.clone() } else { alloc::string::String::from(if he { g.toast.0 } else { g.toast.1 }) };
         let y = lay.cy + g.ring_r * lay.scale * 0.55;
-        text(g, msg, lay.sx + lay.sw * 0.5, y, 26.0 * s * pop, 0.0, F_SANS, g.toast_col, a, 1.0, lay.sw * 0.9, dir);
+        text(g, &msg, lay.sx + lay.sw * 0.5, y, 26.0 * s * pop, 0.0, F_SANS, g.toast_col, a, 1.0, lay.sw * 0.9, dir);
     }
 
     // ── hints
@@ -732,5 +771,141 @@ fn evo_helix(g: &mut Game, x: f32, y: f32, rr: f32, col: (f32, f32, f32), left: 
             let r = u * (1.5 + 1.9 * near);
             circle(g, bx, by, r, (c.0, c.1, c.2, v), (col.0 * 0.5, col.1 * 0.5, col.2 * 0.5, 0.55 * v), u * 0.7, false);
         }
+    }
+}
+
+/// The journey's HUD: the law of the era (with what it's doing right now) and the attempts.
+fn skill_hud(g: &mut Game) {
+    use crate::skill::*;
+    let lay = g.lay;
+    let s = lay.u;
+    let he = g.lang_he;
+    let dir = if he { 1.0 } else { 2.0 };
+    let c = (g.cat as usize).min(LAWS.len() - 1);
+    let law = &LAWS[c];
+    if !law.icon.is_empty() {
+        let mut buf = alloc::string::String::new();
+        buf.push_str(law.icon); buf.push(' ');
+        buf.push_str(if he { law.he } else { law.en });
+        // what the law is doing now
+        match g.cat {
+            E_WIND => {
+                let w = g.wind;
+                let arrows = if abs(w) < 0.15 { "·" } else if w > 0.0 { if w > 0.8 { "→→" } else { "→" } } else if w < -0.8 { "←←" } else { "←" };
+                buf.push_str("  "); buf.push_str(arrows);
+            }
+            E_TIDES => {
+                let rising = cos(g.law_t * TAU / 36.0 - 1.2) > 0.0;
+                buf.push_str(if rising { "  ▲" } else { "  ▼" });
+            }
+            E_RUSH if g.rush_left > 0.0 => { let _ = write!(buf, "  {:.0}", ceil(g.rush_left)); }
+            _ => {}
+        }
+        if g.rush_left > 0.0 && g.cat != E_RUSH { buf.push_str(" · 🚦"); }
+        let col = CATS[c].accent;
+        let col = { let k = mix_rgb(rgb(col), (1.0, 1.0, 1.0), 0.45); ((k.0 * 255.0) as u32) << 16 | ((k.1 * 255.0) as u32) << 8 | (k.2 * 255.0) as u32 };
+        text(g, &buf, lay.sx + lay.sw * 0.5, lay.timer_y, 11.5 * s, 0.0, F_SANS, col, 0.9, 0.3, lay.sw * 0.5, dir);
+    }
+    if g.era_tries > 1 {
+        let mut buf = alloc::string::String::new();
+        if he { let _ = write!(buf, "ניסיון {}", g.era_tries); } else { let _ = write!(buf, "attempt {}", g.era_tries); }
+        let tx = if he { lay.sx + lay.sw * 0.92 } else { lay.sx + lay.sw * 0.08 };
+        // aligned to the start of the line in either direction: the right edge in Hebrew, the left in English
+        text(g, &buf, tx, lay.timer_y + 17.0 * s, 11.0 * s, 1.0, F_MONO, 0xFF9A8A, 0.85, 0.0, 0.0, dir);
+    }
+}
+
+/// The journey in the bubble: the strain line, the cell in hand on its thread,
+/// the line to where it will land, and the first-steps hints.
+fn skill_layer(g: &mut Game, to: &dyn Fn(V2) -> (f32, f32), sc: f32) {
+    use crate::skill::*;
+    let u = g.lay.u;
+    let rr = g.ring_r;
+    let he = g.lang_he;
+    let dir = if he { 1.0 } else { 2.0 };
+    if g.over { return; }
+    // ── the strain line (the nursery has none)
+    if g.cat > E_NURSERY {
+        let ly = g.line_y();
+        let half = sqrt((rr * rr - ly * ly).max(0.0)) * 0.97;
+        let (x0, y0) = to(V2::new(-half, ly));
+        let (x1, _) = to(V2::new(half, ly));
+        let k = g.strain;
+        let pulse = 0.5 + 0.5 * sin(g.real * (5.0 + 12.0 * k));
+        let warm = if g.over_line { 0.45 } else { 0.0 };
+        let col = mix_rgb((1.0, 1.0, 1.0), (1.0, 0.24, 0.2), smooth(k * 2.5).max(warm));
+        let a = 0.2 + 0.25 * warm + 0.55 * k * pulse;
+        let n = 34;
+        for i in (0..n).step_by(2) {
+            let (fa, fb) = (i as f32 / n as f32, (i + 1) as f32 / n as f32);
+            cmd(g, OP_LINE, &[lerp(x0, x1, fa), y0, lerp(x0, x1, fb), y0, (1.4 + 1.6 * k) * u, col.0, col.1, col.2, a, 0.6 + k]);
+        }
+        if k > 0.02 {
+            // how close it is: a red glow rising with the strain
+            let (cx, cy) = to(V2::new(0.0, ly));
+            cmd(g, OP_GLOW, &[cx, cy, half * sc * 1.1, 1.0, 0.2, 0.15, 0.25 * k * (0.6 + 0.4 * pulse)]);
+        }
+    }
+    // ── the cell in hand: it squeezes out of the pore, then hangs on a thread
+    let (t, kind) = g.queue[0];
+    let r = g.cell_r(t);
+    let k = smooth(g.hold_k);
+    let pore = V2::new(0.0, g.join_y() + 0.01);
+    let hold = V2::new(g.hold_x, HOLD_Y * rr);
+    let p = pore + (hold - pore) * k;
+    let (x, y) = to(p);
+    let (px, py) = to(pore);
+    let rp = r * sc * (0.3 + 0.7 * k);
+    let ball = g.opts.get(Opt::BallStyle);
+    cmd(g, OP_LINE, &[px, py, x, y - rp * 0.85, 1.3 * u, 0.9, 0.95, 1.0, 0.32 * k + 0.1, 0.4]);
+    if g.hold_k >= 1.0 {
+        // where it will land, falling along gravity (wind and tilt included)
+        let (lp, hit) = g.land_at();
+        let (lx, lyy) = to(lp);
+        let above = g.cat > E_NURSERY && lp.y - r < g.line_y();
+        let c = if above { (1.0, 0.38, 0.32) } else { (1.0, 1.0, 1.0) };
+        let (dx, dy) = (lx - x, lyy - y);
+        let len = sqrt(dx * dx + dy * dy).max(1.0);
+        let start = rp * 1.05;
+        let dash = 6.0 * u;
+        let mut d = start;
+        while d < len - rp * 0.5 {
+            let e = (d + dash * 0.55).min(len - rp * 0.5);
+            cmd(g, OP_LINE, &[x + dx * d / len, y + dy * d / len, x + dx * e / len, y + dy * e / len, 1.3 * u, c.0, c.1, c.2, 0.42, 0.3]);
+            d += dash;
+        }
+        let dif = g.dif();
+        if dif.ghost {
+            circle(g, lx, lyy, rp, (c.0, c.1, c.2, 0.06), (c.0, c.1, c.2, 0.45), 1.4 * u, false);
+        } else {
+            circle(g, lx, lyy, 2.2 * u, (c.0, c.1, c.2, 0.7), NONE, 0.0, false);
+        }
+        // its twin, if that's what it will touch (every difficulty but Hard)
+        if let Some(i) = hit {
+            let b = g.bodies[i];
+            if kind == K_CELL && b.kind == K_CELL && b.tier == t && g.diff != 2 {
+                let (bx, by) = to(b.p);
+                let col = rgb(tier(t).color);
+                circle(g, bx, by, b.r * sc * 1.08, NONE, (col.0, col.1, col.2, 0.55 + 0.25 * sin(g.real * 8.0)), 2.0 * u, true);
+            }
+        }
+    }
+    let ti = if kind != K_CELL { 1000.0 + kind as f32 } else { t as f32 };
+    if kind == K_CELL && t > g.spout {
+        let col = rgb(tier(t).color);
+        cmd(g, OP_GLOW, &[x, y, rp * 2.2, col.0, col.1, col.2, 0.3 * k]);
+    }
+    cmd(g, OP_ITEM, &[ti, x, y, rp, 0.0, 0.0, 0.35 + 0.65 * k, 0.0, 0.5, 0.0, 0.0, if he { 1.0 } else { 0.0 }, 0.0, 0.0, ball]);
+    // ── first steps
+    if g.hint < 2 && g.hold_k >= 1.0 && g.era_t <= 0.0 {
+        let msg = match (g.hint, he) {
+            (0, true) => "גררו כדי לכוון · שחררו כדי להפיל",
+            (0, false) => "Drag to aim · let go to drop",
+            (_, true) => "שני תאים זהים שנוגעים — מתאחדים",
+            _ => "Two identical cells that touch fuse",
+        };
+        let (hx, hy) = to(V2::new(0.0, HOLD_Y * rr + r + 0.12));
+        let a = 0.75 + 0.25 * sin(g.real * 3.0);
+        text(g, msg, hx, hy, 14.0 * u, 0.0, F_SANS, 0xFFFFFF, a, 1.0, g.lay.sw * 0.86, dir);
     }
 }

@@ -136,6 +136,37 @@ pub fn stem(g: &mut Game, to: &dyn Fn(V2) -> (f32, f32), sc: f32, white: f32) {
     circle(g, px - pr * 0.42, py - pr * 0.45, pr * 0.14, (1.0, 1.0, 1.0, 0.85 * a), NONE, 0.0, false);
 
     let s = g.spout;
+    if g.skill() {
+        // the journey: the stem shows the next two cells on their way down
+        let ball = g.opts.get(Opt::BallStyle);
+        let room = (xr1 - xl1).abs() * 0.5 - wall * 0.4;
+        let (_, ytop) = to(V2::new(0.0, top_y));
+        let next = [g.queue[1], g.queue[2]];
+        for (k, &(t, kind)) in next.iter().enumerate() {
+            let r = (g.cell_r(t) * sc).min(room).max(4.0 * u);
+            let f = if k == 0 { 0.8 } else { 0.42 };
+            let y = lerp(ytop, yb, f) - r * 0.2;
+            let x = (lerp(xl0, xl1, f) + lerp(xr0, xr1, f)) * 0.5;
+            let ti = if kind != crate::skill::K_CELL { 1000.0 + kind as f32 } else { t as f32 };
+            let al = a * if k == 0 { 0.95 } else { 0.7 };
+            if kind == crate::skill::K_CELL && t > s {
+                // a bigger one is coming: a ring of its colour
+                let c = rgb(tier(t).color);
+                cmd(g, OP_GLOW, &[x, y, r * 2.4, c.0, c.1, c.2, 0.35 * al]);
+            }
+            cmd(g, OP_ITEM, &[ti, x, y, r, 0.0, 0.0, al, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, ball]);
+        }
+        // how many babies make each cell
+        if s > 0 {
+            let mut buf = alloc::string::String::new();
+            buf.push('×');
+            fmt_big(&mut buf, libm_pow64(2.0, s as f64));
+            let side = if g.lang_he { -1.0 } else { 1.0 };
+            let lx = px + side * (pr + 10.0 * u);
+            text(g, &buf, lx, py, 11.0 * u, if g.lang_he { 2.0 } else { 1.0 }, F_MONO, 0xFFF2E6, 0.9 * a, 0.0, 0.0, 2.0);
+        }
+        return;
+    }
     if s > 0 {
         // the babies flowing down the stem
         let baby_px = g.radius_for(0) * sc;

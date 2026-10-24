@@ -1322,3 +1322,21 @@ pub fn strain(sr: f32, seed: u32) -> St {
     let d = n_of(sr, 0.011); let mut r = vec![0.0f32; n]; for i in d..n { r[i] = s.l[i - d]; } s.r = r;
     s
 }
+
+/// A heartbeat under the strain: lub-dub, two soft low thumps.
+pub fn heart(sr: f32) -> St {
+    let n = n_of(sr, 0.62);
+    let mut x = vec![0.0f32; n];
+    for (at, amp, f0) in [(0.0f32, 1.0f32, 62.0f32), (0.19, 0.7, 54.0)] {
+        let a = n_of(sr, at);
+        let mut o = Osc::default(); let mut o2 = Osc::default();
+        for (i, v) in x.iter_mut().enumerate().skip(a) {
+            let t = (i - a) as f32 / sr;
+            let f = f0 * (1.0 + 0.6 * exp(-t * 40.0));
+            *v += (o.sine(f, sr) + 0.25 * o2.sine(f * 2.0, sr)) * amp * (1.0 - exp(-t * 400.0)) * exp(-t * 18.0);
+        }
+    }
+    fade(&mut x, 0, n_of(sr, 0.05));
+    normalize(&mut x, 0.9);
+    St::from_mono(&x, 0.0)
+}

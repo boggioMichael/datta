@@ -21,6 +21,7 @@ use alloc::vec::Vec;
 
 use crate::m::*;
 use crate::opts::*;
+use crate::skill::*;
 use crate::tiers::*;
 
 pub const CHUTE_W: f32 = 0.09;
@@ -46,6 +47,8 @@ pub const BURST_AT: f32 = 5.6;
 pub const ERA_CARD: f32 = 3.4;
 /// How long a new ride's helix of light lasts.
 pub const EVO_T: f32 = 1.9;
+/// On the journey the evolution card also teaches the era's law, so it stays longer.
+pub const ERA_CARD_SKILL: f32 = 6.5;
 
 // sound ids: 0..=GOD are the tiers' OMGs
 pub const S_DROP: u32 = 200;
@@ -74,6 +77,7 @@ pub const S_POKE: u32 = 222;
 pub const S_DRONE: u32 = 223;
 pub const S_CREATE: u32 = 224;
 pub const S_STRAIN: u32 = 225;
+pub const S_HEART: u32 = 226;
 pub const S_NOTE0: u32 = 230; // + timbre (0..=4)
 pub const S_MUSIC0: u32 = 240; // + era (0..=19)
 
@@ -151,6 +155,8 @@ pub struct Body {
     /// chain-reaction depth: how many merges in a row led to this ball
     pub chain: u16,
     pub trail: [V2; 4],
+    /// what it is: a cell (0), scrap, antimatter or a divine cell (see skill.rs)
+    pub kind: u8,
 }
 
 #[derive(Clone, Copy, Default)]
@@ -189,12 +195,14 @@ pub struct Layout {
 pub struct Pointer { pub down: bool, pub x0: f32, pub y0: f32, pub x: f32, pub y: f32, pub t0: f32, pub dragging: bool }
 
 #[derive(Clone, Copy, Default)]
-pub struct ToolState { pub cd: f32, pub active: f32, pub charges: u8 }
+pub struct ToolState { pub cd: f32, pub active: f32, pub charges: u8, pub cd_max: f32 }
 
 #[derive(Clone, Default)]
 pub struct Stats {
     pub runs: u32, pub merges: u32, pub omgs: u32, pub drops: u32, pub gods: u32,
     pub best: [f32; N_MODES], pub best_tier_ta: u8, pub played: f32, pub top_tier: u8, pub best_combo: u32,
+    /// the journey's best time at each difficulty
+    pub best_evo: [f32; N_DIFF],
 }
 
 pub struct Game {
@@ -354,6 +362,54 @@ pub struct Game {
     pub toast: (&'static str, &'static str),
     pub toast_t: f32,
     pub toast_col: u32,
+    // ── the journey (skill mode, see skill.rs)
+    /// difficulty of the journey in progress
+    pub diff: u8,
+    /// the cell in hand and the next two in the stem: (tier, kind)
+    pub queue: [(u8, u8); 3],
+    /// 0..1: how far the cell in hand has come out of the pore (ready at 1)
+    pub hold_k: f32,
+    /// where the player aims (world x) and where the cell in hand hangs now
+    pub aim_x: f32,
+    pub hold_x: f32,
+    pub aiming: bool,
+    /// keyboard aiming: −1, 0, 1
+    pub aim_key: f32,
+    /// let go before the cell was ready: it drops the moment it is (0 none, 1 drop, 2 slam)
+    pub pend_drop: u8,
+    /// recent pointer samples (x, y, real time) to tell a flick down
+    pub ptr_hist: [(f32, f32, f32); 4],
+    /// 0..1: how close the bubble is to bursting
+    pub strain: f32,
+    /// seconds left in which the strain can't build (a new era, a retry, a continue)
+    pub grace: f32,
+    pub over_line: bool,
+    pub heart_cd: f32,
+    /// seconds since the bubble burst under the strain (< 0: whole)
+    pub fail_t: f32,
+    pub fail_sent: bool,
+    pub bursts: u32,
+    /// attempts at the current era (1 = the first)
+    pub era_tries: u32,
+    /// seconds the current era has lasted (the laws' clock)
+    pub law_t: f32,
+    pub rush_next: f32,
+    pub rush_left: f32,
+    pub rush_wait: f32,
+    pub wind: f32,
+    pub wind_target: f32,
+    pub wind_next: f32,
+    /// first-steps hints: 0 aim, 1 fuse, 2 done
+    pub hint: u8,
+    pub drops_era: u32,
+    /// a toast that needs a number in it (ability charges)
+    pub toast_dyn: String,
+    pub card_retry: bool,
+    pub run_live: Option<crate::skill::Snap>,
+    pub run_ckpt: Option<crate::skill::Snap>,
+    pub save_tick: f32,
+    /// testing: play the journey with other numbers
+    pub dif_ovr: Option<Diff>,
 }
 
 pub const EV_NONE: u8 = 0;
@@ -507,6 +563,38 @@ impl Game {
             toast: ("", ""),
             toast_t: 0.0,
             toast_col: 0xFFFFFF,
+            diff: 1,
+            queue: [(0, 0); 3],
+            hold_k: 0.0,
+            aim_x: 0.0,
+            hold_x: 0.0,
+            aiming: false,
+            aim_key: 0.0,
+            pend_drop: 0,
+            ptr_hist: [(0.0, 0.0, 0.0); 4],
+            strain: 0.0,
+            grace: 0.0,
+            over_line: false,
+            heart_cd: 0.0,
+            fail_t: -1.0,
+            fail_sent: false,
+            bursts: 0,
+            era_tries: 1,
+            law_t: 0.0,
+            rush_next: 30.0,
+            rush_left: 0.0,
+            rush_wait: 0.0,
+            wind: 0.0,
+            wind_target: 0.0,
+            wind_next: 0.0,
+            hint: 0,
+            drops_era: 0,
+            toast_dyn: String::new(),
+            card_retry: false,
+            run_live: None,
+            run_ckpt: None,
+            save_tick: 0.0,
+            dif_ovr: None,
         };
         g.tools[Tool::Upgrade as usize].charges = 1;
         g.make_stars();
@@ -542,6 +630,8 @@ impl Game {
 
     // ───────────────────────────────────────────── run control
     pub fn start(&mut self, mode: Mode) {
+        // leaving a journey in the middle keeps it, to continue later
+        if self.skill() && self.started && !self.finished && !self.story_on { self.run_live = self.live_snap(); }
         self.mode = mode;
         self.bodies.clear();
         self.order.clear();
@@ -623,20 +713,416 @@ impl Game {
             self.era_t = if self.drama() > 0.0 { ERA_CARD } else { 0.0 };
         }
         self.era_time[self.cat as usize] = 0.0;
+        if mode == Mode::Classic {
+            // a new journey
+            self.diff = (self.opts.get(Opt::Difficulty) as usize).min(N_DIFF - 1) as u8;
+            self.run_live = None;
+            self.run_ckpt = None;
+            self.bursts = 0;
+            self.skill_reset();
+            self.intro_k = 0.0;
+            self.era_t = ERA_CARD_SKILL;
+            for t in self.tools.iter_mut() { t.charges = 0; t.cd = 0.0; }
+        }
         self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
         self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
         self.sound_rate(S_FUNNEL, 0.6, 0.0, 0.5);
         self.dirty_save = 0.5;
     }
 
-    pub fn gap(&self) -> u8 { self.opts.get(Opt::Gap) as u8 }
+    // ───────────────────────────────────────────── the journey (skill mode)
+    #[inline] pub fn skill(&self) -> bool { self.mode == Mode::Classic }
+    #[inline] pub fn dif(&self) -> Diff { self.dif_ovr.unwrap_or(*crate::skill::diff(self.diff)) }
+    /// Every burst in the same era gives the bubble a little more patience, so no era is a wall.
+    #[inline] pub fn mercy_n(&self) -> f32 { self.era_tries.saturating_sub(1).min(MERCY_MAX) as f32 }
+    #[inline] pub fn mercy(&self) -> f32 { 1.0 + MERCY_STEP * self.mercy_n() }
+    /// The state of an era that has just begun (or begun again).
+    fn skill_reset(&mut self) {
+        self.strain = 0.0;
+        self.grace = 4.0;
+        self.over_line = false;
+        self.fail_t = -1.0;
+        self.fail_sent = false;
+        self.era_tries = 1;
+        self.law_t = 0.0;
+        self.rush_next = self.rng.range(14.0, 24.0);
+        self.rush_left = 0.0;
+        self.rush_wait = 0.0;
+        self.wind = 0.0; self.wind_target = 0.0; self.wind_next = 0.0;
+        self.drops_era = 0;
+        self.hint = if self.cat == 0 && self.run_max == 0 { 0 } else { 2 };
+        self.aiming = false;
+        self.aim_key = 0.0;
+        self.pend_drop = 0;
+        self.hold_k = 0.0;
+        self.card_retry = false;
+        let d = self.dif();
+        let (s, e) = (self.spout, self.cat);
+        for k in 0..3 { self.queue[k] = next_cell(&mut self.rng, s, e, d); }
+        self.queue[0] = (s, K_CELL);
+        self.aim_x = 0.0;
+        self.hold_x = 0.0;
+    }
+    /// Is this ability yours yet?
+    pub fn tool_unlocked(&self, i: usize) -> bool { !self.skill() || tool_era(i) <= self.cat }
+    /// The strain line (world y): above it the pile strains the bubble.
+    pub fn line_y(&self) -> f32 {
+        let mut y = self.dif().line;
+        // the first eras give a little more room while you learn
+        y -= 0.12 * clamp((6.0 - self.cat as f32) / 5.0, 0.0, 1.0);
+        if self.cat == E_SPACIOUS { y -= 0.08; }
+        if self.cat == E_NARROW { y += 0.05; }
+        if self.cat == E_TIDES { y += 0.13 * sin(self.law_t * TAU / 36.0 - 1.2); }
+        // a bubble that burst in this era comes back with a little more room
+        y -= MERCY_LINE * self.mercy_n();
+        y * self.ring_r
+    }
+    /// Radius of a cell in hand or in the stem.
+    pub fn cell_r(&self, t: u8) -> f32 { self.radius_for(t) }
+    /// Where the cell in hand would land if dropped at `x` now (it falls along gravity, wind and all).
+    pub fn land_from(&self, x: f32, t: u8) -> (V2, Option<usize>) {
+        let r = self.cell_r(t);
+        let lim = aim_limit(self.ring_r, r);
+        let p0 = V2::new(clamp(x, -lim, lim), HOLD_Y * self.ring_r);
+        let d = self.gravity(p0, false).norm();
+        let d = if d.len2() < 0.5 { V2::new(0.0, 1.0) } else { d };
+        landing(&self.bodies, self.ring_r, p0, d, r)
+    }
+    pub fn land_at(&self) -> (V2, Option<usize>) { self.land_from(self.hold_x, self.queue[0].0) }
+    /// Aim at screen point (x, y).
+    fn set_aim(&mut self, x: f32, y: f32) {
+        let w = self.to_world(x, y);
+        self.aim_x = w.x;
+    }
+    fn push_hist(&mut self, x: f32, y: f32) {
+        self.ptr_hist = [(x, y, self.real), self.ptr_hist[0], self.ptr_hist[1], self.ptr_hist[2]];
+    }
+    /// Did the finger flick down as it let go?
+    fn flick_down(&self) -> bool {
+        let (x1, y1, t1) = self.ptr_hist[0];
+        let mut s0 = self.ptr_hist[0];
+        for k in 1..4 { if t1 - self.ptr_hist[k].2 <= 0.16 { s0 = self.ptr_hist[k]; } }
+        let (dx, dy, dt) = (x1 - s0.0, y1 - s0.1, (t1 - s0.2).max(1e-3));
+        let u = self.lay.u.max(0.3);
+        dy > 22.0 * u && dy / dt > 650.0 * u && abs(dx) < dy
+    }
+    fn skill_pointer(&mut self, kind: u32, x: f32, y: f32) {
+        match kind {
+            0 => {
+                if self.over || self.paused { return; }
+                self.ptr = Pointer { down: true, x0: x, y0: y, x, y, t0: self.real, dragging: false };
+                self.ptr_hist = [(x, y, self.real); 4];
+                if self.upgrade_armed { return; }
+                self.aiming = true;
+                self.pend_drop = 0;
+                self.set_aim(x, y);
+            }
+            1 => {
+                if !self.ptr.down { return; }
+                self.ptr.x = x; self.ptr.y = y;
+                self.push_hist(x, y);
+                if self.aiming { self.set_aim(x, y); }
+            }
+            4 => { if !self.aiming && !self.over && !self.upgrade_armed { self.set_aim(x, y); } }
+            2 => {
+                if !self.ptr.down { return; }
+                self.ptr.down = false;
+                self.push_hist(x, y);
+                if self.upgrade_armed {
+                    // the armed upgrade lifts the cell under the finger
+                    let w = self.to_world(x, y);
+                    if let Some(i) = self.pick(w) { self.upgrade_body(i); } else { self.upgrade_armed = false; self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0); }
+                    return;
+                }
+                if !self.aiming { return; }
+                self.aiming = false;
+                self.set_aim(x, y);
+                let slam = self.cat >= E_SLAM && self.flick_down();
+                if self.hold_k < 1.0 { self.pend_drop = if slam { 2 } else { 1 }; } else { self.drop_held(slam); }
+            }
+            _ => { self.aiming = false; self.ptr.down = false; }
+        }
+    }
+    /// Let the cell in hand fall where it hangs (a slam throws it down hard).
+    pub fn drop_held(&mut self, slam: bool) {
+        if !self.skill() || !self.started || self.over || self.finished || self.paused || self.story_on { return; }
+        if self.hold_k < 1.0 { return; }
+        let (t, k) = self.queue[0];
+        let r = self.cell_r(t);
+        let lim = aim_limit(self.ring_r, r);
+        let x = clamp(self.aim_x, -lim, lim);
+        let p = V2::new(x, HOLD_Y * self.ring_r);
+        let slam = slam && self.cat >= E_SLAM;
+        let v = if slam { V2::new(0.0, 4.4) } else { V2::new(0.0, 0.2) };
+        if let Some(i) = self.new_body_ex(t, p, v, true) { self.bodies[i].kind = k; }
+        if k == K_CELL { self.poured(t); } else { self.run_drops += 1; self.stats.drops += 1; }
+        self.hold_x = x;
+        self.aim_x = x;
+        let d = self.dif();
+        let (s, e) = (self.spout, self.cat);
+        let nx = next_cell(&mut self.rng, s, e, d);
+        self.queue = [self.queue[1], self.queue[2], nx];
+        self.hold_k = 0.0;
+        self.rush_wait = 0.0;
+        self.drops_era += 1;
+        // once it has been read for a moment, the evolution card makes way for play
+        if self.era_t > 0.5 && ERA_CARD_SKILL - self.era_t > 1.6 { self.era_t = 0.5; }
+        if self.hint == 0 && self.drops_era >= 3 { self.hint = 1; }
+        if slam {
+            self.sound(S_WHOOSH, 0.7, clamp(x, -1.0, 1.0) * 0.5);
+            self.shake = self.shake.max(0.15);
+        } else if self.drop_snd_cd <= 0.0 {
+            let rate = 0.9 + 0.2 * self.rng.f();
+            if t == 0 { self.sound(S_DROP, 0.35, x * 0.5); } else { self.sound_rate(S_FUNNEL, 0.25, x * 0.5, rate); }
+            self.drop_snd_cd = 0.08;
+        }
+    }
+    /// The journey's rules, every step: the stem, the laws and the strain.
+    fn skill_step(&mut self, dt: f32) {
+        let d = self.dif();
+        self.law_t += dt;
+        // the stem forms the next cell
+        let cd = if self.rush_left > 0.0 { 0.3 } else { d.cooldown };
+        if self.hold_k < 1.0 { self.hold_k = (self.hold_k + dt / cd).min(1.0); }
+        if self.hold_k >= 1.0 && self.pend_drop > 0 && !self.aiming {
+            let slam = self.pend_drop == 2;
+            self.pend_drop = 0;
+            self.drop_held(slam);
+        }
+        if self.aim_key != 0.0 { self.aim_x += self.aim_key * dt * 0.95 * self.ring_r; }
+        let r = self.cell_r(self.queue[0].0);
+        let lim = aim_limit(self.ring_r, r);
+        self.aim_x = clamp(self.aim_x, -lim, lim);
+        self.hold_x += (self.aim_x - self.hold_x) * approach(dt.max(1e-4), 0.03);
+        // rush hour: the stem opens up, and a cell you hesitate over drops by itself
+        if self.cat == E_RUSH && self.rush_left <= 0.0 {
+            self.rush_next -= dt;
+            if self.rush_next <= 0.0 { self.start_rush(8.0); self.rush_next = self.rng.range(30.0, 42.0); }
+        }
+        if self.rush_left > 0.0 {
+            self.rush_left -= dt;
+            if self.hold_k >= 1.0 && !self.aiming {
+                self.rush_wait += dt;
+                if self.rush_wait > 0.9 { self.drop_held(false); }
+            }
+        }
+        // wind: it changes direction now and then
+        if self.cat == E_WIND {
+            self.wind_next -= dt;
+            if self.wind_next <= 0.0 {
+                let opts = [-1.0f32, -0.6, 0.6, 1.0];
+                let mut w = opts[self.rng.below(4) as usize];
+                if self.wind_target != 0.0 && (w > 0.0) == (self.wind_target > 0.0) && self.rng.chance(0.6) { w = -w; }
+                self.wind_target = w;
+                self.wind_next = self.rng.range(13.0, 20.0);
+            }
+        } else { self.wind_target = 0.0; }
+        self.wind += (self.wind_target - self.wind) * approach(dt, 1.1);
+
+        // specials that found nothing to do fade away
+        for b in self.bodies.iter_mut() {
+            if b.alive && b.kind != K_CELL && b.dying <= 0.0 && b.age > SPECIAL_LIFE { b.dying = 0.5; }
+        }
+        self.check_strain(dt);
+        self.spout_cd -= dt;
+        self.check_spout();
+    }
+    fn start_rush(&mut self, secs: f32) {
+        self.rush_left = secs;
+        self.rush_wait = 0.0;
+        self.toast = (EVENTS[EV_RUSH as usize].0, EVENTS[EV_RUSH as usize].1);
+        self.toast_t = 2.2; self.toast_col = EVENTS[EV_RUSH as usize].2;
+        self.sound(S_SPOUT, 0.8, 0.0);
+    }
+    /// The pile above the strain line strains the bubble; too long and it bursts.
+    fn check_strain(&mut self, dt: f32) {
+        let ly = self.line_y();
+        let mut over = false;
+        for b in &self.bodies {
+            if !b.alive || b.dying > 0.0 || b.age < 0.9 { continue; }
+            if b.p.y - b.r < ly && b.v.len2() < 0.36 { over = true; break; }
+        }
+        self.over_line = over;
+        self.grace -= dt;
+        if over && self.cat > E_NURSERY && self.grace <= 0.0 { self.strain += dt / (self.dif().strain_s * self.mercy()); } else { self.strain = (self.strain - dt * 0.6).max(0.0); }
+        if self.strain > 0.02 {
+            self.heart_cd -= dt;
+            if self.heart_cd <= 0.0 {
+                self.sound(S_HEART, 0.35 + 0.55 * self.strain, 0.0);
+                self.heart_cd = 0.78 - 0.42 * self.strain;
+                self.ring_wob = self.ring_wob.max(0.35 + 0.4 * self.strain);
+                self.haptic(10.0 + 30.0 * self.strain);
+            }
+            self.ring_col = 0xFF3B30;
+            self.ring_pulse = self.ring_pulse.max(0.25 + 0.75 * self.strain);
+        }
+        if self.strain >= 1.0 { self.burst_fail(); }
+    }
+    /// The bubble bursts under the strain: the era begins again.
+    fn burst_fail(&mut self) {
+        self.over = true;
+        self.strain = 1.0;
+        self.fail_t = 0.0;
+        self.fail_sent = false;
+        self.bursts += 1;
+        self.aiming = false;
+        self.upgrade_armed = false;
+        self.burst_t = 0.0;
+        let n = 56;
+        for k in 0..n {
+            let a = k as f32 / n as f32 * TAU + self.rng.sym() * 0.05;
+            let d = V2::new(cos(a), sin(a));
+            let life = self.rng.range(0.8, 1.6);
+            let col = if k % 3 == 0 { 0xFFFFFF } else { 0xFF8A80 };
+            self.parts.push(Particle { kind: 10, p: d * self.ring_r, v: d * self.rng.range(1.0, 3.0), life, max: life, size: self.rng.range(0.012, 0.035), color: col, drag: 1.1, grav: 1.2, angle: self.rng.range(0.0, TAU), spin: 0.0 });
+        }
+        self.parts.push(Particle { kind: 9, p: V2::default(), v: V2::default(), life: 0.9, max: 0.9, size: self.ring_r * 2.4, color: 0xFF6B5E, drag: 0.0, grav: 0.0, angle: 0.0, spin: 0.0 });
+        for b in self.bodies.iter_mut() {
+            if !b.alive { continue; }
+            let d = b.p.norm();
+            b.v += d * (1.4 / (1.0 + b.r * 2.0)) + V2::new(0.0, -0.6);
+        }
+        self.add_flash(0xFF3B30, 0.7);
+        self.shake = self.shake.max(1.1);
+        self.hitstop = self.hitstop.max(0.3);
+        self.sound(S_BURST, 1.0, 0.0);
+        self.haptic(140.0);
+        // after a burst the journey goes on from the start of this era
+        self.run_live = self.run_ckpt.clone();
+        self.dirty_save = 0.4;
+    }
+    /// After a burst: back to the beginning of the era.
+    pub fn retry(&mut self) {
+        if !self.skill() || !self.started { return; }
+        let Some(ck) = self.run_ckpt.clone() else { self.start(Mode::Classic); return; };
+        let (time, bursts, tries) = (self.time, self.bursts, self.era_tries);
+        self.restore(&ck);
+        self.time = time;
+        self.bursts = bursts;
+        self.era_tries = tries + 1;
+        // and a way out: every ability already unlocked has at least one charge
+        for i in 0..N_TOOLS { if self.tool_unlocked(i) { self.tools[i].charges = self.tools[i].charges.max(1); } }
+        self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+        self.card_retry = true;
+        self.run_live = self.live_snap();
+        self.dirty_save = 0.5;
+    }
+    /// Pick up the journey where it was left.
+    pub fn continue_run(&mut self) -> bool {
+        let Some(live) = self.run_live.clone() else { return false };
+        let ck = self.run_ckpt.clone();
+        self.started = false;
+        self.start(Mode::Classic);
+        self.stats.runs = self.stats.runs.saturating_sub(1);
+        self.run_live = Some(live.clone());
+        self.run_ckpt = ck.or_else(|| Some(live.clone()));
+        self.restore(&live);
+        self.time = live.time;
+        self.bursts = live.bursts;
+        self.era_tries = live.era_tries.max(1);
+        true
+    }
+    /// Put the bubble back the way a snapshot saw it.
+    fn restore(&mut self, s: &Snap) {
+        self.bodies.clear(); self.order.clear(); self.parts.clear(); self.evo.clear(); self.bolts.clear();
+        self.diff = s.diff;
+        self.spout = s.spout;
+        self.base = s.spout as f32;
+        self.run_max = s.run_max.max(s.spout);
+        self.run_seen = s.seen;
+        for t in 0..=self.run_max { self.run_seen.set(t); }
+        self.cat = s.cat; self.prev_cat = s.cat; self.cat_mix = 1.0;
+        for i in 0..N_CATS { self.era_time[i] = s.era_time.get(i).copied().unwrap_or(-1.0); }
+        self.run_merges = s.merges; self.run_drops = s.drops; self.babies = s.babies;
+        for i in 0..N_TOOLS { self.tools[i] = ToolState { cd: 0.0, active: 0.0, charges: s.charges[i].min(3), cd_max: 0.0 }; }
+        self.skill_reset();
+        self.queue = s.queue;
+        for &(t, k, x, y) in &s.bodies {
+            if let Some(i) = self.new_body_ex(t, V2::new(x, y), V2::default(), true) { let b = &mut self.bodies[i]; b.kind = k; b.age = 3.0; }
+        }
+        self.over = false; self.finished = false; self.burst_t = -1.0;
+        self.intro_k = 0.0; self.view_manual = false;
+        self.combo_n = 0; self.combo_show = 0.0; self.banner_t = 0.0; self.toast_t = 0.0;
+        self.upgrade_armed = false;
+        self.shake = 0.0; self.flash = 0.0; self.hitstop = 0.0; self.ts = 1.0; self.cam_k = 0.0; self.cam_v = 0.0;
+        self.era_card = self.cat;
+        self.era_t = ERA_CARD_SKILL;
+        self.ev(EV_CATEGORY, self.cat as f32, 0.0, 0.0, 0.0);
+        self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
+        self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+    }
+    /// The journey as it stands.
+    pub fn snap(&self) -> Snap {
+        let mut bodies = Vec::with_capacity(self.bodies.len());
+        for b in &self.bodies {
+            if !b.alive || b.dying > 0.0 || b.tier == GOD { continue; }
+            let lim = (self.ring_r - b.r).max(0.0);
+            let mut p = b.p;
+            if p.len() > lim { p = p.norm() * lim; }
+            bodies.push((b.tier, b.kind, p.x, p.y));
+        }
+        let mut charges = [0u8; N_TOOLS];
+        for i in 0..N_TOOLS { charges[i] = self.tools[i].charges; }
+        Snap {
+            diff: self.diff, time: self.time, spout: self.spout, run_max: self.run_max, seen: self.run_seen, cat: self.cat,
+            era_time: self.era_time.to_vec(), merges: self.run_merges, drops: self.run_drops, babies: self.babies,
+            bursts: self.bursts, era_tries: self.era_tries, charges, queue: self.queue, bodies,
+        }
+    }
+    /// What to keep of the journey right now (None: no journey to continue).
+    pub fn live_snap(&self) -> Option<Snap> {
+        if self.skill() && self.started {
+            if self.finished || self.story_on { return None; }
+            if self.over { return self.run_ckpt.clone(); }
+            return Some(self.snap());
+        }
+        self.run_live.clone()
+    }
+    /// A new era of the journey: abilities, laws, and a checkpoint.
+    fn skill_new_era(&mut self, c: u8) {
+        if c as usize >= N_CATS - 1 { return; }
+        let d = self.dif();
+        for i in 0..N_TOOLS {
+            let e = tool_era(i);
+            if e == c { self.tools[i].charges = self.tools[i].charges.max(d.charges0); }
+            else if e < c { self.tools[i].charges = (self.tools[i].charges + 1).min(3); }
+        }
+        let tries = self.era_tries;
+        self.skill_reset();
+        let _ = tries;
+        self.era_t = ERA_CARD_SKILL;
+        self.run_ckpt = Some(self.snap());
+        self.dirty_save = 0.5;
+        self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+    }
+    /// A chain reaction earns a charge for one of your abilities.
+    fn grant_charge(&mut self) {
+        let mut can: Vec<usize> = Vec::new();
+        for i in 0..N_TOOLS { if self.tool_unlocked(i) && self.tools[i].charges < 3 { can.push(i); } }
+        if can.is_empty() { return; }
+        let i = can[self.rng.below(can.len() as u32) as usize];
+        self.tools[i].charges += 1;
+        self.toast_dyn.clear();
+        self.toast_dyn.push_str("+1 ");
+        self.toast_dyn.push_str(TOOLS[i].icon);
+        self.toast_dyn.push(' ');
+        self.toast_dyn.push_str(if self.lang_he { TOOLS[i].he } else { TOOLS[i].en });
+        self.toast = ("", "");
+        self.toast_t = 2.0;
+        self.toast_col = 0x7CFFB2;
+        self.sound_rate(S_UPGRADE, 0.5, 0.0, 1.25);
+        self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+    }
+
+    pub fn gap(&self) -> u8 { if self.skill() { self.dif().gap } else { self.opts.get(Opt::Gap) as u8 } }
     fn max_bodies(&self) -> usize { if self.mode == Mode::Mega { MAX_BODIES_MEGA } else { MAX_BODIES } }
 
     /// How much wider each tier is than the one below it.
-    #[inline] pub fn grow(&self) -> f32 { self.opts.get(Opt::SizeGrow) }
+    #[inline] pub fn grow(&self) -> f32 { if self.skill() { self.dif().grow } else { self.opts.get(Opt::SizeGrow) } }
     /// Radius of the ball the funnel drops (ring radii). The vessel option picks
     /// it; a long journey shrinks it so the biggest ball still fits.
     pub fn seed_r(&self) -> f32 {
+        if self.skill() { let d = self.dif(); return d.max_ball / pow(d.grow, d.gap as f32); }
         let mut r = self.opts.get(Opt::RingSize);
         if self.mode == Mode::Mega { r *= 0.74; }
         let span = pow(self.grow(), self.gap() as f32);
@@ -661,7 +1147,7 @@ impl Game {
         let b = Body {
             id: self.next_id, tier: t, p, v, acc: V2::default(), r, angle: self.rng.range(-0.3, 0.3), spin: 0.0,
             age: 0.0, pop: 0.0, flash: 0.0, alive: true, merged: false, orphan_t: 0.0, rest_t: 0.0, dying: 0.0, hl: 0.0,
-            squash: 0.0, squash_a: 0.0, chain: 0, trail: [p; 4],
+            squash: 0.0, squash_a: 0.0, chain: 0, trail: [p; 4], kind: 0,
         };
         self.next_id += 1;
         self.bodies.push(b);
@@ -759,7 +1245,11 @@ impl Game {
     }
 
     pub fn gravity(&self, p: V2, in_chute: bool) -> V2 {
-        let mut gmul = self.opts.get(Opt::Gravity);
+        let mut gmul = if self.skill() { 1.0 } else { self.opts.get(Opt::Gravity) };
+        if self.skill() {
+            if self.cat == E_SPEED { gmul *= 1.3; }
+            if self.cat == E_THIN { gmul *= 0.72; }
+        }
         if self.mode == Mode::Trampoline { gmul *= 0.85; }
         let g = BASE_G * gmul;
         let flip = self.tools[Tool::Flip as usize].active > 0.0;
@@ -773,6 +1263,7 @@ impl Game {
             V2::new(0.0, g).rot(-self.tilt)
         };
         if flip { a = -a * 0.9; }
+        if self.skill() && self.wind != 0.0 { a += V2::new(self.wind * g * 0.16, 0.0); }
         if self.ev_left > 0.0 {
             match self.ev_kind {
                 EV_ZEROG => { a = a * 0.18; }
@@ -786,6 +1277,8 @@ impl Game {
     // ───────────────────────────────────────────── input
     pub fn pointer(&mut self, kind: u32, x: f32, y: f32) {
         if self.story_on { self.ptr.down = false; self.story_pointer(kind, x, y); return; }
+        if self.skill() && self.started && !self.finished { self.skill_pointer(kind, x, y); return; }
+        if kind == 4 { return; }
         match kind {
             0 => { self.ptr = Pointer { down: true, x0: x, y0: y, x, y, t0: self.real, dragging: false }; }
             1 => {
@@ -822,6 +1315,14 @@ impl Game {
     }
 
     pub fn key(&mut self, code: u32, down: bool) {
+        if self.skill() && self.started && !self.finished && !self.story_on {
+            match code {
+                1 | 2 => { let dir = if code == 1 { -1.0 } else { 1.0 }; self.aim_key = if down { dir } else if self.aim_key == dir { 0.0 } else { self.aim_key }; return; }
+                3 => { if down { self.drop_held(false); } return; }
+                13 => { if down { self.drop_held(true); } return; }
+                _ => {}
+            }
+        }
         match code {
             1 | 2 => {
                 if self.mode == Mode::Watch { return; }
@@ -900,7 +1401,7 @@ impl Game {
     fn pick(&self, w: V2) -> Option<usize> {
         let mut best = None; let mut bd = f32::MAX;
         for (i, b) in self.bodies.iter().enumerate() {
-            if !b.alive || b.dying > 0.0 || b.tier >= GOD - 1 { continue; }
+            if !b.alive || b.dying > 0.0 || b.tier >= GOD - 1 || b.kind != K_CELL { continue; }
             let d = (b.p - w).len() - b.r;
             if d < 0.05 && d < bd { bd = d; best = Some(i); }
         }
@@ -910,8 +1411,28 @@ impl Game {
     pub fn tool(&mut self, i: usize) {
         if i >= N_TOOLS || !self.started || self.finished || self.over || self.paused { return; }
         if self.mode == Mode::Watch { return; }
+        if self.skill() {
+            // on the journey every ability is yours from its era on, and runs on charges
+            if !self.tool_unlocked(i) || self.tools[i].charges == 0 { return; }
+            if i == Tool::Upgrade as usize {
+                self.upgrade_armed = !self.upgrade_armed;
+                self.aiming = false;
+                self.ev(EV_TOOLS, 0.0, 0.0, 0.0, 0.0);
+                self.sound(S_CLICK, 0.6, 0.0);
+                return;
+            }
+            if self.tools[i].cd > 0.0 { return; }
+            self.tools[i].charges -= 1;
+            self.tools[i].cd = 1.5; self.tools[i].cd_max = 1.5;
+        }
+        let skill = self.skill();
         let t = &mut self.tools[i];
         let info = &TOOLS[i];
+        if skill {
+            t.active = info.duration;
+            self.tool_effect(i);
+            return;
+        }
         if i == Tool::Upgrade as usize {
             if t.charges == 0 { return; }
             self.upgrade_armed = !self.upgrade_armed;
@@ -921,7 +1442,11 @@ impl Game {
         }
         if t.cd > 0.0 && self.mode != Mode::Sandbox { return; }
         t.cd = if self.mode == Mode::Sandbox { 0.6 } else { info.cooldown };
+        t.cd_max = t.cd;
         t.active = info.duration;
+        self.tool_effect(i);
+    }
+    fn tool_effect(&mut self, i: usize) {
         match i {
             0 => {
                 for b in self.bodies.iter_mut() {
@@ -945,12 +1470,12 @@ impl Game {
 
     fn bomb(&mut self) {
         let mut low = 255u8;
-        for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.tier < low && b.p.y > self.join_y() { low = b.tier; } }
-        if low == 255 { return; }
+        for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.kind == K_CELL && b.tier < low && b.p.y > self.join_y() { low = b.tier; } }
         let mut pts = Vec::new();
         for b in self.bodies.iter_mut() {
-            if b.alive && b.dying <= 0.0 && b.tier == low { b.dying = 0.35; pts.push((b.p, b.r)); }
+            if b.alive && b.dying <= 0.0 && ((b.kind == K_CELL && b.tier == low) || b.kind == K_SCRAP || b.kind == K_ANTI) { b.dying = 0.35; pts.push((b.p, b.r)); }
         }
+        if pts.is_empty() { return; }
         for (p, r) in pts.iter() {
             self.burst(*p, 0xFFAA33, 24, 1.4);
             self.smoke(*p, 6, 0x8A8A8A, *r * 2.0);
@@ -1088,6 +1613,17 @@ impl Game {
         self.warp += self.warp_v * pdt;
         self.warp_v *= exp(-pdt * 2.2);
         if self.burst_t >= 0.0 { self.burst_t += pdt; }
+        if self.fail_t >= 0.0 {
+            self.fail_t += pdt;
+            if self.fail_t > 1.7 && !self.fail_sent {
+                self.fail_sent = true;
+                self.ev(EV_GAMEOVER, 2.0, self.run_max as f32, self.time, self.cat as f32);
+            }
+        }
+        if self.skill() && live && !self.finished && !self.over {
+            self.save_tick += real_dt;
+            if self.save_tick > 12.0 { self.save_tick = 0.0; if self.dirty_save <= 0.0 { self.dirty_save = 0.05; } }
+        }
         self.poke_cd -= real_dt;
         self.stir_k = (self.stir_k - pdt * 3.0).max(0.0);
         // camera spring
@@ -1123,8 +1659,9 @@ impl Game {
     fn step(&mut self, dt: f32) {
         if !self.finished && !self.over { self.time += dt; }
         // tools
+        let skill = self.skill();
         for (i, t) in self.tools.iter_mut().enumerate() {
-            if i == Tool::Upgrade as usize {
+            if i == Tool::Upgrade as usize && !skill {
                 if t.charges < 3 {
                     t.cd -= dt;
                     if t.cd <= 0.0 { t.charges += 1; t.cd = TOOLS[i].cooldown; }
@@ -1141,6 +1678,12 @@ impl Game {
         if (self.opts.on(Opt::AutoTilt) || self.mode == Mode::Watch) && !self.ptr.dragging {
             target += 0.2 * sin(self.time * 0.85) + 0.08 * sin(self.time * 2.3 + 1.0);
         }
+        if skill {
+            // on the journey only the laws (and the phone, if you let it) tilt gravity
+            target = if self.opts.on(Opt::DeviceTilt) { self.device_tilt } else { 0.0 };
+            if self.cat == E_SWAY { target += 0.24 * sin(self.law_t * TAU / 8.0); }
+            if self.cat == E_ORBIT { target += 0.26 * sin(self.law_t * TAU / 34.0); }
+        }
         self.tilt += (target - self.tilt) * approach(dt, 0.12);
         // time attack
         if self.mode == Mode::TimeAttack && !self.finished && !self.over {
@@ -1153,10 +1696,12 @@ impl Game {
         for b in &self.bodies { if b.alive && b.dying <= 0.0 && best.map_or(true, |(t, _)| b.tier > t) { best = Some((b.tier, b.p)); } }
         if let Some((_, p)) = best { self.follow_p += (p - self.follow_p) * approach(dt, 0.6); }
         // the camera pulls back from the first babies as the pile grows
-        let intro_target = if self.run_max >= 4 || self.time > 45.0 { 0.0 } else { 1.0 - self.run_max as f32 / 4.5 };
+        let intro_target = if skill || self.run_max >= 4 || self.time > 45.0 { 0.0 } else { 1.0 - self.run_max as f32 / 4.5 };
         self.intro_k += (intro_target - self.intro_k) * approach(dt, 1.6);
         // spout
-        if !self.finished && !self.over && self.mode != Mode::Sandbox {
+        if !self.finished && !self.over && skill {
+            self.skill_step(dt);
+        } else if !self.finished && !self.over && self.mode != Mode::Sandbox {
             self.update_fill();
             let mut interval = self.drop_base / self.opts.get(Opt::DropRate);
             // the very first babies come one at a time
@@ -1207,7 +1752,7 @@ impl Game {
         // per-body bookkeeping
         let mut dissolve: Vec<usize> = Vec::new();
         let mut tier_count = [0u8; N_TIERS];
-        for b in &self.bodies { if b.alive && b.dying <= 0.0 { tier_count[b.tier as usize] = tier_count[b.tier as usize].saturating_add(1); } }
+        for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.kind == K_CELL { tier_count[b.tier as usize] = tier_count[b.tier as usize].saturating_add(1); } }
         let sandbox = self.mode == Mode::Sandbox;
         for i in 0..self.bodies.len() {
             let target_r = if self.finished && self.bodies[i].tier == GOD { 0.62 * self.ring_r.min(1.0) } else { self.radius_for(self.bodies[i].tier) };
@@ -1227,6 +1772,12 @@ impl Game {
             if b.dying > 0.0 {
                 b.dying -= dt;
                 if b.dying <= 0.0 { b.alive = false; dissolve.push(i); }
+                continue;
+            }
+            if b.kind != K_CELL {
+                // scrap the zoom has left behind crumbles; the others fade on their own clock
+                if b.kind == K_SCRAP && b.tier + 1 < spout { b.dying = 0.45; }
+                if b.r < DUST_R { b.dying = 0.3; }
                 continue;
             }
             if b.tier < spout && !sandbox && !self.finished {
@@ -1294,12 +1845,13 @@ impl Game {
             }
             if self.ev_left <= 0.0 { self.ev_kind = EV_NONE; }
         }
-        let on = self.opts.on(Opt::Events) && matches!(self.mode, Mode::Classic | Mode::Watch | Mode::Mega | Mode::Chaos | Mode::Trampoline);
+        let on = if self.skill() { self.cat == E_MIRACLES } else { self.opts.on(Opt::Events) && matches!(self.mode, Mode::Watch | Mode::Mega | Mode::Chaos | Mode::Trampoline) };
         if !on || self.finished || self.over { return; }
         self.ev_next -= dt;
         if self.ev_next > 0.0 { return; }
-        self.ev_next = self.rng.range(24.0, 40.0);
+        self.ev_next = if self.skill() { self.rng.range(15.0, 24.0) } else { self.rng.range(24.0, 40.0) };
         let kind = 1 + self.rng.below(5) as u8;
+        if self.skill() && kind == EV_RUSH { self.start_rush(5.0); self.ring_pulse = 1.0; return; }
         self.ev_kind = kind;
         self.ev_dir = if self.rng.chance(0.5) { 1.0 } else { -1.0 };
         match kind {
@@ -1371,12 +1923,16 @@ impl Game {
     fn check_spout(&mut self) {
         if self.spout_cd > 0.0 || self.mode == Mode::Sandbox { return; }
         let mut maxp = 0u8;
-        for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.tier > maxp { maxp = b.tier; } }
+        for b in &self.bodies { if b.alive && b.dying <= 0.0 && b.kind == K_CELL && b.tier > maxp { maxp = b.tier; } }
         // the very first babies get one extra tier of room before they start clumping
-        let gap = self.gap() + if self.spout == 0 { 1 } else { 0 };
+        let gap = self.gap() + if self.spout == 0 && !self.skill() { 1 } else { 0 };
         if maxp >= self.spout + gap && self.spout + 1 + self.gap() <= GOD {
             self.spout += 1;
             self.spout_cd = 0.6;
+            if self.skill() {
+                // what's in the stem grows with the zoom, so it looks the same
+                for q in self.queue.iter_mut() { q.0 = (q.0 + 1).min(GOD - 1); }
+            }
             // the funnel now clumps twice as many babies, and the camera pulls back
             self.sound(S_ZOOM, 0.32, 0.0);
             let p = self.funnel_p();
@@ -1388,6 +1944,7 @@ impl Game {
         let assist = self.opts.get(Opt::Magnet);
         let tool = self.tools[Tool::Magnet as usize].active > 0.0 || (self.ev_kind == EV_STORM && self.ev_left > 0.0);
         let assist = if self.mode == Mode::Mega { assist * 0.5 } else { assist };
+        let assist = if self.skill() { if self.cat == E_WELLS { 4.0 } else { 0.0 } } else { assist };
         let k_base = assist * 0.55 + if tool { 3.2 } else { 0.0 } + if self.mode == Mode::Watch { 0.6 } else { 0.0 };
         let jy = self.join_y();
         for b in self.bodies.iter_mut() { b.acc = V2::default(); }
@@ -1406,12 +1963,12 @@ impl Game {
             if t != GOD && e - s >= 2 {
                 for a in s..e {
                     let i = self.by_tier[a] as usize;
-                    let (pi, ri, oi, resti, ok_i) = { let b = &self.bodies[i]; (b.p, b.r, b.orphan_t, b.rest_t, b.alive && b.dying <= 0.0 && b.p.y >= jy) };
+                    let (pi, ri, oi, resti, ok_i) = { let b = &self.bodies[i]; (b.p, b.r, b.orphan_t, b.rest_t, b.alive && b.dying <= 0.0 && b.kind == K_CELL && b.p.y >= jy) };
                     if !ok_i { continue; }
                     for c in (a + 1)..e {
                         let j = self.by_tier[c] as usize;
                         let bj = &self.bodies[j];
-                        if !bj.alive || bj.dying > 0.0 || bj.p.y < jy { continue; }
+                        if !bj.alive || bj.dying > 0.0 || bj.kind != K_CELL || bj.p.y < jy { continue; }
                         let d = bj.p - pi; let l = d.len();
                         let reach = 0.5 + ri * 3.0 + if tool { 0.8 } else { 0.0 };
                         if l > reach || l < 1e-4 { continue; }
@@ -1434,9 +1991,14 @@ impl Game {
 
     fn substep(&mut self, h: f32) {
         let tramp = self.mode == Mode::Trampoline;
-        let e = if tramp { 0.96 } else { self.opts.get(Opt::Bounce) };
+        let skill = self.skill();
+        let mut e = if tramp { 0.96 } else if skill { self.dif().bounce } else { self.opts.get(Opt::Bounce) };
+        if skill && self.cat == E_SPEED { e += 0.1; }
+        if skill && self.cat == E_THIN { e += 0.06; }
         let jy = self.join_y();
-        let spin = self.opts.get(Opt::RingSpin) * 1.6;
+        let spin = if skill { 0.0 } else { self.opts.get(Opt::RingSpin) * 1.6 };
+        let walls = self.fail_t < 0.0;
+        let (spout, top) = (self.spout, self.run_max);
         let rr = self.ring_r;
         let n = self.bodies.len();
         // integrate
@@ -1468,6 +2030,7 @@ impl Game {
             }
         }
         let mut merges: Vec<(usize, usize)> = Vec::new();
+        let mut specials: Vec<(usize, usize, u8)> = Vec::new();
         let mut hit_v = 0.0f32; let mut hit_x = 0.0f32;
         // Mega keeps every ball around a little longer, so the ring stays packed
         let age_min = self.merge_age * if self.mode == Mode::Mega { 1.85 } else { 1.0 };
@@ -1487,7 +2050,22 @@ impl Game {
                 let l = sqrt(l2).max(1e-6);
                 let nrm = d * (1.0 / l);
                 let (ti, tj) = (self.bodies[i].tier, self.bodies[j].tier);
-                let can_merge = ti == tj && ti != GOD && !self.finished && self.bodies[i].dying <= 0.0 && self.bodies[j].dying <= 0.0
+                let (ki, kj) = (self.bodies[i].kind, self.bodies[j].kind);
+                if (ki != K_CELL || kj != K_CELL) && !self.finished && self.bodies[i].dying <= 0.0 && self.bodies[j].dying <= 0.0 && !self.bodies[i].merged && !self.bodies[j].merged {
+                    // antimatter annihilates small cells, scrap and divine cells; a divine cell lifts a cell one tier
+                    let small = |k: u8, t: u8| k == K_SCRAP || k == K_DIVINE || (k == K_CELL && t <= spout + 2);
+                    let what = if ki == K_ANTI && small(kj, tj) { Some((i, j, 1u8)) }
+                        else if kj == K_ANTI && small(ki, ti) { Some((j, i, 1u8)) }
+                        else if ki == K_DIVINE && kj == K_CELL && tj < top && tj + 1 < GOD { Some((i, j, 2u8)) }
+                        else if kj == K_DIVINE && ki == K_CELL && ti < top && ti + 1 < GOD { Some((j, i, 2u8)) }
+                        else { None };
+                    if let Some(w) = what {
+                        self.bodies[i].merged = true; self.bodies[j].merged = true;
+                        specials.push(w);
+                        continue;
+                    }
+                }
+                let can_merge = ti == tj && ki == K_CELL && kj == K_CELL && ti != GOD && !self.finished && self.bodies[i].dying <= 0.0 && self.bodies[j].dying <= 0.0
                     && !self.bodies[i].merged && !self.bodies[j].merged && self.bodies[i].age > age_min && self.bodies[j].age > age_min;
                 if can_merge {
                     self.bodies[i].merged = true; self.bodies[j].merged = true;
@@ -1542,7 +2120,7 @@ impl Game {
                 let u = b.p * (1.0 / d);
                 let in_gap = u.y < 0.0 && abs(u.x * rr) < CHUTE_W;
                 let lim = rr - r;
-                if !in_gap && d > lim {
+                if !in_gap && d > lim && walls {
                     b.p = u * lim;
                     let vn = b.v.dot(u);
                     if vn > 0.0 {
@@ -1582,6 +2160,43 @@ impl Game {
             if !self.bodies[i].alive || !self.bodies[j].alive { continue; }
             self.merge(i, j);
         }
+        for (a, b, what) in specials {
+            if !self.bodies[a].alive || !self.bodies[b].alive { continue; }
+            if what == 1 { self.annihilate(a, b); } else { self.divine_lift(a, b); }
+        }
+    }
+
+    /// Antimatter `a` meets `b`: both are gone in a flash.
+    fn annihilate(&mut self, a: usize, b: usize) {
+        let (pa, pb) = (self.bodies[a].p, self.bodies[b].p);
+        let p = (pa + pb) * 0.5;
+        let r = self.bodies[a].r.max(self.bodies[b].r);
+        self.bodies[a].dying = 0.14;
+        self.bodies[b].dying = 0.14;
+        self.wave(p, r * 3.0, 0xB04CFF);
+        self.wave(p, r * 1.6, 0xFFFFFF);
+        self.sparkle(p, 14, 0xD9A6FF);
+        self.add_flash(0x8A2BE2, 0.25);
+        self.shake = self.shake.max(0.25);
+        self.sound_rate(S_ZOOM, 0.8, clamp(p.x, -1.0, 1.0) * 0.5, 0.6);
+        self.haptic(30.0);
+    }
+    /// Divine cell `a` touches cell `b`: `b` rises one tier.
+    fn divine_lift(&mut self, a: usize, b: usize) {
+        let p = self.bodies[b].p;
+        let t = self.bodies[b].tier + 1;
+        self.bodies[a].dying = 0.12;
+        self.bodies[b].tier = t;
+        self.bodies[b].pop = 1.0;
+        self.bodies[b].flash = 1.0;
+        self.bodies[b].age = 0.0;
+        self.bodies[b].chain = 1;
+        self.flames(p, 10, 0xFFD54F);
+        self.sparkle(p, 16, 0xFFF2C8);
+        self.wave(p, self.bodies[b].r * 2.6, 0xFFE27A);
+        self.sound(S_UPGRADE, 0.95, clamp(p.x, -1.0, 1.0) * 0.4);
+        let id = self.bodies[b].id;
+        self.on_new_tier(t, p, id);
     }
 
     /// One note of the era's tune per hard bounce (rate-limited).
@@ -1613,8 +2228,9 @@ impl Game {
         let t = a.tier + 1;
         let lvl = t as f32 / GOD as f32;
         let start_r = a.r.max(b.r);
-        // the new ride jumps out of the merge
-        if t != GOD { v += V2::new(self.rng.sym() * 0.4, -(0.9 + 0.9 * lvl)); }
+        // the new ride jumps out of the merge (on the journey it only rises a little: you need to read the pile)
+        let skill = self.skill();
+        if t != GOD { v += if skill { V2::new(0.0, -0.3) } else { V2::new(self.rng.sym() * 0.4, -(0.9 + 0.9 * lvl)) }; }
         // a chain reaction continues when a freshly merged ball merges again
         // a cascade: a ball made by a merge lands on a twin that was already
         // waiting, right after its cooldown — each step of that climbs the chain
@@ -1638,8 +2254,8 @@ impl Game {
             nid = nb.id;
         }
         // shove the neighbours away
-        let reach = (a.r + b.r) * 3.2;
-        let push = 1.1 + 1.2 * lvl;
+        let reach = (a.r + b.r) * if skill { 2.4 } else { 3.2 };
+        let push = if skill { 0.4 + 0.4 * lvl } else { 1.1 + 1.2 * lvl };
         for q in self.bodies.iter_mut() {
             if !q.alive || q.merged || q.dying > 0.0 { continue; }
             let d = q.p - p; let l = d.len();
@@ -1649,6 +2265,25 @@ impl Game {
         }
         self.run_merges += 1;
         self.stats.merges += 1;
+        if skill {
+            // a fusion smashes the scrap it touches
+            let nr = start_r * 1.02 * self.grow();
+            let mut smashed = Vec::new();
+            for (k, q) in self.bodies.iter_mut().enumerate() {
+                if !q.alive || q.dying > 0.0 || q.kind != K_SCRAP { continue; }
+                if (q.p - p).len() < (nr + q.r) * 1.12 { q.dying = 0.3; smashed.push(k); }
+            }
+            for k in smashed {
+                let (qp, qr) = (self.bodies[k].p, self.bodies[k].r);
+                self.smoke(qp, 4, 0x8A8070, qr * 1.6);
+                self.burst(qp, 0xB8A890, 12, 0.9);
+                self.sound_rate(S_BOMB, 0.45, clamp(qp.x, -1.0, 1.0) * 0.5, 1.4);
+                self.shake = self.shake.max(0.2);
+            }
+            let need = self.dif().chain;
+            if chain == need || chain == need + 2 || chain == need + 4 { self.grant_charge(); }
+            if self.hint == 1 { self.hint = 2; }
+        }
         // chain-reaction combos
         if self.opts.on(Opt::Combo) && chain >= 2 {
             let n = chain as u32;
@@ -1780,10 +2415,19 @@ impl Game {
                 self.ev(EV_CATEGORY, c as f32, 0.0, 0.0, 0.0);
                 self.ev(EV_MUSIC, c as f32, 0.0, 0.0, 0.0);
                 self.shockwave(p, tier(t).color);
+                if self.skill() && t != GOD { self.skill_new_era(c); }
             }
         }
         if t == GOD && !self.finished {
             self.finished = true;
+            if self.skill() {
+                // the journey is over
+                self.run_live = None;
+                self.run_ckpt = None;
+                self.strain = 0.0;
+                let k = self.diff as usize;
+                if self.stats.best_evo[k] <= 0.0 || self.time < self.stats.best_evo[k] { self.stats.best_evo[k] = self.time; }
+            }
             self.god_t = 0.0;
             self.god_id = self.next_id - 1;
             self.stats.gods += 1;
@@ -1815,7 +2459,37 @@ impl Game {
             let _ = self.new_body_ex(k, V2::new(x * (i as f32 * 0.3 + 0.2).min(1.0), 0.9 - r - i as f32 * 0.05), V2::default(), true);
         }
         self.ev(EV_MUSIC, self.cat as f32, 0.0, 0.0, 0.0);
+        if self.skill() {
+            for (i, &e) in [0u8].iter().enumerate() { let _ = (i, e); }
+            for i in 0..N_TOOLS { if self.tool_unlocked(i) { self.tools[i].charges = self.tools[i].charges.max(1); } }
+            self.skill_reset();
+            self.run_ckpt = Some(self.snap());
+        }
     }
+    /// Testing: the cell in hand becomes a special one.
+    pub fn debug_special(&mut self, kind: u8) {
+        if !self.skill() { return; }
+        let t = if kind == K_DIVINE { self.spout } else { (self.spout + 1).min(GOD - 1) };
+        self.queue[0] = (t, kind.min(K_DIVINE));
+        self.hold_k = 1.0;
+    }
+    /// Testing: scrap piled up to height `y` (ring radii).
+    pub fn debug_fill(&mut self, top: f32) {
+        let t = (self.spout + 1).min(GOD - 1);
+        let r = self.radius_for(t);
+        let mut y = 0.95 - r;
+        while y > top {
+            let half = sqrt(((1.0 - r) * (1.0 - r) - y * y).max(0.0));
+            let mut x = -half;
+            while x <= half {
+                if self.free_at(V2::new(x, y), r * 0.9) { if let Some(i) = self.new_body_ex(t, V2::new(x, y), V2::default(), true) { self.bodies[i].kind = K_SCRAP; self.bodies[i].age = 5.0; } }
+                x += r * 1.9;
+            }
+            y -= r * 1.7;
+        }
+    }
+    /// Testing: the journey's bubble bursts now.
+    pub fn debug_burst(&mut self) { if self.skill() && self.started && !self.over && !self.finished { self.burst_fail(); } }
     /// Testing: two of the last tier meet and God is born.
     pub fn debug_god(&mut self) {
         if !self.started || self.finished { return; }
@@ -2253,13 +2927,248 @@ mod sim {
         println!("age {} db {} | mode {:?} gap {} dr {} mag {} e {}: god={} t={:.0}s avg_bodies={:.1} max={} drops={} | {:?}", g.merge_age, g.drop_base, mode as u8, g.gap(), g.opts.get(Opt::DropRate), g.opts.get(Opt::Magnet), g.opts.get(Opt::Bounce), g.finished, g.time, sum as f32 / frames as f32, maxb, g.run_drops, marks.iter().map(|m| (m.0, m.1 as i32, m.2, (m.3 * 100.0) as i32)).collect::<Vec<_>>());
     }
 
-    #[test]
-    fn classic_reaches_god() {
-        for seed in [1u32, 2] {
-            let r = run(Mode::Classic, 3.0, 8.0, 7200.0, seed, seed == 1);
-            println!("classic seed {seed}: god={} time={:.0}s top={} max_bodies={} avg_bodies={:.0} jams={}", r.god, r.time, r.top + 1, r.max_b, r.avg_b, r.jams);
-            assert!(r.god, "did not reach God");
+    // ───────────────────────── the journey, played by a bot
+    /// A greedy player: it reads where each cell would land and prefers twins, low
+    /// spots and company of its own size; it waits for the pile to calm down, uses
+    /// its abilities when the bubble strains, and aims with a human's slight error.
+    pub struct Bot { pub rng: Rng, pub noise: f32, pub calm: f32, pub think: f32, pub slop: f32 }
+    impl Bot {
+        pub fn new(seed: u32, noise: f32) -> Bot { Bot { rng: Rng::new(seed as u64 * 7919 + 1), noise, calm: 0.0, think: 0.0, slop: 0.0 } }
+        fn score(g: &Game, x: f32, t: u8, k: u8) -> f32 {
+            let r = g.cell_r(t);
+            let (p, hit) = g.land_from(x, t);
+            let y = p.y;
+            let ly = g.line_y();
+            let mut sc = y * 30.0;
+            if y - r < ly + 0.05 { sc -= 400.0; }
+            let hb = hit.map(|i| g.bodies[i]);
+            match k {
+                K_CELL => {
+                    if let Some(b) = hb {
+                        if b.kind == K_CELL && b.tier == t { sc += 140.0 + t as f32; }
+                        else if b.kind == K_CELL && b.tier + 1 == t { sc -= 20.0; }
+                        else if b.kind == K_SCRAP { sc -= 10.0; }
+                    }
+                    for b in &g.bodies {
+                        if !b.alive || b.dying > 0.0 { continue; }
+                        let d = (b.p - p).len() - r - b.r;
+                        if d > 0.05 { continue; }
+                        if b.kind != K_CELL { sc -= 6.0; continue; }
+                        if b.tier == t { sc += 55.0; } else if b.tier == t + 1 { sc += 12.0; } else if b.tier < t { sc -= 14.0; } else { sc += 2.0; }
+                    }
+                }
+                K_SCRAP => {
+                    // bury it low beside something big, away from the small ones
+                    sc += y * 30.0;
+                    for b in &g.bodies {
+                        if !b.alive || b.dying > 0.0 || b.kind != K_CELL { continue; }
+                        let d = (b.p - p).len() - r - b.r;
+                        if d < 0.05 { if b.tier > g.spout + 2 { sc += 6.0; } else { sc -= 10.0; } }
+                    }
+                }
+                K_ANTI => {
+                    if let Some(b) = hb {
+                        if b.kind == K_SCRAP { sc += 320.0; }
+                        else if b.kind == K_CELL && b.tier <= g.spout + 2 {
+                            // a small cell with no twin anywhere is the one to lose
+                            let twins = g.bodies.iter().filter(|q| q.alive && q.kind == K_CELL && q.tier == b.tier).count();
+                            sc += if twins < 2 { 160.0 } else { 40.0 };
+                        } else { sc -= 60.0; }
+                    }
+                }
+                _ => {
+                    if let Some(b) = hb {
+                        if b.kind == K_CELL && b.tier < g.run_max {
+                            let twin_up = g.bodies.iter().any(|q| q.alive && q.kind == K_CELL && q.tier == b.tier + 1);
+                            sc += 200.0 + 8.0 * b.tier as f32 + if twin_up { 80.0 } else { 0.0 };
+                        }
+                    }
+                }
+            }
+            sc
         }
+        pub fn act(&mut self, g: &mut Game, dt: f32) {
+            if g.over { if g.fail_sent { g.retry(); } return; }
+            if g.finished { return; }
+            // abilities
+            if g.strain > 0.35 {
+                for tl in [Tool::Bomb, Tool::Shake, Tool::Flip] {
+                    let i = tl as usize;
+                    if g.tool_unlocked(i) && g.tools[i].charges > 0 && g.tools[i].cd <= 0.0 { g.tool(i); break; }
+                }
+            }
+            let up = Tool::Upgrade as usize;
+            if g.tool_unlocked(up) && g.tools[up].charges > 0 && g.strain < 0.2 {
+                // lift the biggest cell that has a twin waiting one tier up
+                let mut best: Option<(usize, u8)> = None;
+                for (i, b) in g.bodies.iter().enumerate() {
+                    if !b.alive || b.dying > 0.0 || b.kind != K_CELL || b.tier + 1 >= GOD || b.tier >= g.run_max { continue; }
+                    let twin = g.bodies.iter().any(|q| q.alive && q.kind == K_CELL && q.tier == b.tier + 1);
+                    if twin && best.map_or(true, |(_, t)| b.tier > t) { best = Some((i, b.tier)); }
+                }
+                if let Some((i, _)) = best { g.upgrade_body(i); }
+            }
+            if g.hold_k < 1.0 { self.think = 0.0; return; }
+            let speed = g.bodies.iter().filter(|b| b.alive).map(|b| b.v.len2()).fold(0.0f32, f32::max);
+            self.calm = if speed < 0.25 { self.calm + dt } else { 0.0 };
+            self.think += dt;
+            if self.calm < 0.15 && self.think < 2.0 { return; }
+            let (t, k) = g.queue[0];
+            let r = g.cell_r(t);
+            let lim = aim_limit(g.ring_r, r);
+            let n = 29;
+            let (mut bx, mut bs) = (0.0, f32::MIN);
+            for c in 0..n {
+                let x = -lim + 2.0 * lim * c as f32 / (n - 1) as f32;
+                let sc = Bot::score(g, x, t, k);
+                if sc > bs { bs = sc; bx = x; }
+            }
+            // a careless moment: the cell goes wherever the thumb happened to be
+            if self.rng.chance(self.slop) { bx = self.rng.sym() * lim; }
+            g.aim_x = bx + self.rng.sym() * self.noise;
+            g.hold_x = g.aim_x;
+            g.drop_held(false);
+            self.think = 0.0;
+        }
+    }
+    pub struct JR { pub god: bool, pub time: f32, pub top: u8, pub drops: u32, pub bursts: u32, pub era_s: [f32; N_CATS], pub era_drops: [u32; N_CATS], pub era_bursts: [u32; N_CATS], pub era_strain: [f32; N_CATS] }
+    pub fn journey(diff: u8, seed: u32, noise: f32, max_s: f32, verbose: bool) -> JR { journey_with(diff, None, seed, noise, 0.0, max_s, verbose) }
+    pub fn journey_with(diff: u8, ovr: Option<Diff>, seed: u32, noise: f32, slop: f32, max_s: f32, verbose: bool) -> JR {
+        journey_span(diff, ovr, seed, noise, slop, max_s, verbose, 0, N_CATS as u8)
+    }
+    /// A bot plays the journey from the first tier of era `from` until era `until` begins (or God).
+    pub fn journey_span(diff: u8, ovr: Option<Diff>, seed: u32, noise: f32, slop: f32, max_s: f32, verbose: bool, from: u8, until: u8) -> JR {
+        let mut g = Game::new(seed);
+        g.resize(390.0, 844.0, 3.0);
+        g.opts.set(Opt::Difficulty as usize, diff as f32);
+        g.opts.set(Opt::Drama as usize, 0.0);
+        g.opts.set(Opt::Speed as usize, 8.0);
+        g.dif_ovr = ovr;
+        g.start(Mode::Classic);
+        if from > 0 {
+            let first = (0..GOD).find(|&t| cat_of(t) >= from).unwrap_or(GOD - 1);
+            g.debug_jump(first);
+            g.time = 0.0;
+        }
+        let mut bot = Bot::new(seed, noise);
+        bot.slop = slop;
+        let mut r = JR { god: false, time: 0.0, top: 0, drops: 0, bursts: 0, era_s: [0.0; N_CATS], era_drops: [0; N_CATS], era_bursts: [0; N_CATS], era_strain: [0.0; N_CATS] };
+        let mut frames = 0u32;
+        let (mut last_drops, mut last_bursts) = (0u32, 0u32);
+        while g.time < max_s && !g.finished && g.cat < until {
+            bot.act(&mut g, 8.0 / 60.0);
+            let c = g.cat as usize;
+            let t0 = g.time;
+            g.frame(1.0 / 60.0);
+            g.events.clear();
+            r.era_s[c] += g.time - t0;
+            if g.strain > 0.0 { r.era_strain[c] += g.time - t0; }
+            if g.run_drops > last_drops { r.era_drops[c] += g.run_drops - last_drops; }
+            last_drops = g.run_drops;
+            if g.bursts > last_bursts {
+                r.era_bursts[c] += 1; last_bursts = g.bursts;
+                if verbose && r.era_bursts[c] <= 2 {
+                    println!("    burst in era {} at tier {} ({:.0}s) spout {} bodies {}", c, g.run_max + 1, g.time, g.spout, g.bodies.len());
+                    let mut v: Vec<(u8, u8, f32, f32, f32)> = g.bodies.iter().filter(|b| b.alive).map(|b| (b.tier, b.kind, b.p.x, b.p.y, b.r)).collect();
+                    v.sort_by(|a, b| a.3.partial_cmp(&b.3).unwrap());
+                    for (t, k, x, y, rr) in v.iter().take(40) { println!("      t{:3} k{} x {:+.2} y {:+.2} r {:.3}", t, k, x, y, rr); }
+                }
+            }
+            for b in &g.bodies { assert!(b.p.x.is_finite() && b.p.y.is_finite() && b.v.x.is_finite() && b.r.is_finite(), "NaN body"); }
+            frames += 1;
+            assert!(frames < 3_000_000);
+        }
+        r.god = g.finished; r.time = g.time; r.top = g.run_max; r.drops = g.run_drops; r.bursts = g.bursts;
+        if verbose {
+            for c in 0..N_CATS { if r.era_s[c] > 0.0 { println!("  era {:2} {:20} {:6.0}s {:5} drops {:2} bursts {:5.0}s strained", c, CATS[c].en, r.era_s[c], r.era_drops[c], r.era_bursts[c], r.era_strain[c]); } }
+        }
+        r
+    }
+
+    #[test]
+    fn journey_reaches_god() {
+        // a careful bot on the relaxed journey gets there
+        let r = journey(0, 1, 0.01, 30000.0, true);
+        println!("relaxed: god={} time={:.0}s ({:.1} h) top={} drops={} bursts={}", r.god, r.time, r.time / 3600.0, r.top + 1, r.drops, r.bursts);
+        assert!(r.god, "the relaxed journey did not reach God");
+    }
+
+    #[test]
+    #[ignore]
+    fn journey_calibrate() {
+        let env = |k: &str, d: f32| std::env::var(k).ok().and_then(|v| v.parse().ok()).unwrap_or(d);
+        let diff = env("OMG_DIFF", 1.0) as u8;
+        let seed = env("OMG_SEED", 1.0) as u32;
+        let noise = env("OMG_NOISE", 0.012);
+        let mut d = *crate::skill::diff(diff);
+        d.line = env("OMG_LINE", d.line);
+        d.max_ball = env("OMG_MAXB", d.max_ball);
+        d.grow = env("OMG_GROW", d.grow);
+        d.gap = env("OMG_GAP", d.gap as f32) as u8;
+        d.strain_s = env("OMG_STRAIN", d.strain_s);
+        d.hazard = env("OMG_HAZ", d.hazard);
+        d.litter = env("OMG_LIT", d.litter);
+        d.bounce = env("OMG_E", d.bounce);
+        let (from, until) = (env("OMG_FROM", 0.0) as u8, env("OMG_UNTIL", N_CATS as f32) as u8);
+        let r = journey_span(diff, Some(d), seed, noise, env("OMG_SLOP", 0.0), env("OMG_MAX", 60000.0), true, from, until);
+        println!("diff {diff} seed {seed} noise {noise} eras {from}..{until}: god={} time={:.0}s ({:.2} h) top={} drops={} bursts={}", r.god, r.time, r.time / 3600.0, r.top + 1, r.drops, r.bursts);
+    }
+
+    #[test]
+    fn journey_rules() {
+        let mut g = Game::new(9);
+        g.resize(390.0, 844.0, 2.0);
+        g.opts.set(Opt::Drama as usize, 0.0);
+        g.start(Mode::Classic);
+        assert!(g.skill() && g.bodies.is_empty(), "the journey pours nothing by itself");
+        for _ in 0..120 { g.frame(1.0 / 60.0); }
+        assert!(g.bodies.is_empty() && g.hold_k >= 1.0, "the stem holds a cell ready");
+        // drop two babies on the same spot: they fuse
+        g.aim_x = 0.0; g.drop_held(false);
+        for _ in 0..90 { g.frame(1.0 / 60.0); }
+        g.aim_x = 0.0; g.drop_held(false);
+        for _ in 0..240 { g.frame(1.0 / 60.0); }
+        assert_eq!(g.run_max, 1, "two babies make a walker");
+        // the nursery never bursts
+        for k in 0..6 { let _ = g.new_body_ex(0, V2::new(-0.3 + 0.12 * k as f32, -0.5), V2::default(), true); }
+        for _ in 0..600 { g.frame(1.0 / 60.0); }
+        assert!(!g.over);
+        // from the second era a pile above the line bursts the bubble, and retry goes back to the era's start
+        g.debug_jump(8);
+        let ck = g.run_ckpt.clone().expect("checkpoint");
+        assert_eq!(g.cat, 1);
+        // fill the bubble with scrap past the line
+        let r = g.radius_for(g.spout + 1);
+        let mut y = 0.95 - r;
+        while y > -0.97 {
+            let half = sqrt(((1.0 - r) * (1.0 - r) - y * y).max(0.0));
+            let mut x = -half;
+            while x <= half { if let Some(i) = g.new_body_ex(g.spout + 1, V2::new(x, y), V2::default(), true) { g.bodies[i].kind = K_SCRAP; g.bodies[i].age = 5.0; } x += r * 1.7; }
+            y -= r * 1.45;
+        }
+        for _ in 0..(60 * 12) { g.frame(1.0 / 60.0); if g.over { break; } }
+        assert!(g.over && g.fail_t >= 0.0, "the strain bursts the bubble");
+        for _ in 0..120 { g.frame(1.0 / 60.0); }
+        assert!(g.fail_sent);
+        let line0 = g.line_y();
+        for t in g.tools.iter_mut() { t.charges = 0; }
+        g.retry();
+        assert!(!g.over && g.era_tries == 2 && g.bodies.len() == ck.bodies.len());
+        // the bubble comes back tougher: more patience, a lower line, a charge in every ability it has
+        assert!(g.line_y() < line0 && g.mercy() > 1.0, "the line drops and the bubble waits longer after a burst");
+        for i in 0..N_TOOLS { if g.tool_unlocked(i) { assert!(g.tools[i].charges >= 1, "tool {i} has a charge after a burst"); } }
+        assert!((0..N_TOOLS).any(|i| g.tool_unlocked(i)));
+        let mut g3 = Game::new(3);
+        g3.era_tries = 50;
+        assert!((g3.mercy() - (1.0 + MERCY_STEP * MERCY_MAX as f32)).abs() < 1e-5, "mercy has a ceiling");
+        // the journey survives a save and comes back
+        let txt = crate::save::save(&g);
+        assert!(txt.contains("run.live=") && txt.contains("run.ckpt="));
+        let mut g2 = Game::new(10);
+        g2.resize(390.0, 844.0, 2.0);
+        crate::save::load(&mut g2, &txt);
+        assert!(g2.continue_run());
+        assert!(g2.skill() && g2.cat == 1 && g2.run_max == g.run_max && g2.bodies.len() == g.bodies.iter().filter(|b| b.alive && b.dying <= 0.0).count());
     }
 
     #[test]
@@ -2274,7 +3183,7 @@ mod sim {
     #[test]
     fn short_and_epic() {
         for gap in [2.0f32, 5.0] {
-            let r = run(Mode::Classic, gap, 8.0, 14400.0, 11, false);
+            let r = run(Mode::Watch, gap, 8.0, 14400.0, 11, false);
             println!("gap {gap}: god={} time={:.0}s top={} max_bodies={} avg_bodies={:.0}", r.god, r.time, r.top + 1, r.max_b, r.avg_b);
             assert!(r.god);
         }
@@ -2285,7 +3194,7 @@ mod sim {
         let mut g = Game::new(3);
         g.resize(390.0, 844.0, 2.0);
         g.unlocked = Mask::all();
-        g.start(Mode::Classic);
+        g.start(Mode::Watch);
         assert_eq!(g.spout, 0);
         for _ in 0..240 { g.frame(1.0 / 60.0); g.events.clear(); }
         // four seconds in: nothing but crawling babies, poured one at a time, no zoom yet
@@ -2313,10 +3222,13 @@ mod sim {
         g.base = 97.0;
         let k2 = g.radius_for(shuttle + 1) / g.radius_for(shuttle);
         assert!((k1 - k2).abs() < 1e-4 && (k1 - g.grow()).abs() < 1e-3);
-        // Hermes' sandals are far, far wider than the Space Shuttle
+        // Hermes' sandals are far, far wider than the Space Shuttle (on the journey a thousand
+        // times; in the automatic modes, where every tier grows by three quarters, far more)
         let ratio = Game::babies_wide(g.grow(), sandals) / Game::babies_wide(g.grow(), shuttle);
         println!("sandals / shuttle = {ratio:.3e}, God is {:.3e} babies wide", Game::babies_wide(g.grow(), GOD));
-        assert!(ratio > 1e5);
+        assert!(ratio > 1e3);
+        g.mode = Mode::Watch;
+        assert!(Game::babies_wide(g.grow(), sandals) / Game::babies_wide(g.grow(), shuttle) > 1e5);
     }
 
     #[test]

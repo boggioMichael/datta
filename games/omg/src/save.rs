@@ -43,7 +43,11 @@ pub fn save(g: &Game) -> String {
     let _ = writeln!(o, "s.ta3={}", s.best_tier_ta);
     let _ = writeln!(o, "s.combo={}", s.best_combo);
     for (i, m) in MODES.iter().enumerate() { if s.best[i] > 0.0 { let _ = writeln!(o, "b3.{}={}", m.key, s.best[i]); } }
+    for (i, d) in crate::skill::DIFFS.iter().enumerate() { if s.best_evo[i] > 0.0 { let _ = writeln!(o, "bj.{}={}", d.key, s.best_evo[i]); } }
     let _ = writeln!(o, "lang={}", if g.lang_he { "he" } else { "en" });
+    // the journey in progress, and the start of its era (where a burst sends you back)
+    if let Some(r) = g.live_snap() { let _ = writeln!(o, "run.live={}", r.to_str()); }
+    if g.live_snap().is_some() { if let Some(r) = &g.run_ckpt { let _ = writeln!(o, "run.ckpt={}", r.to_str()); } }
     o
 }
 
@@ -90,6 +94,12 @@ pub fn load(g: &mut Game, data: &str) {
             if ver < 2 && !V1_KEEP.contains(&key) { continue; }
             if ver < 3 && V2_DROP.contains(&key) { continue; }
             if let Some(i) = OPTS.iter().position(|d| d.key == key) { if let Some(x) = parse_f(v) { g.opts.set(i, x); } }
+        } else if let Some(key) = k.strip_prefix("bj.") {
+            if let Some(i) = crate::skill::DIFFS.iter().position(|d| d.key == key) { if let Some(x) = parse_f(v) { if x > 0.0 { g.stats.best_evo[i] = x; } } }
+        } else if k == "run.live" {
+            g.run_live = crate::skill::Snap::parse(v);
+        } else if k == "run.ckpt" {
+            g.run_ckpt = crate::skill::Snap::parse(v);
         } else if let Some(key) = k.strip_prefix("b3.") {
             if let Some(i) = MODES.iter().position(|m| m.key == key) { if let Some(x) = parse_f(v) { if x > 0.0 { g.stats.best[i] = x; } } }
         } else {

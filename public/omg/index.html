@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>OH MY GOD — מזחילה עד אלוהים · DATTA</title>
-<meta name="description" content="משחק מיזוג בבועת חיים: רק תינוקות זוחלים, ושני תאים זהים מתמזגים למשהו גדול יותר — 155 דרגות ו־19 עידנים, עולם שמתרחק עד קצה היקום, ובסוף הבועה מתפוצצת ואלוהים מספר את סיפור הבריאה בזמן שאתם בוראים בנגיעה. נכתב ב־Rust.">
+<meta name="description" content="משחק מיזוג של מיומנות בבועת חיים: מכוונים כל תא, ושני תאים זהים מתאחדים למשהו גדול יותר — 155 דרגות ו־19 עידנים, חוק טבע חדש בכל עידן, קו לחץ שמפוצץ את הבועה, ומסע של שעות עד אלוהים, שמספר את סיפור הבריאה בזמן שאתם בוראים בנגיעה. נכתב ב־Rust.">
 <meta property="og:title" content="OH MY GOD — מזחילה עד אלוהים">
-<meta property="og:description" content="A merge game in a bubble of life: nothing but crawling babies, and two identical cells fuse into something bigger — 155 tiers, 19 eras, a world that pulls back to the edge of the universe, and at the end the bubble bursts and God tells the story of creation while you touch it into being. Written in Rust.">
+<meta property="og:description" content="A merge game of skill in a bubble of life: aim every cell, and two identical cells fuse into something bigger — 155 tiers in 19 eras, a new law of nature in every era, a strain line that bursts the bubble, and a journey of hours to God, who tells the story of creation while you touch it into being. Written in Rust.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://boggiomichael.github.io/datta/omg/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -47,6 +47,7 @@
     <p class="sub" data-ui="subtitle"></p>
     <p class="tag" data-ui="tagline"></p>
     <div id="ladder-preview" aria-hidden="true"></div>
+    <button class="cta" id="btn-continue" hidden><span data-ui="continue"></span><small id="continue-info"></small></button>
     <button class="cta" id="btn-play"><span data-ui="play"></span></button>
     <div id="mode-list" class="modes"></div>
     <div class="start-foot">
@@ -86,6 +87,7 @@
       <button class="cta" id="btn-again" data-ui="again"></button>
       <button class="ghost" id="btn-stay" data-ui="keep_watching"></button>
       <button class="ghost" id="btn-end-rec" data-ui="record"></button>
+      <button class="ghost" id="btn-end-home" data-ui="modes"></button>
     </div>
   </div>
 </section>

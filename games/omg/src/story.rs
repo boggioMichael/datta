@@ -722,7 +722,7 @@ fn subtitle(g: &mut Game, c: &Clock, he: bool) {
 }
 
 /// Greedy word wrap by character count.
-fn wrap(s: &str, per_line: usize) -> Vec<String> {
+pub fn wrap(s: &str, per_line: usize) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let mut cur = String::new();
     let mut cur_n = 0usize;

@@ -16,6 +16,7 @@ pub mod game;
 pub mod render;
 pub mod world;
 pub mod vessel;
+pub mod skill;
 pub mod story;
 pub mod ui;
 pub mod save;
@@ -128,20 +129,42 @@ pub extern "C" fn omg_pause(on: u32) { g().paused = on != 0; }
 pub extern "C" fn omg_pointer(kind: u32, x: f32, y: f32) { g().pointer(kind, x, y); }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_tool(i: u32) { g().tool(i as usize); }
-/// field: 0 cooldown fraction left, 1 active seconds, 2 charges, 3 armed
+/// field: 0 cooldown fraction left, 1 active seconds, 2 charges, 3 armed, 4 yours (on the journey abilities unlock by era),
+/// 5 runs on charges (the journey), 6 the era it unlocks in
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_tool_state(i: u32, field: u32) -> f32 {
     let gm = g();
     let i = i as usize; if i >= N_TOOLS { return 0.0; }
     let t = gm.tools[i];
+    let frac = |cd: f32, max: f32| if max > 0.0 { m::clamp(cd / max, 0.0, 1.0) } else { 0.0 };
     match field {
-        0 => if i == opts::Tool::Upgrade as usize { if t.charges > 0 { 0.0 } else { m::clamp(t.cd / opts::TOOLS[i].cooldown, 0.0, 1.0) } } else { m::clamp(t.cd / opts::TOOLS[i].cooldown, 0.0, 1.0) },
+        0 => if gm.skill() { frac(t.cd, t.cd_max) } else if i == opts::Tool::Upgrade as usize { if t.charges > 0 { 0.0 } else { frac(t.cd, opts::TOOLS[i].cooldown) } } else { frac(t.cd, if t.cd_max > 0.0 { t.cd_max } else { opts::TOOLS[i].cooldown }) },
         1 => t.active,
         2 => t.charges as f32,
         3 => if gm.upgrade_armed && i == opts::Tool::Upgrade as usize { 1.0 } else { 0.0 },
+        4 => gm.tool_unlocked(i) as u32 as f32,
+        5 => gm.skill() as u32 as f32,
+        6 => skill::tool_era(i) as f32,
         _ => 0.0,
     }
 }
+/// The journey: go on from where it was left (1 if there was one).
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_continue() -> u32 { g().continue_run() as u32 }
+/// The journey: after a burst, back to the beginning of the era.
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_retry() { g().retry(); }
+/// The journey kept to continue: 0 there is one, 1 era, 2 game seconds, 3 difficulty, 4 highest tier, 5 bursts
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_run_info(f: u32) -> f32 {
+    let gm = g();
+    let s = gm.live_snap();
+    let Some(s) = s else { return if f == 0 { 0.0 } else { -1.0 } };
+    match f { 0 => 1.0, 1 => s.cat as f32, 2 => s.time, 3 => s.diff as f32, 4 => s.run_max as f32, 5 => s.bursts as f32, _ => 0.0 }
+}
+/// Best time on the journey at difficulty `d` (0: none).
+#[unsafe(no_mangle)]
+pub extern "C" fn omg_best_journey(d: u32) -> f32 { let gm = g(); gm.stats.best_evo.get(d as usize).copied().unwrap_or(0.0) }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_set_opt(i: u32, v: f32) {
     let gm = g();
@@ -155,7 +178,7 @@ pub extern "C" fn omg_get_opt(i: u32) -> f32 { if (i as usize) < N_OPTS { g().op
 pub extern "C" fn omg_set_lang(he: u32) { let gm = g(); gm.lang_he = he != 0; gm.dirty_save = 0.3; }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_get_lang() -> u32 { g().lang_he as u32 }
-/// Keyboard: code 1 left, 2 right, 3 drop, 4..9 tools; down = 1 pressed / 0 released.
+/// Keyboard: code 1 left, 2 right, 3 drop, 4..9 tools, 10/11 zoom, 12 auto camera, 13 slam; down = 1 pressed / 0 released.
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_key(code: u32, down: u32) { g().key(code, down != 0); }
 #[unsafe(no_mangle)]
@@ -184,7 +207,7 @@ pub extern "C" fn omg_view(op: u32, a: f32, b: f32, c: f32) {
 pub extern "C" fn omg_story_time(t: f32) { let gm = g(); if gm.story_on && t.is_finite() { gm.story_ext = t; } }
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_story_skip() { let gm = g(); if gm.story_on { gm.end_story(); } }
-/// Testing hooks: 1 jump the run to tier `a`; 2 start the Genesis story at time `a`; 3 set the story's time to `a`.
+/// Testing hooks: 1 jump the run to tier `a`; 2 start the Genesis story at time `a`; 3 set the story's time to `a`; 4 God; 5 burst the journey's bubble; 6 the cell in hand becomes kind `a`; 7 fill the bubble with scrap up to height `a`.
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_debug(op: u32, a: f32) {
     let gm = g();
@@ -193,6 +216,9 @@ pub extern "C" fn omg_debug(op: u32, a: f32) {
         2 => gm.debug_story(a),
         3 => { if gm.story_on { gm.story_t = a.max(0.0); } }
         4 => gm.debug_god(),
+        5 => gm.debug_burst(),
+        6 => gm.debug_special(a as u8),
+        7 => gm.debug_fill(a),
         _ => {}
     }
 }
@@ -209,7 +235,9 @@ pub extern "C" fn omg_reset_progress() {
     gm.unlocked = game::Mask::ONE; gm.stats = game::Stats::default(); gm.dirty_save = 0.1;
 }
 /// 0 started, 1 paused, 2 finished, 3 over, 4 mode, 5 run_max, 6 time, 7 spout, 8 merges(run), 9 drops(run), 10 ta_left, 11 god_t,
-/// 12 voice busy, 13 bodies, 14 era, 15 log10(babies poured), 16 log10(zoom-out factor), 17 story on, 18 story time, 19 view manual, 20 view zoom
+/// 12 voice busy, 13 bodies, 14 era, 15 log10(babies poured), 16 log10(zoom-out factor), 17 story on, 18 story time, 19 view manual, 20 view zoom,
+/// 21–28 the story's beats, 29 holding, 30 beat, 31 marks; the journey: 32 on, 33 strain, 34 tries at this era, 35 bursts, 36 cell in hand ready,
+/// 37 difficulty, 38/39 cell in hand (tier, kind), 40 aim x, 41 hand x, 42 strain line y, 43 seconds since a burst
 #[unsafe(no_mangle)]
 pub extern "C" fn omg_info(f: u32) -> f32 {
     let gm = g();
@@ -224,6 +252,10 @@ pub extern "C" fn omg_info(f: u32) -> f32 {
         19 => gm.view_manual as u32 as f32, 20 => gm.cam().0,
         21..=28 => story::beat_times(story::track(gm.story_he))[(f - 21) as usize],
         29 => gm.story_hold as u32 as f32, 30 => gm.story_beat as f32, 31 => gm.story_marks.len() as f32,
+        32 => gm.skill() as u32 as f32, 33 => gm.strain, 34 => gm.era_tries as f32, 35 => gm.bursts as f32,
+        36 => gm.hold_k, 37 => gm.diff as f32, 38 => gm.queue[0].0 as f32, 39 => gm.queue[0].1 as f32,
+        40 => gm.aim_x, 41 => gm.hold_x, 42 => gm.line_y(), 43 => gm.fail_t,
+        44 => gm.mercy(), 45 => (gm.era_tries <= skill::MERCY_MAX) as u32 as f32,
         _ => 0.0,
     }
 }

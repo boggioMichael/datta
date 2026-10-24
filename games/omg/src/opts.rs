@@ -12,9 +12,9 @@ impl Mode {
 }
 pub struct ModeInfo { pub key: &'static str, pub icon: &'static str, pub he: &'static str, pub en: &'static str, pub dhe: &'static str, pub den: &'static str }
 pub static MODES: [ModeInfo; N_MODES] = [
-    ModeInfo { key: "classic", icon: "🏁", he: "קלאסי", en: "Classic",
-        dhe: "הגבעול שופך לבועה רק תינוקות זוחלים. נגיעה שופכת עוד אחד, גרירה מערבבת ומטה את הכבידה, נגיעה בדופן דוחפת, צביטה מתקרבת. כמה זמן ייקח לך להגיע לאלוהים?",
-        den: "The stem pours nothing but crawling babies into the bubble. Tap to pour one more, drag to stir and tilt, tap the wall to poke, pinch to zoom. How fast can you reach God?" },
+    ModeInfo { key: "classic", icon: "🧬", he: "המסע", en: "The Journey",
+        dhe: "המשחק האמיתי. אתם מכוונים כל תא ומפילים אותו, והגבעול מראה מה מגיע. ערימה שנשארת מעל קו הלחץ מפוצצת את הבועה. בכל עידן חוק טבע חדש ויכולת חדשה, וכל עידן נשמר. שחקן טוב יגיע לאלוהים בכמה שעות.",
+        den: "The real game. You aim every cell and drop it, and the stem shows what's coming. A pile that stays above the strain line bursts the bubble. Every era brings a new law of nature and a new ability, and every era is saved. A good player reaches God in a few hours." },
     ModeInfo { key: "watch", icon: "🍿", he: "צפייה", en: "Watch",
         dhe: "סימולציה אוטומטית כמו ברילז. לשבת, להקליט ולשמוע את ה־OMG מתעצם.",
         den: "A hands-off simulation, like the reel. Sit back, record, and let the OMGs escalate." },
@@ -49,18 +49,18 @@ pub static TOOLS: [ToolInfo; N_TOOLS] = [
     ToolInfo { key: "bomb", icon: "💣", he: "פצצה", en: "Bomb", dhe: "מפוצץ את הדרגה הנמוכה בבועה", den: "Blows up the lowest tier in the bubble", cooldown: 18.0, duration: 0.0 },
     ToolInfo { key: "slowmo", icon: "🐢", he: "הילוך איטי", en: "Slow-mo", dhe: "רבע מהירות ל־3 שניות", den: "Quarter speed for 3 s", cooldown: 10.0, duration: 3.0 },
     ToolInfo { key: "flip", icon: "🙃", he: "היפוך", en: "Flip", dhe: "הכבידה מתהפכת לשנייה", den: "Gravity flips for a second", cooldown: 8.0, duration: 1.1 },
-    ToolInfo { key: "upgrade", icon: "⏫", he: "שדרוג", en: "Upgrade", dhe: "נוגעים בפריט והוא עולה דרגה (מטען כל 45 שניות)", den: "Tap an item to lift it one tier (one charge per 45 s)", cooldown: 45.0, duration: 0.0 },
+    ToolInfo { key: "upgrade", icon: "⏫", he: "שדרוג", en: "Upgrade", dhe: "לוחצים, ואז נוגעים בתא — והוא עולה דרגה", den: "Press, then touch a cell — it rises one tier", cooldown: 45.0, duration: 0.0 },
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum Opt {
-    Speed = 0, DropRate, Gap, HardMode, Combo, Events,
+    Speed = 0, Difficulty, DropRate, Gap, HardMode, Combo, Events,
     Gravity, Bounce, Magnet, RingSize, SizeGrow, RingSpin, AutoTilt, DeviceTilt,
     VolMaster, VolVoice, VolSfx, VolMusic, VoiceStyle, Music, Notes, VolNotes,
     Drama, Camera, Theme, Scenery, Stars, BallStyle, Particles, ScreenShake, Flashes, Labels, Trails, Ladder, Timer, Caption, Haptics,
 }
-pub const N_OPTS: usize = 37;
+pub const N_OPTS: usize = 38;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind { Choice, Range, Toggle }
@@ -72,7 +72,7 @@ pub struct OptDef {
     pub choices: &'static [(&'static str, &'static str, f32)],
     pub min: f32, pub max: f32, pub step: f32, pub default: f32,
 }
-pub static GROUPS: [(&str, &str); 4] = [("משחק", "Game"), ("פיזיקה", "Physics"), ("סאונד", "Sound"), ("תצוגה", "Display")];
+pub static GROUPS: [(&str, &str); 4] = [("משחק", "Game"), ("פיזיקה (במצבים האוטומטיים)", "Physics (automatic modes)"), ("סאונד", "Sound"), ("תצוגה", "Display")];
 
 const OFFON: &[(&str, &str, f32)] = &[("כבוי", "Off", 0.0), ("פועל", "On", 1.0)];
 const fn ch(key: &'static str, group: u8, he: &'static str, en: &'static str, hhe: &'static str, hen: &'static str, choices: &'static [(&'static str, &'static str, f32)], default: f32) -> OptDef {
@@ -89,11 +89,13 @@ pub static OPTS: [OptDef; N_OPTS] = [
     // ── game
     ch("speed", 0, "מהירות סימולציה", "Simulation speed", "לא משנה את שעון השיא — הוא סופר זמן משחק", "Doesn't affect records — the clock counts game time",
        &[("×0.5", "×0.5", 0.5), ("×1", "×1", 1.0), ("×2", "×2", 2.0), ("×4", "×4", 4.0), ("×8", "×8", 8.0)], 1.0),
-    ch("droprate", 0, "קצב השפיכה", "Pour rate", "כמה מהר התינוקות נשפכים מהפיה", "How fast the babies pour from the spout",
+    ch("difficulty", 0, "קושי המסע", "Journey difficulty", "חל על מסע חדש. רגוע: בערך שעתיים עד אלוהים · רגיל: ארבע עד חמש שעות לשחקן טוב · קשה: למדויקים · אפי: פי שניים תאים בכל דרגה", "Applies to a new journey. Relaxed: about two hours to God · Normal: four to five hours for a good player · Hard: for the precise · Epic: twice the cells for every tier",
+       &[("רגוע", "Relaxed", 0.0), ("רגיל", "Normal", 1.0), ("קשה", "Hard", 2.0), ("אפי", "Epic", 3.0)], 1.0),
+    ch("droprate", 0, "קצב השפיכה", "Pour rate", "כמה מהר התינוקות נשפכים (במצבים האוטומטיים)", "How fast the babies pour (in the automatic modes)",
        &[("איטי", "Slow", 0.6), ("רגיל", "Normal", 1.0), ("מהיר", "Fast", 1.6), ("מטורף", "Insane", 2.6), ("מבול", "Flood", 4.0)], 1.0),
     ch("gap", 0, "אורך המסע", "Journey length", "כמה דרגות בונים בתוך המיכל לפני שהמשפך מתחיל לגבש את התינוקות לכדור גדול יותר. ארוך = יותר כדורים ויותר זמן", "How many tiers you build in the vessel before the funnel starts clumping the babies into a bigger ball. Longer = more balls, more time",
        &[("קצר", "Short", 2.0), ("רגיל", "Normal", 3.0), ("ארוך", "Long", 4.0), ("אפי", "Epic", 5.0)], 3.0),
-    tg("hard", 0, "מצב קשה", "Hard mode", "אם הבועה מתמלאת עד הגבעול — המשחק נגמר", "If the bubble fills up to the stem, the game is over", 0.0),
+    tg("hard", 0, "מצב קשה (מצבים אוטומטיים)", "Hard mode (automatic modes)", "אם הבועה מתמלאת עד הגבעול — המשחק נגמר", "If the bubble fills up to the stem, the game is over", 0.0),
     tg("combo", 0, "קומבו", "Combos", "מיזוגים ברצף בונים מונה קומבו", "Back-to-back merges build a combo counter", 1.0),
     tg("events", 0, "אירועים אקראיים", "Random events", "שעת עומס, רעידת אדמה, רוח צד, אפס כבידה וסערה מגנטית", "Rush hour, earthquakes, crosswinds, zero-g and magnetic storms", 1.0),
     // ── physics
@@ -184,5 +186,7 @@ mod tests {
         assert_eq!(OPTS[Opt::Events as usize].key, "events");
         assert_eq!(OPTS[Opt::Camera as usize].key, "camera");
         assert_eq!(OPTS[Opt::RingSize as usize].key, "ringsize");
+        assert_eq!(OPTS[Opt::Difficulty as usize].key, "difficulty");
+        assert_eq!(OPTS[Opt::DropRate as usize].key, "droprate");
     }
 }

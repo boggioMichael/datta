@@ -2,6 +2,14 @@
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
 - date: 2026-10-24
   project: lab/omg
+  title: { en: "OH MY GOD: the journey, a game of skill that takes hours", he: "OH MY GOD: המסע, משחק של מיומנות שלוקח שעות" }
+  text:
+    en: "The stem no longer pours by itself: you aim every cell, see the next two, and decide when it falls. A pile that stays above the strain line bursts the bubble and sends you back to the start of the era, every era brings a law of nature to understand — rush hour, crosswinds, tides, thin air, antimatter, the narrow way — and six abilities unlock along the way, charged by chain reactions. Four difficulties, from Relaxed (about two hours) to Epic; at Normal a good player needs four to five hours to reach God. The journey saves itself, so you can stop and carry on later; Watch still plays on its own."
+    he: "הגבעול כבר לא שופך לבד: מכוונים כל תא, רואים את שני הבאים ומחליטים מתי הוא נופל. ערימה שנשארת מעל קו הלחץ מפוצצת את הבועה ומחזירה לתחילת העידן, כל עידן מביא חוק טבע שצריך להבין — שעת עומס, רוח צד, גאות ושפל, אוויר דליל, אנטי־חומר, הדרך הצרה — ושש יכולות נפתחות בדרך, ותגובות שרשרת טוענות אותן. ארבע רמות קושי, מרגוע (בערך שעתיים) ועד אפי; ברמה הרגילה שחקן טוב צריך ארבע עד חמש שעות כדי להגיע לאלוהים. המסע נשמר לבד, אז אפשר לעצור ולהמשיך אחר כך; מצב הצפייה עדיין משחק לבד."
+  link: https://boggiomichael.github.io/datta/omg/
+
+- date: 2026-10-24
+  project: lab/omg
   title: { en: "OH MY GOD 3: a bubble of life, a world that zooms out to the edge of the universe, and creation in your hands", he: "OH MY GOD 3: בועת חיים, עולם שמתרחק עד קצה היקום, והבריאה בידיים שלכם" }
   text:
     en: "The neon ring is gone: every run is a living bubble you can poke and stir, in a world of its own for each of 19 eras that pulls back as the sizes grow, with the next giants floating out of focus behind it. 155 tiers, always from the first baby. Every new era is a moment of evolution on the road from the baby to God, and every new tier is born in a double helix of light. When God is born the bubble bursts and God reads Genesis 1, waiting at every moment of creation for your touch."

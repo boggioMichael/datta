@@ -203,6 +203,82 @@
     sprites.set(key, c);
     return c;
   }
+  // the journey's special cells (OP_ITEM index 1000 + kind): 1 scrap, 2 antimatter, 3 divine
+  function specialSprite(kind, big = false) {
+    const SPR = big ? SPR_L : SPR_S;
+    const key = 'sp' + kind + (big ? 'L' : 'S');
+    let c = sprites.get(key);
+    if (c) return c;
+    c = document.createElement('canvas'); c.width = c.height = SPR;
+    const g = c.getContext('2d');
+    const cx = SPR / 2, cy = SPR / 2, R = SPR * 0.4;
+    let gr;
+    if (kind === 1) {
+      // scrap: a dented lump of rusty metal
+      g.beginPath();
+      for (let k = 0; k <= 18; k++) {
+        const a = k / 18 * TAU;
+        const rr = R * (0.86 + 0.1 * Math.sin(k * 2.7 + 1) + 0.06 * Math.cos(k * 4.3));
+        const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+        if (k === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.closePath();
+      gr = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+      gr.addColorStop(0, '#b8b0a4'); gr.addColorStop(0.55, '#77706a'); gr.addColorStop(1, '#3c3632');
+      g.fillStyle = gr; g.fill();
+      g.lineWidth = R * 0.05; g.strokeStyle = 'rgba(20,16,14,.85)'; g.stroke();
+      g.save(); g.clip();
+      for (const [x, y, rr] of [[-0.35, 0.2, 0.22], [0.28, -0.3, 0.16], [0.3, 0.38, 0.13], [-0.1, -0.5, 0.1]]) {
+        gr = g.createRadialGradient(cx + x * R, cy + y * R, 0, cx + x * R, cy + y * R, rr * R);
+        gr.addColorStop(0, 'rgba(176,84,34,.85)'); gr.addColorStop(1, 'rgba(176,84,34,0)');
+        g.fillStyle = gr; g.fillRect(0, 0, SPR, SPR);
+      }
+      g.strokeStyle = 'rgba(25,20,18,.75)'; g.lineWidth = R * 0.045; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(cx - R * 0.5, cy - R * 0.1); g.lineTo(cx - R * 0.1, cy + R * 0.05); g.lineTo(cx + R * 0.05, cy + R * 0.45); g.stroke();
+      g.beginPath(); g.moveTo(cx + R * 0.2, cy - R * 0.55); g.lineTo(cx + R * 0.45, cy - R * 0.15); g.stroke();
+      g.fillStyle = 'rgba(30,26,24,.9)';
+      for (const [x, y] of [[0.48, 0.12], [-0.52, -0.38], [0.05, -0.2]]) { g.beginPath(); g.arc(cx + x * R, cy + y * R, R * 0.07, 0, TAU); g.fill(); }
+      g.restore();
+      g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(cx - R * 0.35, cy - R * 0.45, R * 0.28, R * 0.12, -0.6, 0, TAU); g.fill();
+    } else if (kind === 2) {
+      // antimatter: a hole of dark matter ringed with violet light
+      gr = g.createRadialGradient(cx, cy, R * 0.7, cx, cy, SPR / 2);
+      gr.addColorStop(0, 'rgba(190,80,255,.55)'); gr.addColorStop(1, 'rgba(190,80,255,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, SPR, SPR);
+      gr = g.createRadialGradient(cx - R * 0.2, cy - R * 0.25, R * 0.05, cx, cy, R);
+      gr.addColorStop(0, '#3a1458'); gr.addColorStop(0.6, '#12041f'); gr.addColorStop(1, '#05000b');
+      g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fillStyle = gr; g.fill();
+      g.lineCap = 'round';
+      for (let k = 0; k < 3; k++) {
+        g.strokeStyle = `rgba(${k === 1 ? '120,230,255' : '226,120,255'},${0.75 - k * 0.15})`; g.lineWidth = R * (0.07 - k * 0.012);
+        g.beginPath(); g.arc(cx, cy, R * (0.78 - k * 0.2), k * 2.1, k * 2.1 + 3.6); g.stroke();
+      }
+      g.lineWidth = R * 0.07; g.strokeStyle = '#e07bff';
+      g.beginPath(); g.arc(cx, cy, R * 0.97, 0, TAU); g.stroke();
+      g.fillStyle = '#fff'; g.font = `800 ${R * 0.62}px Assistant, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('−', cx, cy + R * 0.02);
+    } else {
+      // divine: a golden cell with a star of light in it
+      gr = g.createRadialGradient(cx, cy, R * 0.6, cx, cy, SPR / 2);
+      gr.addColorStop(0, 'rgba(255,214,110,.75)'); gr.addColorStop(1, 'rgba(255,214,110,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, SPR, SPR);
+      gr = g.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.05, cx, cy, R);
+      gr.addColorStop(0, '#fffbe8'); gr.addColorStop(0.45, '#ffd968'); gr.addColorStop(1, '#c98a10');
+      g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fillStyle = gr; g.fill();
+      g.lineWidth = R * 0.05; g.strokeStyle = 'rgba(255,250,225,.95)'; g.beginPath(); g.arc(cx, cy, R * 0.97, 0, TAU); g.stroke();
+      g.fillStyle = '#fff';
+      g.beginPath();
+      for (let k = 0; k < 8; k++) {
+        const a = k / 8 * TAU - Math.PI / 2, rr = k % 2 === 0 ? R * 0.62 : R * 0.16;
+        const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+        if (k === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(cx - R * 0.5, cy - R * 0.5, R * 0.08, 0, TAU); g.fill();
+    }
+    sprites.set(key, c);
+    return c;
+  }
   // plain picture: a tier's illustration (index < 1000) or a story sprite (1000 + i)
   function plainIcon(idx) {
     const key = idx >= 1000 ? (S.story_icons || [])[idx - 1000] : (S.tiers[idx] && S.tiers[idx].icon);
@@ -447,7 +523,7 @@
           const orphan = D[i + 10], hl = D[i + 11], heLbl = D[i + 12] > 0.5, sq = D[i + 13], sqa = D[i + 14];
           ballStyle = D[i + 15] | 0;
           if (r < 0.5) break;
-          const s = sprite(ti, r * DPR > 46);
+          const s = ti >= 1000 ? specialSprite(ti - 1000, r * DPR > 46) : sprite(ti, r * DPR > 46);
           ctx.globalAlpha = a;
           if (ti === S.god) {
             ctx.globalCompositeOperation = 'lighter';
@@ -858,7 +934,7 @@
     prefetch(maxTier) {
       const s0 = S.sounds.sfx0;
       // the long creation sounds (held breath, creation swell) only near the end
-      for (let id = s0; id <= S.sounds.sfx1; id++) if (id !== S.sounds.iam && id < s0 + 23) this.ensure(id);
+      for (let id = s0; id <= S.sounds.sfx1; id++) if (id !== S.sounds.iam && (id < s0 + 23 || id > s0 + 25)) this.ensure(id);
       for (let k = 0; k < 5; k++) this.ensure(S.sounds.note0 + k);
       const lo = Math.max(0, maxTier - 1), hi = Math.min(S.god, maxTier + 5);
       for (let k = lo; k <= hi; k++) this.ensure(k);
@@ -1074,7 +1150,7 @@
         case 4: showEnd(a, b, c, d | 0); break;
         case 5: persist(); break;
         case 6: if (navigator.vibrate) try { navigator.vibrate(a | 0); } catch { /* */ } break;
-        case 7: showOver(a | 0, b | 0, c); break;
+        case 7: showOver(a | 0, b | 0, c, d | 0); break;
         case 8: break;
         case 9: audio.duck(a | 0); break;
         case 10: toolsUI(true); break;
@@ -1134,7 +1210,7 @@
       if (pts.size === 1) X.omg_pointer(0, ...pos(e));
     });
     canvas.addEventListener('pointermove', (e) => {
-      if (!pts.has(e.pointerId)) return;
+      if (!pts.has(e.pointerId)) { if (e.pointerType === 'mouse' && running) X.omg_pointer(4, ...pos(e)); return; }
       pts.set(e.pointerId, pos(e));
       if (pinch && pts.size >= 2) {
         const m = mid();
@@ -1163,7 +1239,7 @@
     $('#btn-zin').addEventListener('click', () => { X.omg_view(0, 1.6, ...centre()); zoomUI(); });
     $('#btn-zout').addEventListener('click', () => { X.omg_view(0, 1 / 1.6, ...centre()); zoomUI(); });
     $('#btn-zauto').addEventListener('click', () => { X.omg_view(2, 0, 0, 0); zoomUI(); });
-    const keys = { ArrowLeft: 1, ArrowRight: 2, ' ': 3, Enter: 3, 1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, '+': 10, '=': 10, '-': 11, _: 11, 0: 12 };
+    const keys = { ArrowLeft: 1, ArrowRight: 2, ' ': 3, Enter: 3, ArrowDown: 13, 1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, '+': 10, '=': 10, '-': 11, _: 11, 0: 12 };
     window.addEventListener('keydown', (e) => {
       if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
       if (e.key === 'Escape') { menuOpen ? closeMenu() : openMenu('modes'); return; }
@@ -1176,8 +1252,9 @@
     window.addEventListener('keyup', (e) => { const k = keys[e.key]; if (k === 1 || k === 2) X.omg_key(k, 0); });
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+    window.addEventListener('pagehide', () => { if (X) persist(); });
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { if (running) X.omg_pause(1); story.pause(true); if (audio.ctx) audio.ctx.suspend().catch(() => {}); }
+      if (document.hidden) { if (running) X.omg_pause(1); persist(); story.pause(true); if (audio.ctx) audio.ctx.suspend().catch(() => {}); }
       else { if (running && !userPaused && !menuOpen) { X.omg_pause(0); story.pause(false); } if (audio.ctx && audio.unlocked) audio.ctx.resume().catch(() => {}); }
     });
   }
@@ -1212,14 +1289,17 @@
         box.appendChild(b);
       });
     }
+    const skill = X.omg_info(32) > 0.5;
     [...box.children].forEach((b, i) => {
       const cd = X.omg_tool_state(i, 0), act = X.omg_tool_state(i, 1), ch = X.omg_tool_state(i, 2), armed = X.omg_tool_state(i, 3);
+      b.hidden = X.omg_tool_state(i, 4) < 0.5;
       b.style.setProperty('--cd', cd.toFixed(3));
       b.classList.toggle('active', act > 0);
       b.classList.toggle('cooling', cd > 0);
       b.classList.toggle('armed', armed > 0);
+      b.classList.toggle('empty', skill && ch < 1);
       const chEl = b.querySelector('.ch');
-      chEl.textContent = S.tools[i].key === 'upgrade' ? String(ch | 0) : '';
+      chEl.textContent = skill || S.tools[i].key === 'upgrade' ? String(ch | 0) : '';
     });
   }
 
@@ -1266,6 +1346,11 @@
     if (menuOpen) showTab(currentTab);
   }
   function setLang(isHe) { he = isHe; X.omg_set_lang(he ? 1 : 0); applyLang(); persist(); }
+  function goHome() {
+    closeMenu(true); running = false; story.stop(); X.omg_pause(1); persist();
+    $('#start').hidden = false; document.body.classList.add('home');
+    buildLadder(); buildModes(); toolsUI(false); sandboxUI();
+  }
 
   function buildLadder() {
     const box = $('#ladder-preview'); box.innerHTML = '';
@@ -1280,7 +1365,7 @@
   function buildModes() {
     const box = $('#mode-list'); box.innerHTML = '';
     S.modes.forEach((m, i) => {
-      const b = document.createElement('button'); b.className = 'mode' + (i === mode ? ' on' : '');
+      const b = document.createElement('button'); b.className = 'mode' + (i === mode ? ' on' : '') + (i === 0 ? ' journey' : '');
       b.innerHTML = `<b>${m.icon}</b><span>${m[he ? 'he' : 'en']}</span>`;
       b.addEventListener('click', () => { mode = i; store.set('omg.mode', String(i)); buildModes(); });
       box.appendChild(b);
@@ -1288,22 +1373,75 @@
     let d = $('#mode-desc');
     if (!d) { d = document.createElement('p'); d.id = 'mode-desc'; d.className = 'mode-desc'; box.after(d); }
     d.textContent = S.modes[mode][he ? 'dhe' : 'den'];
+    // the journey's difficulty
+    let dl = $('#diff-list');
+    if (!dl) { dl = document.createElement('div'); dl.id = 'diff-list'; dl.className = 'diffs'; $('#btn-play').after(dl); }
+    dl.hidden = mode !== 0;
+    dl.innerHTML = '';
+    if (mode === 0) {
+      const cur = Math.round(opt('difficulty'));
+      const chips = document.createElement('div'); chips.className = 'chips';
+      S.diffs.forEach((df, i) => {
+        const c = document.createElement('button'); c.className = 'chip' + (i === cur ? ' on' : ''); c.textContent = df[he ? 'he' : 'en'];
+        c.addEventListener('click', () => { X.omg_set_opt(optIndex('difficulty'), i); persist(); buildModes(); });
+        chips.appendChild(c);
+      });
+      const p = document.createElement('p'); p.className = 'diff-desc'; p.textContent = S.diffs[cur] ? S.diffs[cur][he ? 'dhe' : 'den'] : '';
+      dl.append(chips, p);
+    }
+    // continue the journey in progress
+    const sj = savedJourney();
+    const cb = $('#btn-continue');
+    cb.hidden = !sj;
+    if (sj) {
+      $('#continue-info').textContent = `${S.cats[sj[0]][he ? 'he' : 'en']} · ${fmtTime(sj[1])} · ${S.diffs[sj[2]] ? S.diffs[sj[2]][he ? 'he' : 'en'] : ''}`;
+    }
+    $('#btn-play').querySelector('span').textContent = mode === 0 && sj ? t('new_journey') : t('play');
+    $('#btn-play').classList.toggle('second', mode === 0 && !!sj);
   }
 
-  function startGame(m = mode) {
-    audio.unlock();
-    mode = m; store.set('omg.mode', String(m));
+  // a journey kept to continue: [era, seconds, difficulty, tier] or null
+  function savedJourney() {
+    if (!X || X.omg_run_info(0) < 0.5) return null;
+    return [X.omg_run_info(1) | 0, X.omg_run_info(2), X.omg_run_info(3) | 0, X.omg_run_info(4) | 0];
+  }
+  let confirmNew = 0;
+  function enterGame() {
     $('#start').hidden = true; $('#end').hidden = true;
     document.body.classList.remove('home');
     closeMenu(true);
     story.stop();
-    X.omg_start(m);
     running = true; userPaused = false;
     X.omg_pause(0);
     $('#btn-pause').classList.remove('paused');
     lastMax = -1;
     toolsUI(true); sandboxUI();
     audio.prefetch(X.omg_info(5) | 0);
+  }
+  function startGame(m = mode, force = false) {
+    audio.unlock();
+    // a new journey replaces the one in progress: ask once
+    if (m === 0 && !force && savedJourney() && !(running && X.omg_info(4) === 0 && X.omg_info(2) > 0.5)) {
+      if (performance.now() - confirmNew > 4000) { confirmNew = performance.now(); toast(t('new_journey_q')); return; }
+    }
+    confirmNew = 0;
+    mode = m; store.set('omg.mode', String(m));
+    X.omg_start(m);
+    enterGame();
+    persist();
+  }
+  function continueJourney() {
+    audio.unlock(); story.unlock();
+    mode = 0; store.set('omg.mode', '0');
+    if (!X.omg_continue()) { startGame(0, true); return; }
+    enterGame();
+  }
+  function retryEra() {
+    audio.unlock();
+    X.omg_retry();
+    $('#end').hidden = true;
+    if (!running) enterGame();
+    toolsUI(true);
   }
   function togglePause() {
     userPaused = !userPaused;
@@ -1312,7 +1450,10 @@
     $('#btn-pause').classList.toggle('paused', userPaused);
     if (audio.ctx) userPaused ? audio.ctx.suspend().catch(() => {}) : audio.ctx.resume().catch(() => {});
   }
-  function fmtTime(s) { const m = Math.floor(s / 60); const r = s - m * 60; return `${m}:${String(Math.floor(r)).padStart(2, '0')}.${Math.floor((r % 1) * 10)}`; }
+  function fmtTime(s) {
+    if (s >= 3600) { const h = Math.floor(s / 3600), m = Math.floor((s - h * 3600) / 60), r = Math.floor(s % 60); return `${h}:${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`; }
+    const m = Math.floor(s / 60); const r = s - m * 60; return `${m}:${String(Math.floor(r)).padStart(2, '0')}.${Math.floor((r % 1) * 10)}`;
+  }
 
   // a big number for the menus (HTML): 12, 3.4K … 1.2T, then 10 with a raised exponent, always left to right
   function fmtPow(log10, prefix = '') {
@@ -1343,24 +1484,55 @@
     box.append(head, row);
   }
   function showEnd(time, merges, drops, m) {
-    const el = $('#end'); el.classList.add('god');
+    const el = $('#end'); el.classList.add('god'); el.classList.remove('burst');
+    endKind = 'god';
+    $('#btn-again').textContent = t('again');
+    $('#btn-end-rec').hidden = false;
     $('#end-title').textContent = t('end_title');
     $('#end-sub').textContent = t('end_story');
     const best = X.omg_stat(10 + m);
-    const st = $('#end-stats'); st.classList.add('five');
+    const st = $('#end-stats'); st.classList.add('five'); st.classList.toggle('six', m === 0);
     st.innerHTML = `<div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${merges | 0}</dd></div><div><dt>${t('end_drops')}</dt><dd>${drops | 0}</dd></div>`
-      + `<div><dt>👶 ${t('end_babies')}</dt><dd>${fmtPow(X.omg_info(15))}</dd></div><div><dt>🔍 ${t('end_zoom')}</dt><dd>${fmtPow(X.omg_info(16), '×')}</dd></div>`;
+      + `<div><dt>👶 ${t('end_babies')}</dt><dd>${fmtPow(X.omg_info(15))}</dd></div><div><dt>🔍 ${t('end_zoom')}</dt><dd>${fmtPow(X.omg_info(16), '×')}</dd></div>`
+      + (m === 0 ? `<div><dt>💥 ${t('bursts')}</dt><dd>${X.omg_info(35) | 0}</dd></div>` : '');
     evolutionUI();
     const rec = $('#end-record');
+    rec.classList.remove('mercy');
     rec.hidden = !(best > 0 && Math.abs(best - time) < 0.05 && [0, 2, 3, 4, 5].includes(m));
     rec.textContent = t('end_record');
     $('#btn-stay').hidden = false;
     el.hidden = false;
     persist();
   }
-  function showOver(reason, top, time) {
+  let endKind = '';
+  function showOver(reason, top, time, era) {
     const el = $('#end'); el.classList.remove('god');
-    $('#end-stats').classList.remove('five');
+    $('#end-stats').classList.remove('five', 'six');
+    if (reason === 2) {
+      // the journey: the bubble burst under the strain — back to the start of the era
+      endKind = 'burst';
+      el.classList.add('burst');
+      $('#end-title').textContent = t('burst_title');
+      $('#end-sub').textContent = `${t('burst_sub')}: ${S.cats[era] ? S.cats[era][he ? 'he' : 'en'] : ''}`;
+      $('#end-stats').innerHTML = `<div><dt>${t('attempt')}</dt><dd>${(X.omg_info(34) | 0) + 1}</dd></div><div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('tier')}</dt><dd>${top + 1}/${S.n}</dd></div>`;
+      evolutionUI();
+      // every burst in the same era makes the bubble a little more patient
+      const mercy = $('#end-record');
+      mercy.textContent = t(X.omg_info(45) > 0.5 ? 'mercy' : 'mercy_max');
+      mercy.classList.add('mercy');
+      mercy.hidden = false;
+      $('#btn-again').textContent = t('retry');
+      $('#btn-stay').hidden = true;
+      $('#btn-end-rec').hidden = true;
+      el.hidden = false;
+      persist();
+      return;
+    }
+    endKind = 'over';
+    el.classList.remove('burst');
+    $('#end-record').classList.remove('mercy');
+    $('#btn-again').textContent = t('again');
+    $('#btn-end-rec').hidden = false;
     $('#end-title').textContent = reason === 1 ? t('over_time') : t('over_jam');
     $('#end-sub').textContent = `${t('over_reached')}: ${tierName(top)}`;
     $('#end-stats').innerHTML = `<div><dt>${t('tier')}</dt><dd>${top + 1}/${S.n}</dd></div><div><dt>${t('end_time')}</dt><dd>${fmtTime(time)}</dd></div><div><dt>${t('end_merges')}</dt><dd>${X.omg_info(8) | 0}</dd></div>`;
@@ -1419,10 +1591,21 @@
     draw();
     const go = document.createElement('button'); go.className = 'cta'; go.textContent = t('play');
     go.addEventListener('click', () => startGame(sel));
+    let cont = null;
+    if (savedJourney() && !(running && X.omg_info(4) === 0)) {
+      cont = document.createElement('button'); cont.className = 'cta'; cont.textContent = t('continue');
+      cont.addEventListener('click', () => continueJourney());
+    }
     const wrap = document.createElement('div'); wrap.style.cssText = 'display:grid;gap:14px;justify-items:center';
     wrap.append(list, desc, go);
+    if (cont) wrap.prepend(cont);
     const how = document.createElement('div'); how.className = 'about';
-    how.innerHTML = `<h3>${t('how')}</h3><ul class="how"><li>${t('how1')}</li><li>${t('how2')}</li><li>${t('how3')}</li></ul><h3>${t('tools')}</h3><ul class="tool-list">${S.tools.map((x) => `<li><b>${x.icon}</b><span><strong>${x[he ? 'he' : 'en']}</strong> — ${x[he ? 'dhe' : 'den']}</span></li>`).join('')}</ul>`;
+    const laws = S.laws.map((l, e) => {
+      if (!l.icon) return '';
+      const met = !!X.omg_unlocked(S.cats[e].first);
+      return `<li><b>${met ? l.icon : '?'}</b><span><strong>${S.cats[e][he ? 'he' : 'en']} · ${met ? l[he ? 'he' : 'en'] : '???'}</strong>${met ? ' — ' + l[he ? 'dhe' : 'den'] : ''}</span></li>`;
+    }).join('');
+    how.innerHTML = `<h3>${t('how')}</h3><ul class="how"><li>${t('how1')}</li><li>${t('how2')}</li><li>${t('how3')}</li></ul><h3>${t('laws')}</h3><ul class="tool-list">${laws}</ul><h3>${t('tools')}</h3><ul class="tool-list">${S.tools.map((x) => `<li><b>${x.icon}</b><span><strong>${x[he ? 'he' : 'en']}</strong> — ${x[he ? 'dhe' : 'den']}</span></li>`).join('')}</ul>`;
     body.append(wrap, how);
   }
   function tabSettings(body) {
@@ -1510,7 +1693,8 @@
     const ta = X.omg_stat(7) | 0; if (ta > 0) rows.push(['s_ta', tierName(ta)]);
     const box = document.createElement('div'); box.className = 'stats';
     for (const [k, v] of rows) box.insertAdjacentHTML('beforeend', `<div>${t(k)}</div><div>${v}</div>`);
-    S.modes.forEach((m, i) => { const b = X.omg_stat(10 + i); if (b > 0) box.insertAdjacentHTML('beforeend', `<div>${t('best')} · ${m[he ? 'he' : 'en']}</div><div>${fmtTime(b)}</div>`); });
+    S.modes.forEach((m, i) => { if (i === 0) return; const b = X.omg_stat(10 + i); if (b > 0) box.insertAdjacentHTML('beforeend', `<div>${t('best')} · ${m[he ? 'he' : 'en']}</div><div>${fmtTime(b)}</div>`); });
+    S.diffs.forEach((df, i) => { const b = X.omg_best_journey(i); if (b > 0) box.insertAdjacentHTML('beforeend', `<div>${t('s_journey')} · ${df[he ? 'he' : 'en']}</div><div>${fmtTime(b)}</div>`); });
     body.appendChild(box);
   }
   function tabAbout(body) {
@@ -1583,18 +1767,20 @@
   // ───────────────────────── wiring
   function bindUI() {
     $('#btn-play').addEventListener('click', () => { story.unlock(); startGame(mode); });
+    $('#btn-continue').addEventListener('click', () => continueJourney());
     $('#btn-lang').addEventListener('click', () => setLang(!he));
     $('#btn-start-settings').addEventListener('click', () => openMenu('settings'));
     $('#btn-menu').addEventListener('click', () => { audio.unlock(); openMenu('modes'); });
     $('#btn-close').addEventListener('click', () => closeMenu());
     $('#btn-resume').addEventListener('click', () => closeMenu());
     $('#btn-restart').addEventListener('click', () => startGame(X.omg_info(4) | 0));
-    $('#btn-home').addEventListener('click', () => { closeMenu(true); running = false; story.stop(); X.omg_pause(1); $('#start').hidden = false; document.body.classList.add('home'); buildLadder(); buildModes(); toolsUI(false); sandboxUI(); });
+    $('#btn-end-home').addEventListener('click', () => { $('#end').hidden = true; goHome(); });
+    $('#btn-home').addEventListener('click', () => goHome());
     $('#story-skip').addEventListener('click', () => { X.omg_story_skip(); });
     $('#btn-sound').addEventListener('click', () => { audio.unlock(); audio.toggleMute(); });
     $('#btn-pause').addEventListener('click', () => togglePause());
     $('#btn-rec').addEventListener('click', () => rec.start());
-    $('#btn-again').addEventListener('click', () => startGame(X.omg_info(4) | 0));
+    $('#btn-again').addEventListener('click', () => { if (endKind === 'burst') retryEra(); else startGame(X.omg_info(4) | 0, true); });
     $('#btn-stay').addEventListener('click', () => { $('#end').hidden = true; });
     $('#btn-end-rec').addEventListener('click', () => { $('#end').hidden = true; startGame(X.omg_info(4) | 0); rec.start(); });
     $('#video-close').addEventListener('click', () => { $('#video-ready').hidden = true; });
