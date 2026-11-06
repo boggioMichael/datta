@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E3B33">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="קופת הלא">
+<title>קופת הלא · DATTA</title>
+<meta name="description" content="קופת חיסכון מנטלית: כל לא שאתה אומר לעצמך נכנס לקופה.">
+<meta property="og:title" content="קופת הלא · The No Bank">
+<meta property="og:description" content="קופת חיסכון מנטלית: כל לא שאתה אומר לעצמך נכנס לקופה. · Every no you say to yourself goes in the bank.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://boggiomichael.github.io/datta/piggy/icons/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preload" href="../fonts/frankruhllibre.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/assistant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="piggy.css">
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="bar">
+    <nav class="plans" id="plans" data-i18n-attr="aria-label:plans.label"></nav>
+    <button class="icon-btn" id="open-settings" type="button" data-i18n-attr="aria-label:settings.open;title:settings.open">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1"/><path d="M19.4 13.5c.05-.5.05-1 0-1.5l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.3-.75L15.3 4.7h-4l-.4 2.55c-.46.2-.9.45-1.3.75l-2.4-1-2 3.4 2 1.6c-.05.5-.05 1 0 1.5l-2 1.6 2 3.4 2.4-1c.4.3.84.55 1.3.75l.4 2.55h4l.4-2.55c.46-.2.9-.45 1.3-.75l2.4 1 2-3.4z"/></svg>
+    </button>
+  </header>
+
+  <section class="vault">
+    <div class="register" id="register"></div>
+    <div class="goal" id="goal" hidden>
+      <div class="goal-rail"><span class="goal-fill" id="goal-fill"></span></div>
+      <p class="goal-caption" id="goal-caption"></p>
+    </div>
+  </section>
+
+  <section class="stage" id="stage">
+    <div class="rosette" id="rosette" aria-hidden="true"></div>
+    <div class="pig-shadow" id="pig-shadow" aria-hidden="true"></div>
+    <button class="pig" id="pig" type="button">
+      <span class="pig-jump" id="pig-jump"><span class="pig-squash" id="pig-squash"><span class="pig-fat" id="pig-fat"><span class="pig-breathe" id="pig-art"></span></span></span></span>
+    </button>
+    <div class="toast" id="toast" role="status" hidden>
+      <span class="toast-text" id="toast-text"></span>
+      <button class="toast-action" id="toast-action" type="button" hidden></button>
+    </div>
+  </section>
+
+  <p class="today" id="today"></p>
+
+  <fieldset class="sizes" id="sizes">
+    <legend class="sr-only" data-i18n="sizes.legend"></legend>
+  </fieldset>
+
+  <footer class="foot">
+    <button class="text-btn" id="open-history" type="button" data-i18n="history.open"></button>
+  </footer>
+</div>
+
+<div class="drop-clip" id="drop-clip" aria-hidden="true"></div>
+<div class="float-layer" id="float-layer" aria-hidden="true"></div>
+<canvas class="fx" id="fx" aria-hidden="true"></canvas>
+<svg class="defs" id="defs" width="0" height="0" aria-hidden="true" focusable="false"></svg>
+<a class="sr-only" id="download" hidden></a>
+<input class="sr-only" id="import-file" type="file" accept=".json,application/json" hidden>
+
+<!-- New / edit a plan -->
+<dialog class="sheet" id="editor" aria-labelledby="editor-title">
+  <form class="sheet-body" id="editor-form" novalidate>
+    <header class="sheet-head">
+      <h2 id="editor-title"></h2>
+      <button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:dialog.close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </header>
+    <label class="field">
+      <span class="field-label" data-i18n="editor.name"></span>
+      <input class="text-input" id="editor-name" type="text" autocomplete="off" enterkeyhint="done" data-i18n-attr="placeholder:editor.namePlaceholder">
+    </label>
+    <fieldset class="field">
+      <legend class="field-label" data-i18n="editor.glaze"></legend>
+      <div class="glazes" id="editor-glazes"></div>
+    </fieldset>
+    <label class="field">
+      <span class="field-label" data-i18n="editor.goal"></span>
+      <span class="money-input"><span class="money-input-symbol" data-currency-symbol aria-hidden="true"></span><input id="editor-goal" type="number" inputmode="numeric" min="0" step="1"></span>
+      <span class="field-hint" data-i18n="editor.goalHint"></span>
+    </label>
+    <fieldset class="field">
+      <legend class="field-label" data-i18n="editor.amounts"></legend>
+      <div class="amounts" id="editor-amounts"></div>
+    </fieldset>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" id="editor-submit" type="submit"></button>
+      <button class="btn" type="button" data-close data-i18n="editor.cancel"></button>
+    </div>
+    <div class="danger" id="editor-danger">
+      <button class="btn btn-quiet" id="editor-break" type="button" data-i18n="editor.break"></button>
+      <p class="field-hint" data-i18n="editor.breakHint"></p>
+      <button class="btn btn-danger" id="editor-delete" type="button" data-i18n="editor.delete"></button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Settings -->
+<dialog class="sheet" id="settings" aria-labelledby="settings-title">
+  <div class="sheet-body">
+    <header class="sheet-head">
+      <h2 id="settings-title" data-i18n="settings.title"></h2>
+      <button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:dialog.close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </header>
+    <fieldset class="field">
+      <legend class="field-label" data-i18n="settings.language"></legend>
+      <div class="segmented" id="settings-locales"></div>
+    </fieldset>
+    <label class="field field-row">
+      <span class="field-label" data-i18n="settings.sound"></span>
+      <input class="switch" id="settings-sound" type="checkbox" role="switch">
+    </label>
+    <fieldset class="field">
+      <legend class="field-label" data-i18n="settings.currency"></legend>
+      <div class="segmented" id="settings-currencies"></div>
+    </fieldset>
+    <section class="field">
+      <h3 class="field-label" data-i18n="settings.backup"></h3>
+      <p class="field-hint" data-i18n="settings.backupHint"></p>
+      <div class="row">
+        <button class="btn" id="settings-export" type="button" data-i18n="settings.export"></button>
+        <button class="btn" id="settings-import" type="button" data-i18n="settings.import"></button>
+      </div>
+    </section>
+    <p class="field-hint" data-i18n="settings.install"></p>
+    <a class="text-btn" id="settings-site" href="../he/" data-i18n="settings.site"></a>
+  </div>
+</dialog>
+
+<!-- History of the active plan -->
+<dialog class="sheet sheet-tall" id="history" aria-labelledby="history-title">
+  <div class="sheet-body">
+    <header class="sheet-head">
+      <h2 id="history-title"></h2>
+      <button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:dialog.close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </header>
+    <dl class="summary" id="history-summary"></dl>
+    <p class="field-hint history-empty" id="history-empty" data-i18n="history.empty" hidden></p>
+    <div class="history-list" id="history-list"></div>
+    <button class="text-btn" id="history-more" type="button" data-i18n="history.more" hidden></button>
+    <section class="rounds" id="history-rounds" hidden>
+      <h3 class="field-label" data-i18n="history.rounds"></h3>
+      <ul class="round-list" id="history-rounds-list"></ul>
+    </section>
+  </div>
+</dialog>
+
+<!-- Confirm -->
+<dialog class="sheet sheet-confirm" id="confirm" aria-labelledby="confirm-title">
+  <form class="sheet-body" method="dialog">
+    <h2 id="confirm-title"></h2>
+    <p class="confirm-body" id="confirm-body"></p>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" id="confirm-ok" value="ok"></button>
+      <button class="btn" value="cancel" data-i18n="confirm.cancel"></button>
+    </div>
+  </form>
+</dialog>
+
+<template id="tpl-tab"><button class="plan-tab" type="button"><span class="plan-dot" data-part="dot"></span><span class="plan-name" data-part="name"></span><svg class="plan-edit" data-part="edit" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5h3.8L19 8.8 15.2 5 4.5 15.7z"/></svg></button></template>
+<template id="tpl-add"><button class="plan-add" type="button" data-add data-i18n-attr="aria-label:plan.add;title:plan.add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></template>
+<template id="tpl-size"><label class="size"><input type="radio" data-part="input"><span class="size-money" data-part="money" aria-hidden="true"></span><span class="size-name" data-part="name"></span><span class="size-amount" data-part="amount"></span></label></template>
+<template id="tpl-glaze"><label class="glaze"><input type="radio" data-part="input"><span class="glaze-swatch" data-part="swatch" aria-hidden="true"></span><span class="sr-only" data-part="name"></span></label></template>
+<template id="tpl-amount"><label class="amount-row"><span class="amount-money" data-part="money" aria-hidden="true"></span><span class="amount-name" data-part="name"></span><span class="money-input"><span class="money-input-symbol" data-part="symbol" aria-hidden="true"></span><input type="number" inputmode="numeric" step="1" data-part="input"></span></label></template>
+<template id="tpl-segment"><label class="segment"><input type="radio" data-part="input"><span data-part="label"></span></label></template>
+<template id="tpl-summary"><div class="summary-row"><dt data-part="label"></dt><dd data-part="count"></dd><dd class="summary-amount" data-part="amount"></dd></div></template>
+<template id="tpl-day"><section class="history-day"><h3 class="history-day-head"><span data-part="label"></span><span class="history-day-total" data-part="total"></span></h3><ul class="history-rows" data-part="rows"></ul></section></template>
+<template id="tpl-row"><li class="history-row"><time class="history-time" data-part="time"></time><span class="history-size" data-part="size"></span><span class="history-amount" data-part="amount"></span><button class="history-remove" type="button" data-part="remove"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button></li></template>
+<template id="tpl-round"><li class="round"><span class="round-dates" data-part="dates"></span><span class="round-count" data-part="count"></span><span class="round-total" data-part="total"></span></li></template>
+
+<noscript><p class="noscript">כדי להשתמש בקופה צריך להפעיל JavaScript. · The bank needs JavaScript to work.</p></noscript>
+</body>
+</html>
