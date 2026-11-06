@@ -1,10 +1,12 @@
 // The No Bank's sharing server (server/piggy): accounts, banks, visibility, CORS and files.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createPiggyServer } from "../server/piggy/server.mjs";
+import { startTunnel, tunnelCommands } from "../server/piggy/tunnel.mjs";
+import { MESSAGES } from "../server/piggy/settings.mjs";
 import { CONFIG, VISIBILITY } from "../public/piggy/js/config.js";
 
 const KEY_A = "a".repeat(43);
@@ -125,4 +127,29 @@ test("a bank that isn't valid is cleaned before it is stored", async (t) => {
   } finally {
     await close();
   }
+});
+
+test("cloudflared is looked for in its install folders when it isn't on the PATH", () => {
+  const [present, absent] = [join("opt", "present"), join("opt", "absent")];
+  const commands = tunnelCommands({ command: "cloudflared", installed: [absent, present] }, (path) => path === present);
+  assert.deepEqual(commands, ["cloudflared", present]);
+});
+
+test("the tunnel falls back to an installed copy, and says so when there is none", { skip: process.platform === "win32" }, async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "piggy-tunnel-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const address = "https://quiet-river-1234.trycloudflare.com";
+  const fake = join(dir, "cloudflared");
+  writeFileSync(fake, `#!/bin/sh\necho "INF | ${address} |"\nsleep 5\n`, { mode: 0o755 });
+  const missing = join(dir, "not-installed");
+
+  const found = await new Promise((resolve) => {
+    const tunnel = startTunnel({ port: 1, log: quiet, commands: [missing, fake], onUrl: (url) => { tunnel.stop(); resolve(url); } });
+  });
+  assert.equal(found, address);
+
+  const warned = await new Promise((resolve) => {
+    startTunnel({ port: 1, commands: [missing], onUrl: () => resolve(null), log: { ...quiet, warn: resolve } });
+  });
+  assert.equal(warned, MESSAGES.tunnelMissing);
 });

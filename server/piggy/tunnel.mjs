@@ -2,20 +2,27 @@
 // restarted if it drops. Each new address is published as server.json on its own branch of the
 // site's repository, where the page looks for it — so nobody has to copy addresses around.
 import { spawn, execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import { SETTINGS, MESSAGES } from "./settings.mjs";
 
 const GIT = "git";
 const NOT_FOUND = "ENOENT";
 const FILE_MODE = "100644 blob";
 
-export function startTunnel({ port, onUrl, log = console }) {
-  const { command, args, url: pattern, restartMs } = SETTINGS.tunnel;
+/** cloudflared as configured, then every installed copy that the PATH of this window may not know about. */
+export function tunnelCommands({ command, installed } = SETTINGS.tunnel, exists = existsSync) {
+  return [command, ...installed.filter((path) => path !== command && exists(path))];
+}
+
+export function startTunnel({ port, onUrl, log = console, commands = tunnelCommands() }) {
+  const { args, url: pattern, restartMs } = SETTINGS.tunnel;
   let child = null;
   let stopped = false;
+  let pick = 0;
 
   function run() {
     let announced = false;
-    child = spawn(command, args(port), { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+    child = spawn(commands[pick], args(port), { stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
     const scan = (chunk) => {
       const match = String(chunk).match(pattern);
       if (!match || announced) return;
@@ -24,8 +31,13 @@ export function startTunnel({ port, onUrl, log = console }) {
     };
     child.stdout.on("data", scan);
     child.stderr.on("data", scan);
+    // A command that can't start emits only "error" (never "exit"): try the next copy, if any.
     child.on("error", (error) => {
-      if (error.code === NOT_FOUND) { stopped = true; log.warn(MESSAGES.tunnelMissing); } else log.error(error);
+      if (stopped) return;
+      pick += 1;
+      if (pick < commands.length) { run(); return; }
+      stopped = true;
+      if (error.code === NOT_FOUND) log.warn(MESSAGES.tunnelMissing); else log.error(error);
     });
     child.on("exit", () => {
       if (stopped) return;

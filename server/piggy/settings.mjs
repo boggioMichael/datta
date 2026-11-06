@@ -6,6 +6,13 @@ import { CONFIG, VISIBILITY } from "../../public/piggy/js/config.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const env = process.env;
+const WINDOWS = process.platform === "win32";
+const TUNNEL_BINARY = WINDOWS ? "cloudflared.exe" : "cloudflared";
+// Where the usual installers put cloudflared. Used when it isn't on the PATH of the window the
+// server runs in, e.g. a terminal that was already open when cloudflared was installed.
+const TUNNEL_DIRS = WINDOWS
+  ? [[env["ProgramFiles(x86)"], "cloudflared"], [env.ProgramFiles, "cloudflared"], [env.LOCALAPPDATA, "Microsoft", "WinGet", "Links"]]
+  : [["/opt/homebrew/bin"], ["/usr/local/bin"]];
 
 export { CONFIG, VISIBILITY };
 
@@ -34,6 +41,7 @@ export const SETTINGS = Object.freeze({
   tunnel: {
     enabled: env.PIGGY_TUNNEL !== "0",
     command: env.PIGGY_CLOUDFLARED || "cloudflared",
+    installed: TUNNEL_DIRS.filter(([base]) => base).map((parts) => join(...parts, TUNNEL_BINARY)),
     args: (port) => ["tunnel", "--no-autoupdate", "--url", `http://127.0.0.1:${port}`],
     url: /https:\/\/(?!api\.)[a-z0-9-]+\.trycloudflare\.com/,
     restartMs: 10000,
