@@ -17,6 +17,7 @@
 <link rel="icon" href="../favicon.svg">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="stylesheet" href="omg.css">
+<script type="module" src="../shared/datta-home.js"></script>
 </head>
 <body>
 <canvas id="game" aria-label="OH MY GOD"></canvas>
@@ -41,6 +42,7 @@
 </div>
 
 <section id="start" class="screen">
+  <datta-home class="omg-home"></datta-home>
   <div class="start-inner">
     <p class="eyebrow">DATTA · GAME</p>
     <h1 class="logo"><span>OH</span> <span>MY</span> <span>GOD</span></h1>
@@ -65,6 +67,7 @@
 <section id="menu" class="sheet" hidden>
   <div class="sheet-inner">
     <header class="sheet-head">
+      <datta-home class="omg-sheet-home"></datta-home>
       <nav class="tabs" id="tabs"></nav>
       <button class="ib close" id="btn-close" aria-label="סגור"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </header>

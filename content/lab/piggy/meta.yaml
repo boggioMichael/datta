@@ -1,0 +1,35 @@
+title: { en: "The No Bank", he: "קופת הלא" }
+subtitle: { en: "A piggy bank for every no you say to yourself, and a window onto other people's.", he: "קופה לכל לא שאומרים לעצמנו, וחלון לקופות של אחרים." }
+summary:
+  en: "A mental savings plan. Every time you say no to something you want but know is bad for you, you tap the pig and play money drops into its slot: a coin for a small no, a bill or a gold bar for a big one. Every plan is a pig of its own, with a goal that turns it gold and a daily report of every no. A bank can be shown to everyone, with its name or without it, and anyone can watch the banks others chose to show."
+  he: "תוכנית חיסכון מנטלית. בכל פעם שאומרים לא למשהו שרוצים אבל יודעים שהוא רע לנו, מקישים על החזיר וכסף מדומה נופל לחריץ: מטבע ללא קטן, שטר או מטיל זהב ללא גדול. כל תוכנית היא חזיר משלה, עם יעד שמזהיב אותו ודוח יומי של כל הלא. אפשר להראות קופה לכולם, עם השם שלה או בלעדיו, וכל אחד יכול לצפות בקופות שאחרים בחרו להראות."
+category: { en: "Tool · JavaScript + Node", he: "כלי · JavaScript ו-Node" }
+status: live
+started: "2026-11"
+updated: "2026-11-06"
+order: 1
+accent: "#D8A941"
+demo: https://boggiomichael.github.io/datta/piggy/
+languages: ["JavaScript", "Node.js"]
+milestone: { en: "Banks you can share, with a daily report, from a server on the studio's own computer", he: "קופות שאפשר לשתף, עם דוח יומי, משרת שרץ על המחשב של הסטודיו" }
+builtLevels:
+  built:
+    en:
+      - "Four sizes of no, each with its own money and sound: a nickel coin, a brass coin, a bill that flutters in and a gold bar followed by a shower of coins; a register of rolling number wheels with real carries"
+      - "Several banks, each a pig with its own colour, goal and worth for each size of no; the pig grows rounder as it fills and turns gold at the goal; undo, history, and breaking the bank with a hammer into a round of history"
+      - "A daily report: no's per day as columns over two weeks, a month or three months, with the days that had a no, the daily average and the best day"
+      - "Sharing with no sign-up: every device opens an account by itself from a random key it keeps; each bank is private, public, or public without its name; anyone can browse the shown banks and watch new coins fly in; the key moves an account to another device"
+      - "Works offline and installs to the home screen; local-first, so a tap never waits for the server; Hebrew and English; every sound synthesised in the browser; no libraries"
+    he:
+      - "ארבעה גדלים של לא, לכל אחד כסף וצליל משלו: מטבע ניקל, מטבע פליז, שטר שמתנופף פנימה ומטיל זהב שאחריו גשם מטבעות; מונה של גלגלי ספרות מסתובבים עם העברה אמיתית בין הספרות"
+      - "כמה קופות, כל אחת חזיר עם צבע, יעד ושווי לכל גודל של לא; החזיר מתעגל ככל שהוא מתמלא ומוזהב כשמגיע ליעד; ביטול, היסטוריה ושבירת הקופה בפטיש לסבב שנשמר בהיסטוריה"
+      - "דוח יומי: מספר הלא בכל יום כעמודות לאורך שבועיים, חודש או שלושה חודשים, עם הימים שהיה בהם לא, הממוצע היומי והשיא"
+      - "שיתוף בלי הרשמה: כל מכשיר פותח חשבון לבד ממפתח אקראי שהוא שומר; כל קופה פרטית, ציבורית או ציבורית בלי השם שלה; כל אחד יכול לדפדף בקופות שמוצגות ולראות מטבעות חדשים נופלים פנימה; המפתח מעביר חשבון למכשיר אחר"
+      - "עובד בלי רשת ונכנס למסך הבית; הכול נשמר קודם במכשיר, אז הקשה אף פעם לא מחכה לשרת; עברית ואנגלית; כל צליל מסונתז בדפדפן; בלי ספריות"
+  prototyped:
+    en:
+      - "The sharing server runs on the studio's own computer for now, reached through a Cloudflare tunnel. While it is off, banks keep saving on each device and go up when it is back, and other people's banks can't be shown"
+    he:
+      - "שרת השיתוף רץ בינתיים על המחשב של הסטודיו, דרך מנהרה של Cloudflare. כשהוא כבוי, הקופות ממשיכות להישמר בכל מכשיר ועולות כשהוא חוזר, ואי אפשר לראות קופות של אחרים"
+related:
+  - lab/datta-site

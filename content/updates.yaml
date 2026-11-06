@@ -1,5 +1,21 @@
 # Build log. One entry per real event. Newest can go anywhere — the build sorts by date.
 # Fields: date (YYYY-MM-DD), project (collection/slug, optional), title {en, he}, text {en, he} (optional), link (optional).
+- date: 2026-11-06
+  project: lab/piggy
+  title: { en: "The No Bank: share a bank, and a daily report of every no", he: "קופת הלא: לשתף קופה, ודוח יומי של כל לא" }
+  text:
+    en: "Every device now opens an account by itself, with no sign-up, and each bank can be private, shown to everyone, or shown without its name. Anyone can browse the shown banks and watch new coins fly into someone else's pig, look only. Every bank's history opens on a daily report: no's per day as columns, the days that had one, the daily average and the best day. The sharing server runs on the studio's own computer for now."
+    he: "כל מכשיר פותח עכשיו חשבון לבד, בלי הרשמה, וכל קופה יכולה להיות פרטית, מוצגת לכולם או מוצגת בלי השם שלה. כל אחד יכול לדפדף בקופות שמוצגות ולראות מטבעות חדשים נופלים לחזיר של מישהו אחר, רק לצפייה. ההיסטוריה של כל קופה נפתחת בדוח יומי: מספר הלא בכל יום כעמודות, הימים שהיה בהם לא, הממוצע היומי והשיא. שרת השיתוף רץ בינתיים על המחשב של הסטודיו."
+  link: https://boggiomichael.github.io/datta/piggy/
+
+- date: 2026-11-06
+  project: lab/piggy
+  title: { en: "The No Bank: a piggy bank for every no", he: "קופת הלא: קופה לכל לא" }
+  text:
+    en: "A mental savings plan: tap the pig every time you say no to yourself, and the size of the no drops in as a coin, a bill or a gold bar while a tin-bank register rolls the total. Several plans, each a pig with its own colour and goal; undo, history and a hammer to break the bank. Hebrew and English, offline, installs to the home screen."
+    he: "תוכנית חיסכון מנטלית: מקישים על החזיר בכל פעם שאומרים לעצמנו לא, והגודל של הלא נופל פנימה כמטבע, שטר או מטיל זהב בזמן שמונה של קופת פח מגלגל את הסכום. כמה תוכניות, כל אחת חזיר עם צבע ויעד משלו; ביטול, היסטוריה ופטיש לשבירת הקופה. עברית ואנגלית, בלי רשת, ונכנס למסך הבית."
+  link: https://boggiomichael.github.io/datta/piggy/
+
 - date: 2026-10-24
   project: lab/omg
   title: { en: "OH MY GOD: reels that fit in a minute", he: "OH MY GOD: רילז שנכנס בדקה" }

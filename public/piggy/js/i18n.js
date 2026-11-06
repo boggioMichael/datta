@@ -11,6 +11,7 @@ const ATTR_PAIR = ':';
 const DAY_MS = 86400000;
 const WEEK_DAYS = 7;
 const DAY_UNIT = 'day';
+const RELATIVE_UNITS = Object.freeze([['day', 86400], ['hour', 3600], ['minute', 60], ['second', 1]]);
 const PART = Object.freeze({ CURRENCY: 'currency', INTEGER: 'integer' });
 const SELECTOR = Object.freeze({ text: '[data-i18n]', attr: '[data-i18n-attr]' });
 
@@ -21,6 +22,10 @@ const FORMAT = Object.freeze({
   percent: { style: 'percent', maximumFractionDigits: 0 },
   signed: { signDisplay: 'exceptZero' },
   time: { hour: '2-digit', minute: '2-digit' },
+  decimal: { maximumFractionDigits: 1 },
+  days: { style: 'unit', unit: 'day', unitDisplay: 'long' },
+  shortDay: { day: 'numeric', month: 'short', timeZone: 'UTC' },
+  longDay: { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' },
   weekday: { weekday: 'long' },
   date: { day: 'numeric', month: 'long' },
   dateYear: { day: 'numeric', month: 'long', year: 'numeric' },
@@ -68,6 +73,10 @@ export function createI18n({ strings, fallback }) {
       money: new Intl.NumberFormat(locale, money),
       signed: new Intl.NumberFormat(locale, { ...money, ...FORMAT.signed }),
       time: new Intl.DateTimeFormat(locale, FORMAT.time),
+      decimal: new Intl.NumberFormat(locale, FORMAT.decimal),
+      days: new Intl.NumberFormat(locale, FORMAT.days),
+      shortDay: new Intl.DateTimeFormat(locale, FORMAT.shortDay),
+      longDay: new Intl.DateTimeFormat(locale, FORMAT.longDay),
       weekday: new Intl.DateTimeFormat(locale, FORMAT.weekday),
       date: new Intl.DateTimeFormat(locale, FORMAT.date),
       dateYear: new Intl.DateTimeFormat(locale, FORMAT.dateYear),
@@ -81,6 +90,20 @@ export function createI18n({ strings, fallback }) {
   const number = (n) => fmt.number.format(n);
   const percent = (fraction) => fmt.percent.format(fraction);
   const time = (ts) => fmt.time.format(ts);
+  const decimal = (n) => fmt.decimal.format(n);
+  const days = (n) => fmt.days.format(n);
+  /** Dates of local day numbers (see dayNumber): the number is a UTC midnight, so format in UTC. */
+  const shortDay = (day) => fmt.shortDay.format(day * DAY_MS);
+  const longDay = (day) => fmt.longDay.format(day * DAY_MS);
+
+  /** "5 minutes ago", "yesterday" … in the largest unit that fits. */
+  function ago(ts, now = Date.now()) {
+    const seconds = Math.round((ts - now) / 1000);
+    for (const [unit, size] of RELATIVE_UNITS) {
+      if (Math.abs(seconds) >= size || unit === RELATIVE_UNITS[RELATIVE_UNITS.length - 1][0]) return fmt.relative.format(Math.round(seconds / size), unit);
+    }
+    return '';
+  }
 
   /** The currency symbol, and whether this language writes it before the number. */
   function currencyLayout() {
@@ -124,7 +147,7 @@ export function createI18n({ strings, fallback }) {
 
   return {
     t, plural, configure, apply,
-    money, signed, number, percent, time, dayLabel, dateLabel,
+    money, signed, number, percent, time, dayLabel, dateLabel, decimal, days, shortDay, longDay, ago,
     currencyLayout, currencySymbol, currencyName, languageName,
     get locale() { return locale; },
     get currency() { return currency; },

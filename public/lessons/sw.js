@@ -1,6 +1,6 @@
 /* service worker — מטמון לאפליקציה (עובדת גם בלי רשת) + התראות push */
-const VERSION = "lessons-v9";
-const SHELL = ["./", "./index.html", "./app.css", "./app.js", "./config.js", "./store.js", "./content.js", "./quiz.js", "./gen.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "../fonts/assistant.woff2", "../fonts/frankruhllibre.woff2", "../fonts/plexmono-regular.woff2", "../fonts/plexmono-medium.woff2"];
+const VERSION = "lessons-v10";
+const SHELL = ["./", "./index.html", "./app.css", "./app.js", "./config.js", "./store.js", "./content.js", "./quiz.js", "./gen.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "../shared/datta-home.js", "../fonts/assistant.woff2", "../fonts/frankruhllibre.woff2", "../fonts/plexmono-regular.woff2", "../fonts/plexmono-medium.woff2"];
 
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL).catch(() => {})).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });

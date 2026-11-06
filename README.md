@@ -31,6 +31,8 @@ src/assets/site.css      the design system (tokens, typography, layout, RTL)
 src/assets/site.js       the only client-side script
 content/                 all content (see docs/)
 public/                  static files: fonts, images, diagrams, OG images, media
+public/<app>/            standalone sub-sites (lessons, omg, piggy, wtc); public/shared/ holds what they share
+server/piggy/            the No Bank's sharing server (Node, no dependencies; see docs/PIGGY.md)
 tools/                   font conversion, screenshots, OG image generation
 docs/                    how to add things, how to deploy
 ```

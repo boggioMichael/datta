@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { CONFIG } from "../public/piggy/js/config.js";
+import { CONFIG, VISIBILITY } from "../public/piggy/js/config.js";
 import { STRINGS, KEYS } from "../public/piggy/js/strings.js";
 import { createStore, balanceOf, BackupError, REASON } from "../public/piggy/js/store.js";
 import { createI18n } from "../public/piggy/js/i18n.js";
@@ -19,8 +19,10 @@ test("every key the scripts and the markup use exists in every language", () => 
   const html = readFileSync(new URL("../public/piggy/index.html", import.meta.url), "utf8");
   const markup = [...html.matchAll(/data-i18n="([^"]+)"/g)].map((m) => m[1])
     .concat([...html.matchAll(/data-i18n-attr="([^"]+)"/g)].flatMap((m) => m[1].split(";").map((pair) => pair.split(":")[1])));
-  const scripts = Object.entries(KEYS).filter(([name]) => !name.endsWith("Prefix")).map(([, key]) => key);
-  const derived = CONFIG.sizes.map((s) => KEYS.sizePrefix + s.id).concat(CONFIG.glazes.map((g) => KEYS.glazePrefix + g.id));
+  const scripts = Object.entries(KEYS).filter(([name]) => !/(Prefix|Suffix)$/.test(name)).map(([, key]) => key);
+  const derived = CONFIG.sizes.map((s) => KEYS.sizePrefix + s.id)
+    .concat(CONFIG.glazes.map((g) => KEYS.glazePrefix + g.id))
+    .concat(Object.values(VISIBILITY).flatMap((v) => [KEYS.visibilityPrefix + v, KEYS.visibilityPrefix + v + KEYS.hintSuffix]));
   for (const lang of languages) {
     for (const key of [...markup, ...scripts, ...derived]) assert.ok(has(lang, key), `${lang} is missing ${key}`);
   }

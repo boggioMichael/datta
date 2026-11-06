@@ -1,8 +1,9 @@
 /* קופת הלא · The No Bank — the page controller.
  * Tap the pig every time you say no to yourself: the chosen size of "no" flies in as a
- * coin, a bill or a gold bar, and the register rolls. Several plans, each its own pig. */
+ * coin, a bill or a gold bar, and the register rolls. Several banks, each its own pig.
+ * Banks can be shown to everyone; anyone can look at the banks others chose to show. */
 
-import { CONFIG, SOUND } from './config.js';
+import { CONFIG, SOUND, VISIBILITY } from './config.js';
 import { STRINGS, KEYS } from './strings.js';
 import { createI18n, dayNumber } from './i18n.js';
 import { createStore, STORE_EVENT, REASON, BackupError, balanceOf, sizeById, glazeById } from './store.js';
@@ -12,49 +13,62 @@ import { createSound } from './sound.js';
 import { createStage } from './stage.js';
 import { moneyMarkup, moneyDefs } from './art.js';
 import { createHaptics } from './haptics.js';
+import { createCloud, CLOUD } from './cloud.js';
+import { createReport } from './report.js';
 
 /* ───────────────────────── names used in index.html ───────────────────────── */
 
 const ID = Object.freeze({
-  plans: 'plans', openSettings: 'open-settings',
+  plans: 'plans', openPeople: 'open-people', cloudDot: 'cloud-dot', openSettings: 'open-settings',
+  viewing: 'viewing', viewingName: 'viewing-name', viewingLive: 'viewing-live', viewingExit: 'viewing-exit',
   register: 'register', goal: 'goal', goalFill: 'goal-fill', goalCaption: 'goal-caption',
   stage: 'stage', rosette: 'rosette', pig: 'pig', pigShadow: 'pig-shadow', pigJump: 'pig-jump', pigSquash: 'pig-squash', pigFat: 'pig-fat', pigArt: 'pig-art',
   toast: 'toast', toastText: 'toast-text', toastAction: 'toast-action',
   today: 'today', sizes: 'sizes', openHistory: 'open-history',
   clip: 'drop-clip', floatLayer: 'float-layer', fx: 'fx', defs: 'defs', download: 'download', importFile: 'import-file',
   editor: 'editor', editorForm: 'editor-form', editorTitle: 'editor-title', editorName: 'editor-name', editorGlazes: 'editor-glazes',
+  editorVisibility: 'editor-visibility', editorVisibilityHint: 'editor-visibility-hint',
   editorGoal: 'editor-goal', editorAmounts: 'editor-amounts', editorSubmit: 'editor-submit', editorDanger: 'editor-danger',
   editorBreak: 'editor-break', editorDelete: 'editor-delete',
   settings: 'settings', settingsLocales: 'settings-locales', settingsSound: 'settings-sound', settingsCurrencies: 'settings-currencies',
-  settingsExport: 'settings-export', settingsImport: 'settings-import', settingsSite: 'settings-site',
+  settingsExport: 'settings-export', settingsImport: 'settings-import',
+  accountCopy: 'account-copy', accountUse: 'account-use', accountEntry: 'account-entry', accountKey: 'account-key', accountApply: 'account-apply',
+  people: 'people', profileName: 'profile-name', profileStatus: 'profile-status', profileShare: 'profile-share',
+  peopleEmpty: 'people-empty', peopleList: 'people-list',
   history: 'history', historyTitle: 'history-title', historySummary: 'history-summary', historyEmpty: 'history-empty',
   historyList: 'history-list', historyMore: 'history-more', historyRounds: 'history-rounds', historyRoundsList: 'history-rounds-list',
+  report: 'report',
   confirm: 'confirm', confirmTitle: 'confirm-title', confirmBody: 'confirm-body', confirmOk: 'confirm-ok',
   tplTab: 'tpl-tab', tplAdd: 'tpl-add', tplSize: 'tpl-size', tplGlaze: 'tpl-glaze', tplAmount: 'tpl-amount', tplSegment: 'tpl-segment',
-  tplSummary: 'tpl-summary', tplDay: 'tpl-day', tplRow: 'tpl-row', tplRound: 'tpl-round',
+  tplSummary: 'tpl-summary', tplDay: 'tpl-day', tplRow: 'tpl-row', tplRound: 'tpl-round', tplPerson: 'tpl-person',
 });
 const PART = Object.freeze({
   dot: 'dot', name: 'name', edit: 'edit', input: 'input', money: 'money', amount: 'amount', swatch: 'swatch', symbol: 'symbol',
   label: 'label', count: 'count', total: 'total', rows: 'rows', time: 'time', size: 'size', remove: 'remove', dates: 'dates',
+  live: 'live', meta: 'meta', button: 'button',
 });
-const CLS = Object.freeze({ selected: 'is-selected', closing: 'is-closing', danger: 'is-danger', shown: 'is-shown', symbolAfter: 'is-symbol-after' });
+const CLS = Object.freeze({
+  selected: 'is-selected', closing: 'is-closing', danger: 'is-danger', shown: 'is-shown', symbolAfter: 'is-symbol-after',
+  viewing: 'is-viewing', online: 'is-online',
+});
 const SEL = Object.freeze({
-  tab: '[data-plan], [data-add]',
+  tab: '[data-plan], [data-add], [data-view-bank]',
   close: '[data-close]',
   currencySymbol: '[data-currency-symbol]',
   moneyInput: '.money-input',
   amountInput: 'input[data-size]',
   removeEntry: '[data-entry]',
+  person: '[data-person]',
   openDialog: 'dialog[open]',
   typing: 'input, textarea, select',
 });
-const DATA = Object.freeze({ plan: 'plan', add: 'add', size: 'size', entry: 'entry' });
+const DATA = Object.freeze({ plan: 'plan', add: 'add', size: 'size', entry: 'entry', viewBank: 'viewBank', person: 'person' });
 const ATTR = Object.freeze({ label: 'aria-label', current: 'aria-current', title: 'title', lang: 'lang', hidden: 'hidden' });
-const GROUP = Object.freeze({ size: 'size', glaze: 'glaze', locale: 'locale', currency: 'currency' });
+const GROUP = Object.freeze({ size: 'size', glaze: 'glaze', locale: 'locale', currency: 'currency', visibility: 'visibility' });
 const VAR = Object.freeze({ dot: '--dot', iconWidth: '--w', columns: '--n', glazeLight: '--g-light', glazeBase: '--g-base', glazeDark: '--g-dark' });
 const EV = Object.freeze({
   click: 'click', change: 'change', submit: 'submit', keydown: 'keydown', cancel: 'cancel', close: 'close',
-  animationend: 'animationend', contextmenu: 'contextmenu', visibility: 'visibilitychange', touchstart: 'touchstart',
+  animationend: 'animationend', contextmenu: 'contextmenu', visibility: 'visibilitychange', touchstart: 'touchstart', hashchange: 'hashchange',
 });
 const SHORTCUT = Object.freeze({ undo: 'z' });
 const CONFIRM_OK = 'ok'; // the value of #confirm-ok
@@ -67,6 +81,9 @@ const WEEK_DAYS = 7;
 const PERCENT_STEP = 100;
 const URL_REVOKE_MS = 60000;
 const DATE = Object.freeze({ width: 2, pad: '0', join: '-' }); // a sortable YYYY-MM-DD in local time
+const SHORT_ID = 4;
+const LIVE_GAP_MS = 260;
+const LIVE_LEVEL = 0.6;
 
 /* ───────────────────────── helpers ───────────────────────── */
 
@@ -89,14 +106,18 @@ const localeOf = (id) => CONFIG.locales.find((l) => l.id === id) ?? CONFIG.local
 const isRtl = () => localeOf(i18n.locale).dir === DIR_RTL;
 const stage = createStage({ dom, fx, isReduced, isRtl });
 const register = createRegister(dom.register, { ...CONFIG.register, isReduced, describe: (v) => t(KEYS.registerLabel, { amount: i18n.money(v) }) });
+const cloud = createCloud({ store });
+const report = createReport({ root: dom.report, i18n, keys: KEYS, ...CONFIG.report });
 
 const ui = {
   /** Entries whose money is still in the air: not on the register yet. id → { planId, amount } */
   inFlight: new Map(),
   /** Cancel functions of flights, so undo can stop a coin mid-air. id → cancel() */
   flights: new Map(),
-  /** Whether each plan's pig was gold the last time it was shown (celebrate the change only). */
+  /** Whether each bank's pig was gold the last time it was shown (celebrate the change only). */
   gilded: new Map(),
+  /** Someone else's banks, while looking at them: { id, name, banks, bankId, incoming, timer }. */
+  view: null,
   holdRegister: false,
   historyLimit: CONFIG.limits.historyPage,
   editing: null,
@@ -111,13 +132,18 @@ const ui = {
 
 const state = () => store.state;
 const activePlan = () => store.active();
-const planIndex = (plan) => state().plans.findIndex((p) => p.id === plan.id);
-const planName = (plan) => plan.name || t(KEYS.planFallback, { n: i18n.number(planIndex(plan) + 1) });
+const viewing = () => ui.view !== null;
+const shownBanks = () => (viewing() ? ui.view.banks : state().plans);
+const shownPlan = () => (viewing() ? ui.view.banks.find((b) => b.id === ui.view.bankId) ?? ui.view.banks[0] : activePlan());
+const planName = (plan) => plan.name || t(KEYS.planFallback, { n: i18n.number(shownBanks().findIndex((p) => p.id === plan.id) + 1) });
+const personName = (person) => person.name || t(KEYS.peopleFallback, { id: person.id.slice(0, SHORT_ID) });
 const sizeLabel = (id) => t(KEYS.sizePrefix + id);
 const pendingFor = (planId) => [...ui.inFlight.values()].reduce((sum, f) => (f.planId === planId ? sum + f.amount : sum), 0);
-const shownBalance = (plan) => balanceOf(plan) - pendingFor(plan.id);
+const shownBalance = (plan) => balanceOf(plan) - (viewing() ? ui.view.incoming : pendingFor(plan.id));
 const lookFor = (size, amount) => ({ tone: size.tone, colors: CONFIG.tones[size.tone], mark: t(KEYS.coinMark), value: i18n.number(amount) });
 const showerLook = () => ({ tone: CONFIG.showerTone, colors: CONFIG.tones[CONFIG.showerTone], mark: t(KEYS.coinMark), value: '' });
+const shareLink = (id) => `${CONFIG.site.url}#${CONFIG.cloud.shareParam}=${encodeURIComponent(id)}`;
+const sharedId = () => new URLSearchParams(location.hash.slice(1)).get(CONFIG.cloud.shareParam);
 
 /** Count and total of the newest entries since a local day number (entries are oldest first). */
 function since(plan, fromDay) {
@@ -154,31 +180,33 @@ function applyLocale() {
   document.title = fillTemplate(CONFIG.site.title, { app: t(KEYS.appTitle) });
   i18n.apply(document);
   register.setCurrency(i18n.currencyLayout());
-  dom.settingsSite.href = fillTemplate(CONFIG.site.home, { locale: meta.id });
   ui.signatures = {};
 }
 
 function renderTabs() {
-  const s = state();
-  const signature = JSON.stringify([i18n.locale, s.activePlanId, s.plans.map((p) => [p.id, p.name, p.glaze])]);
+  const banks = shownBanks();
+  const current = shownPlan();
+  const signature = JSON.stringify([i18n.locale, viewing(), current.id, banks.map((p) => [p.id, p.name, p.glaze])]);
   if (ui.signatures.tabs === signature) return;
   ui.signatures.tabs = signature;
-  const tabs = s.plans.map((plan) => {
+  const tabs = banks.map((plan) => {
     const node = cloneTemplate(dom.tplTab);
-    const current = plan.id === s.activePlanId;
-    node.dataset[DATA.plan] = plan.id;
-    node.setAttribute(ATTR.current, String(current));
-    node.setAttribute(ATTR.label, current ? t(KEYS.planEdit, { plan: planName(plan) }) : planName(plan));
+    const isCurrent = plan.id === current.id;
+    node.dataset[viewing() ? DATA.viewBank : DATA.plan] = plan.id;
+    node.setAttribute(ATTR.current, String(isCurrent));
+    node.setAttribute(ATTR.label, isCurrent && !viewing() ? t(KEYS.planEdit, { plan: planName(plan) }) : planName(plan));
     part(node, PART.dot).style.setProperty(VAR.dot, glazeById(plan.glaze).base);
     part(node, PART.name).textContent = planName(plan);
-    part(node, PART.edit).toggleAttribute(ATTR.hidden, !current);
+    part(node, PART.edit).toggleAttribute(ATTR.hidden, !isCurrent || viewing());
     return node;
   });
-  dom.plans.replaceChildren(...tabs, cloneTemplate(dom.tplAdd));
+  dom.plans.replaceChildren(...tabs, ...(viewing() ? [] : [cloneTemplate(dom.tplAdd)]));
   dom.plans.querySelector(`[${ATTR.current}="${String(true)}"]`)?.scrollIntoView(SCROLL_NEAREST);
 }
 
 function renderSizes() {
+  dom.sizes.hidden = viewing();
+  if (viewing()) return;
   const plan = activePlan();
   const signature = JSON.stringify([i18n.locale, i18n.currency, plan.id, plan.amounts]);
   if (ui.signatures.sizes !== signature) {
@@ -207,12 +235,14 @@ function renderSizes() {
 
 function renderVault({ animate = true } = {}) {
   if (ui.holdRegister) return;
-  const plan = activePlan();
+  const plan = shownPlan();
   const shown = shownBalance(plan);
   register.set(shown, { animate });
   renderGoal(plan, shown);
   renderPig(plan, shown, { celebrate: animate });
-  dom.pig.setAttribute(ATTR.label, t(KEYS.pigTap, { amount: i18n.money(plan.amounts[plan.size]), plan: planName(plan) }));
+  dom.pig.setAttribute(ATTR.label, viewing()
+    ? t(KEYS.viewPig, { plan: planName(plan) })
+    : t(KEYS.pigTap, { amount: i18n.money(plan.amounts[plan.size]), plan: planName(plan) }));
 }
 
 function renderGoal(plan, shown) {
@@ -233,20 +263,38 @@ function renderPig(plan, shown, { celebrate }) {
   ui.gilded.set(plan.id, reached);
   if (reached && was === false && celebrate) {
     stage.gild();
-    sound.play(SOUND.GOAL);
-    haptic(CONFIG.haptics.goal);
-    toast(t(KEYS.toastGoal));
+    sound.play(SOUND.GOAL, { level: viewing() ? LIVE_LEVEL : 1 });
+    if (!viewing()) {
+      haptic(CONFIG.haptics.goal);
+      toast(t(KEYS.toastGoal));
+    }
   }
 }
 
 function renderToday() {
-  const plan = activePlan();
+  const plan = shownPlan();
   const { count } = since(plan, dayNumber(Date.now()));
-  if (count) dom.today.textContent = i18n.plural(KEYS.todayCount, count);
+  if (viewing()) dom.today.textContent = count ? i18n.plural(KEYS.viewToday, count) : t(KEYS.viewNone);
+  else if (count) dom.today.textContent = i18n.plural(KEYS.todayCount, count);
   else dom.today.textContent = t(plan.entries.length || plan.rounds.length ? KEYS.todayNone : KEYS.todayFirst);
 }
 
+function renderViewing() {
+  document.body.classList.toggle(CLS.viewing, viewing());
+  dom.viewing.hidden = !viewing();
+  if (!viewing()) return;
+  dom.viewingName.textContent = t(KEYS.viewTitle, { name: personName(ui.view) });
+  const last = Math.max(0, ...ui.view.banks.map((b) => (b.entries.length ? b.entries[b.entries.length - 1].at : 0)));
+  dom.viewingLive.hidden = Date.now() - last > CONFIG.cloud.liveWithinMs;
+}
+
+function renderCloud() {
+  dom.cloudDot.hidden = cloud.status !== CLOUD.ONLINE;
+  if (dom.people.open) renderProfile();
+}
+
 function renderAll({ animate = true } = {}) {
+  renderViewing();
   renderTabs();
   renderSizes();
   renderVault({ animate });
@@ -265,6 +313,7 @@ function askPersist() {
 
 function dropNo() {
   if (stage.busy) return;
+  if (viewing()) { stage.nudge(); return; } // someone else's bank: look, don't touch
   sound.unlock();
   const plan = activePlan();
   const size = sizeById(plan.size);
@@ -281,7 +330,7 @@ function dropNo() {
       stage.sparkle(size);
       stage.float(i18n.signed(entry.amount));
       ui.inFlight.delete(entry.id);
-      if (activePlan().id === plan.id) renderVault();
+      if (!viewing() && activePlan().id === plan.id) renderVault();
     },
     onShowerCoin: () => sound.play(SOUND.TINK, { level: 0.5 }),
   });
@@ -342,6 +391,75 @@ async function breakPlan(plan) {
     },
   });
   toast(t(KEYS.toastBroken, { amount: i18n.money(amount) }));
+}
+
+/* ───────────────────────── looking at someone's banks ───────────────────────── */
+
+/** Money that arrived since the last look flies in, a few coins at a time. */
+function playIncoming(bank, fresh) {
+  if (document.hidden) return; // nobody is watching: the register already shows the total
+  const shown = fresh.slice(-CONFIG.cloud.liveDrops);
+  ui.view.incoming = shown.reduce((sum, e) => sum + e.amount, 0);
+  renderVault();
+  shown.forEach((entry, i) => setTimeout(() => {
+    if (!viewing() || shownPlan().id !== bank.id) return;
+    const size = sizeById(entry.size);
+    stage.drop(size, lookFor(size, entry.amount), {
+      showerLook: showerLook(),
+      onEnter: () => {
+        if (!viewing()) return;
+        sound.play(size.sound, { level: LIVE_LEVEL });
+        stage.react(size);
+        stage.sparkle(size);
+        stage.float(i18n.signed(entry.amount));
+        ui.view.incoming = Math.max(0, ui.view.incoming - entry.amount);
+        renderVault();
+        renderToday();
+      },
+      onShowerCoin: () => sound.play(SOUND.TINK, { level: LIVE_LEVEL / 2 }),
+    });
+  }, i * LIVE_GAP_MS));
+}
+
+async function refreshView() {
+  if (!viewing()) return;
+  const { id } = ui.view;
+  let person;
+  try { person = await cloud.person(id); } catch { return; }
+  if (!viewing() || ui.view.id !== id) return;
+  const before = shownPlan();
+  ui.view = { ...ui.view, name: person.name, banks: person.banks };
+  if (!person.banks.some((b) => b.id === ui.view.bankId)) ui.view.bankId = person.banks[0].id;
+  const after = shownPlan();
+  const known = new Set(before.entries.map((e) => e.id));
+  const fresh = after.id === before.id ? after.entries.filter((e) => !known.has(e.id)) : [];
+  renderAll();
+  if (fresh.length) playIncoming(after, fresh);
+}
+
+async function openPerson(id) {
+  let person;
+  try {
+    person = await cloud.person(id);
+  } catch {
+    toast(t(cloud.status === CLOUD.ONLINE ? KEYS.toastPersonMissing : KEYS.toastOffline));
+    return;
+  }
+  if (person.id === cloud.me.id) { exitView(); return; }
+  clearInterval(ui.view?.timer);
+  ui.view = { id: person.id, name: person.name, banks: person.banks, bankId: person.banks[0].id, incoming: 0, timer: setInterval(refreshView, CONFIG.cloud.watchMs) };
+  history.replaceState(null, '', `#${CONFIG.cloud.shareParam}=${encodeURIComponent(person.id)}`);
+  stage.nudge();
+  renderAll();
+}
+
+function exitView() {
+  if (!viewing()) return;
+  clearInterval(ui.view.timer);
+  ui.view = null;
+  history.replaceState(null, '', location.pathname + location.search);
+  stage.nudge();
+  renderAll();
 }
 
 /* ───────────────────────── toast ───────────────────────── */
@@ -405,6 +523,18 @@ function confirmDialog({ title, body, ok, danger = false }) {
   });
 }
 
+async function shareOrCopy(text, copiedKey) {
+  if (matchMedia(POINTER_COARSE).matches && navigator.share) {
+    try { await navigator.share({ url: text }); return; } catch (error) { if (error?.name === ABORT) return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(t(copiedKey));
+  } catch {
+    window.prompt('', text);
+  }
+}
+
 /* ───────────────────────── editor ───────────────────────── */
 
 function unusedGlaze() {
@@ -426,6 +556,11 @@ function renderGlazes(selected) {
     part(node, PART.name).textContent = t(KEYS.glazePrefix + glaze.id);
     return node;
   }));
+}
+
+function renderVisibility(selected) {
+  renderSegmented(dom.editorVisibility, GROUP.visibility, Object.values(VISIBILITY).map((value) => ({ value, label: t(KEYS.visibilityPrefix + value) })), selected);
+  dom.editorVisibilityHint.textContent = t(KEYS.visibilityPrefix + selected + KEYS.hintSuffix);
 }
 
 function renderAmounts(amounts) {
@@ -450,6 +585,7 @@ function openEditor(plan) {
     name: '',
     glaze: unusedGlaze(),
     goal: 0,
+    visibility: CONFIG.defaultVisibility,
     amounts: Object.fromEntries(CONFIG.sizes.map((s) => [s.id, s.amount])),
   };
   dom.editorTitle.textContent = t(plan ? KEYS.editorEdit : KEYS.editorNew);
@@ -459,6 +595,7 @@ function openEditor(plan) {
   dom.editorGoal.max = CONFIG.limits.goalMax;
   dom.editorGoal.value = source.goal > 0 ? source.goal : '';
   renderGlazes(source.glaze);
+  renderVisibility(source.visibility);
   renderAmounts(source.amounts);
   const { symbol, first } = i18n.currencyLayout();
   dom.editor.querySelectorAll(SEL.currencySymbol).forEach((el) => { el.textContent = symbol; });
@@ -476,6 +613,7 @@ function readEditor() {
   return {
     name: dom.editorName.value,
     glaze: dom.editorForm.elements[GROUP.glaze]?.value,
+    visibility: dom.editorForm.elements[GROUP.visibility]?.value,
     goal: Number(dom.editorGoal.value) || 0,
     amounts,
   };
@@ -548,12 +686,85 @@ async function importBackup(file) {
   toast(t(KEYS.toastImported));
 }
 
-/* ───────────────────────── history ───────────────────────── */
+async function useAccountKey() {
+  const key = dom.accountKey.value;
+  if (!cloud.isKey(key)) { toast(t(KEYS.toastKeyInvalid)); return; }
+  const ok = await confirmDialog({ title: t(KEYS.confirmKeyTitle), body: t(KEYS.confirmKeyBody), ok: t(KEYS.confirmKeyOk), danger: true });
+  if (!ok) return;
+  exitView();
+  dropAllFlights();
+  ui.gilded.clear();
+  await cloud.useKey(key);
+  dom.accountKey.value = '';
+  dom.accountEntry.hidden = true;
+  await closeSheet(dom.settings);
+  toast(t(cloud.status === CLOUD.ONLINE ? KEYS.toastKeyUsed : KEYS.toastOffline));
+}
+
+/* ───────────────────────── people ───────────────────────── */
+
+const STATUS_KEY = Object.freeze({ [CLOUD.ONLINE]: KEYS.profileOnline, [CLOUD.OFFLINE]: KEYS.profileOffline, [CLOUD.CONNECTING]: KEYS.profileConnecting });
+
+function renderProfile() {
+  const online = cloud.status === CLOUD.ONLINE;
+  if (document.activeElement !== dom.profileName) dom.profileName.value = cloud.me.name;
+  dom.profileName.disabled = !online;
+  dom.profileShare.disabled = !online || !cloud.me.id;
+  dom.profileStatus.textContent = t(STATUS_KEY[cloud.status]);
+}
+
+async function renderPeople() {
+  dom.peopleList.replaceChildren();
+  if (cloud.status !== CLOUD.ONLINE) {
+    dom.peopleEmpty.hidden = false;
+    dom.peopleEmpty.textContent = t(KEYS.peopleOffline);
+    return;
+  }
+  dom.peopleEmpty.hidden = false;
+  dom.peopleEmpty.textContent = t(KEYS.peopleLoading);
+  let people;
+  try {
+    people = (await cloud.people()).filter((person) => person.id !== cloud.me.id);
+  } catch {
+    dom.peopleEmpty.textContent = t(KEYS.peopleOffline);
+    return;
+  }
+  dom.peopleEmpty.hidden = people.length > 0;
+  dom.peopleEmpty.textContent = t(KEYS.peopleEmpty);
+  dom.peopleList.replaceChildren(...people.map((person) => {
+    const node = cloneTemplate(dom.tplPerson);
+    part(node, PART.button).dataset[DATA.person] = person.id;
+    part(node, PART.live).hidden = Date.now() - person.lastAt > CONFIG.cloud.liveWithinMs;
+    part(node, PART.name).textContent = personName(person);
+    part(node, PART.meta).textContent = i18n.plural(KEYS.peopleMeta, person.banks, { seen: i18n.ago(person.lastAt) });
+    part(node, PART.total).textContent = i18n.money(person.total);
+    return node;
+  }));
+}
+
+function openPeople() {
+  renderProfile();
+  openSheet(dom.people);
+  renderPeople();
+}
+
+async function saveName() {
+  const name = dom.profileName.value;
+  if (name.trim() === cloud.me.name) return;
+  try {
+    await cloud.setName(name);
+    toast(t(KEYS.toastNameSaved));
+  } catch {
+    toast(t(KEYS.toastOffline));
+  }
+}
+
+/* ───────────────────────── history and the daily report ───────────────────────── */
 
 function renderHistory() {
-  const plan = activePlan();
+  const plan = shownPlan();
   const today = dayNumber(Date.now());
-  dom.historyTitle.textContent = planName(plan);
+  dom.historyTitle.textContent = viewing() ? `${personName(ui.view)}, ${planName(plan)}` : planName(plan);
 
   const rows = [
     { key: KEYS.historyToday, ...since(plan, today) },
@@ -568,6 +779,9 @@ function renderHistory() {
     return node;
   }));
 
+  dom.report.hidden = !plan.entries.length;
+  if (plan.entries.length) report.render(plan.entries, isRtl());
+
   const recent = plan.entries.slice(-ui.historyLimit).reverse();
   dom.historyEmpty.hidden = recent.length > 0;
   const days = [];
@@ -579,6 +793,7 @@ function renderHistory() {
   dom.historyList.replaceChildren(...days.map(({ at, entries }) => {
     const node = cloneTemplate(dom.tplDay);
     part(node, PART.label).textContent = i18n.dayLabel(at);
+    part(node, PART.count).textContent = i18n.plural(KEYS.historyTimes, entries.length);
     part(node, PART.total).textContent = i18n.money(entries.reduce((sum, e) => sum + e.amount, 0));
     part(node, PART.rows).replaceChildren(...entries.map((entry) => {
       const row = cloneTemplate(dom.tplRow);
@@ -588,6 +803,7 @@ function renderHistory() {
       part(row, PART.size).textContent = sizeLabel(entry.size);
       part(row, PART.amount).textContent = i18n.money(entry.amount);
       const remove = part(row, PART.remove);
+      remove.hidden = viewing();
       remove.dataset[DATA.entry] = entry.id;
       remove.setAttribute(ATTR.label, t(KEYS.historyRemove, { time: i18n.time(entry.at) }));
       return row;
@@ -617,17 +833,19 @@ store.subscribe((type, detail) => {
   if (reason === REASON.ENTRY_ADDED) ui.inFlight.set(detail.entry.id, { planId: detail.planId, amount: detail.entry.amount });
   if (reason === REASON.ENTRY_REMOVED) ui.inFlight.delete(detail.entry.id);
   if (reason === REASON.PLAN_DELETED) ui.gilded.delete(detail.planId);
-  if (reason === REASON.IMPORTED || reason === REASON.EXTERNAL) {
+  if (reason === REASON.IMPORTED || reason === REASON.EXTERNAL || reason === REASON.REMOTE) {
     dropAllFlights();
-    ui.gilded.clear();
+    if (reason !== REASON.REMOTE) ui.gilded.clear();
   }
   if (reason === REASON.SETTINGS || reason === REASON.IMPORTED || reason === REASON.EXTERNAL) {
     applyLocale();
     sound.setEnabled(state().settings.sound);
   }
-  if (reason === REASON.ACTIVE || reason === REASON.PLAN_CREATED) stage.nudge();
+  if ((reason === REASON.ACTIVE || reason === REASON.PLAN_CREATED) && !viewing()) stage.nudge();
   renderAll({ animate: reason !== REASON.SETTINGS });
 });
+
+cloud.subscribe(renderCloud);
 
 /* ───────────────────────── events ───────────────────────── */
 
@@ -637,6 +855,13 @@ dom.pig.addEventListener(EV.contextmenu, (event) => event.preventDefault());
 dom.plans.addEventListener(EV.click, (event) => {
   const tab = event.target.closest(SEL.tab);
   if (!tab) return;
+  if (DATA.viewBank in tab.dataset) {
+    ui.view.bankId = tab.dataset[DATA.viewBank];
+    ui.view.incoming = 0;
+    stage.nudge();
+    renderAll();
+    return;
+  }
   if (DATA.add in tab.dataset) {
     if (state().plans.length >= CONFIG.limits.plans) toast(t(KEYS.toastLimit, { n: i18n.number(CONFIG.limits.plans) }));
     else openEditor(null);
@@ -661,11 +886,23 @@ dom.toastAction.addEventListener(EV.click, () => {
   run?.();
 });
 
+dom.viewingExit.addEventListener(EV.click, exitView);
+dom.openPeople.addEventListener(EV.click, openPeople);
+dom.profileName.addEventListener(EV.change, saveName);
+dom.profileShare.addEventListener(EV.click, () => shareOrCopy(shareLink(cloud.me.id), KEYS.toastLinkCopied));
+dom.peopleList.addEventListener(EV.click, async (event) => {
+  const button = event.target.closest(SEL.person);
+  if (!button) return;
+  await closeSheet(dom.people);
+  openPerson(button.dataset[DATA.person]);
+});
+
 dom.openSettings.addEventListener(EV.click, () => { renderSettings(); openSheet(dom.settings); });
 dom.openHistory.addEventListener(EV.click, () => {
   ui.historyLimit = CONFIG.limits.historyPage;
   renderHistory();
   openSheet(dom.history);
+  renderHistory(); // again, now that the sheet has a width for the chart
 });
 dom.historyMore.addEventListener(EV.click, () => {
   ui.historyLimit += CONFIG.limits.historyPage;
@@ -673,7 +910,7 @@ dom.historyMore.addEventListener(EV.click, () => {
 });
 dom.historyList.addEventListener(EV.click, (event) => {
   const button = event.target.closest(SEL.removeEntry);
-  if (!button) return;
+  if (!button || viewing()) return;
   const id = button.dataset[DATA.entry];
   ui.flights.get(id)?.();
   ui.flights.delete(id);
@@ -686,6 +923,9 @@ dom.editorForm.addEventListener(EV.submit, (event) => {
   if (ui.editing) store.updatePlan(ui.editing, fields);
   else if (!store.createPlan(fields)) toast(t(KEYS.toastLimit, { n: i18n.number(CONFIG.limits.plans) }));
   closeSheet(dom.editor);
+});
+dom.editorVisibility.addEventListener(EV.change, (event) => {
+  dom.editorVisibilityHint.textContent = t(KEYS.visibilityPrefix + event.target.value + KEYS.hintSuffix);
 });
 
 dom.editorBreak.addEventListener(EV.click, async () => {
@@ -733,9 +973,12 @@ dom.importFile.addEventListener(EV.change, () => {
   dom.importFile.value = '';
   if (file) importBackup(file);
 });
+dom.accountCopy.addEventListener(EV.click, () => shareOrCopy(cloud.key, KEYS.toastKeyCopied));
+dom.accountUse.addEventListener(EV.click, () => { dom.accountEntry.hidden = !dom.accountEntry.hidden; if (!dom.accountEntry.hidden) dom.accountKey.focus(); });
+dom.accountApply.addEventListener(EV.click, useAccountKey);
 
 // Every sheet closes with its × button, a tap on the backdrop, or Escape — always animated.
-[dom.editor, dom.settings, dom.history, dom.confirm].forEach((dialog) => {
+[dom.editor, dom.settings, dom.history, dom.people, dom.confirm].forEach((dialog) => {
   dialog.addEventListener(EV.click, (event) => {
     if (event.target === dialog || event.target.closest(SEL.close)) closeSheet(dialog);
   });
@@ -746,7 +989,7 @@ dom.importFile.addEventListener(EV.change, () => {
 });
 
 document.addEventListener(EV.keydown, (event) => {
-  if (document.querySelector(SEL.openDialog) || event.target.closest?.(SEL.typing)) return;
+  if (document.querySelector(SEL.openDialog) || event.target.closest?.(SEL.typing) || viewing()) return;
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === SHORTCUT.undo) {
     event.preventDefault();
     undoLast();
@@ -759,13 +1002,29 @@ document.addEventListener(EV.keydown, (event) => {
 // iOS only shows :active press states once the page listens for touches.
 document.addEventListener(EV.touchstart, () => {}, { passive: true });
 
-// Back after midnight: today's count starts over.
-document.addEventListener(EV.visibility, () => { if (!document.hidden) renderToday(); });
+// Back after midnight: today's count starts over; back online: sync again.
+document.addEventListener(EV.visibility, () => {
+  if (document.hidden) return;
+  renderToday();
+  if (cloud.status === CLOUD.OFFLINE) cloud.connect();
+});
+
+// A shared link opened while the page is already open.
+window.addEventListener(EV.hashchange, () => {
+  const id = sharedId();
+  if (id && id !== ui.view?.id) openPerson(id);
+});
 
 /* ───────────────────────── start ───────────────────────── */
 
 dom.defs.innerHTML = `<defs>${moneyDefs(CONFIG.tones)}</defs>`;
+dom.profileName.maxLength = CONFIG.limits.nameLength;
 sound.setEnabled(state().settings.sound);
 applyLocale();
 renderAll({ animate: false });
+renderCloud();
 navigator.serviceWorker?.register(CONFIG.serviceWorker).catch(() => {});
+cloud.connect().then(() => {
+  const id = sharedId();
+  if (id) openPerson(id);
+});

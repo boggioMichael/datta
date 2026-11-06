@@ -2,7 +2,7 @@
  * of "no" per plan, and the settings. Saved to localStorage on every change, validated
  * on every read, so a damaged or hand-edited save can never break the page. */
 
-import { CONFIG } from './config.js';
+import { CONFIG, VISIBILITY } from './config.js';
 
 export const STORE_EVENT = Object.freeze({ CHANGE: 'change', ERROR: 'error' });
 
@@ -19,6 +19,7 @@ export const REASON = Object.freeze({
   SETTINGS: 'settings',
   IMPORTED: 'imported',
   EXTERNAL: 'external',
+  REMOTE: 'remote',
 });
 
 export class BackupError extends Error {}
@@ -27,6 +28,7 @@ const { limits } = CONFIG;
 const SIZE_IDS = CONFIG.sizes.map((s) => s.id);
 const GLAZE_IDS = CONFIG.glazes.map((g) => g.id);
 const LOCALE_IDS = CONFIG.locales.map((l) => l.id);
+const VISIBILITIES = Object.values(VISIBILITY);
 const ID_RADIX = 36;
 const ID_RANDOM = 6;
 const ID_MAX = 48;
@@ -80,8 +82,10 @@ function sanitizeAmounts(raw) {
   return Object.fromEntries(CONFIG.sizes.map((s) => [s.id, clampInt(source[s.id], limits.amountMin, limits.amountMax, s.amount)]));
 }
 
-function sanitizePlan(raw) {
+/** A valid bank from anything: unknown fields dropped, every value clamped. Shared with the server. */
+export function sanitizePlan(raw) {
   if (!isObject(raw)) return null;
+  const createdAt = isTime(raw.createdAt) ? raw.createdAt : Date.now();
   return {
     id: isId(raw.id) ? raw.id : uid(),
     name: typeof raw.name === 'string' ? raw.name.trim().slice(0, limits.nameLength) : '',
@@ -91,11 +95,13 @@ function sanitizePlan(raw) {
     size: oneOf(raw.size, SIZE_IDS, CONFIG.defaultSize),
     entries: sanitizeEntries(raw.entries),
     rounds: sanitizeRounds(raw.rounds),
-    createdAt: isTime(raw.createdAt) ? raw.createdAt : Date.now(),
+    visibility: oneOf(raw.visibility, VISIBILITIES, CONFIG.defaultVisibility),
+    createdAt,
+    updatedAt: isTime(raw.updatedAt) ? raw.updatedAt : createdAt,
   };
 }
 
-function sanitizeState(raw) {
+export function sanitizeState(raw) {
   const source = isObject(raw) ? raw : {};
   const settings = isObject(source.settings) ? source.settings : {};
   const seen = new Set();
@@ -148,6 +154,7 @@ export function createStore(storage = globalThis.localStorage) {
 
   const plan = (id) => state.plans.find((p) => p.id === id) ?? null;
   const active = () => plan(state.activePlanId) ?? state.plans[0];
+  const touch = (target) => { target.updatedAt = Date.now(); };
 
   function addEntry(planId, sizeId) {
     const target = plan(planId);
@@ -155,6 +162,7 @@ export function createStore(storage = globalThis.localStorage) {
     const size = oneOf(sizeId, SIZE_IDS, target.size);
     const entry = { id: uid(), at: Date.now(), size, amount: target.amounts[size] };
     target.entries.push(entry);
+    touch(target);
     if (target.entries.length > limits.entries) target.entries.splice(0, target.entries.length - limits.entries);
     commit(REASON.ENTRY_ADDED, { planId, entry });
     return entry;
@@ -165,6 +173,7 @@ export function createStore(storage = globalThis.localStorage) {
     const index = target ? target.entries.findIndex((e) => e.id === entryId) : -1;
     if (index < 0) return null;
     const [entry] = target.entries.splice(index, 1);
+    touch(target);
     commit(REASON.ENTRY_REMOVED, { planId, entry });
     return entry;
   }
@@ -182,7 +191,7 @@ export function createStore(storage = globalThis.localStorage) {
     const index = state.plans.findIndex((p) => p.id === planId);
     if (index < 0) return null;
     const current = state.plans[index];
-    const updated = sanitizePlan({ ...current, ...fields, id: current.id, entries: current.entries, rounds: current.rounds, createdAt: current.createdAt });
+    const updated = sanitizePlan({ ...current, ...fields, id: current.id, entries: current.entries, rounds: current.rounds, createdAt: current.createdAt, updatedAt: Date.now() });
     state.plans[index] = updated;
     commit(REASON.PLAN_UPDATED, { planId });
     return updated;
@@ -205,6 +214,7 @@ export function createStore(storage = globalThis.localStorage) {
     const round = { from: target.entries[0].at, to: Date.now(), total: balanceOf(target), count: target.entries.length };
     target.rounds.push(round);
     target.entries = [];
+    touch(target);
     commit(REASON.PLAN_BROKEN, { planId, round });
     return round;
   }
@@ -220,12 +230,45 @@ export function createStore(storage = globalThis.localStorage) {
     const target = plan(planId);
     if (!target || !SIZE_IDS.includes(sizeId) || target.size === sizeId) return;
     target.size = sizeId;
+    touch(target);
     commit(REASON.SIZE, { planId });
   }
 
   function setSettings(patch) {
     state = sanitizeState({ ...state, settings: { ...state.settings, ...patch } });
     commit(REASON.SETTINGS);
+  }
+
+  /** A brand-new device: one untouched, unnamed bank and nothing else. */
+  function isPristine() {
+    const [only] = state.plans;
+    return state.plans.length === 1 && !only.entries.length && !only.rounds.length && !only.name && !only.goal;
+  }
+
+  /** Take banks from the server: new ones are added, newer ones replace ours. Returns the ids taken. */
+  function mergeRemote(banks) {
+    const taken = [];
+    const incoming = list(banks).map(sanitizePlan).filter(Boolean);
+    if (incoming.length && isPristine()) state.plans = [];
+    incoming.forEach((bank) => {
+      const index = state.plans.findIndex((p) => p.id === bank.id);
+      if (index < 0 && state.plans.length < limits.plans) state.plans.push(bank);
+      else if (index >= 0 && bank.updatedAt > state.plans[index].updatedAt) state.plans[index] = bank;
+      else return;
+      taken.push(bank.id);
+    });
+    if (!state.plans.length) state.plans.push(sanitizePlan({}));
+    if (!plan(state.activePlanId)) state.activePlanId = state.plans[0].id;
+    if (taken.length) commit(REASON.REMOTE, { planIds: taken });
+    return taken;
+  }
+
+  /** Replace every bank with the server's (restoring an account on a new device). */
+  function replaceRemote(banks) {
+    const incoming = list(banks).map(sanitizePlan).filter(Boolean).slice(0, limits.plans);
+    state.plans = incoming.length ? incoming : [sanitizePlan({})];
+    state.activePlanId = state.plans[0].id;
+    commit(REASON.REMOTE, { planIds: state.plans.map((p) => p.id) });
   }
 
   function exportBackup() {
@@ -258,6 +301,7 @@ export function createStore(storage = globalThis.localStorage) {
     addEntry, removeEntry, createPlan, updatePlan, deletePlan, breakPlan,
     setActive, setSize, setSettings,
     exportBackup, readBackup, restore,
+    isPristine, mergeRemote, replaceRemote,
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
   };
 }

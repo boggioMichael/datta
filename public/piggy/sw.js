@@ -2,7 +2,7 @@
  * so a change to the site shows up on the next visit; the cache is only the fallback for
  * no signal (or a network that hasn't answered within a few seconds). */
 
-const VERSION = 'piggy-v1';
+const VERSION = 'piggy-v4';
 const SHELL = [
   './',
   './index.html',
@@ -19,14 +19,19 @@ const SHELL = [
   './js/register.js',
   './js/stage.js',
   './js/haptics.js',
+  './js/cloud.js',
+  './js/report.js',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/apple-touch-icon.png',
+  '../shared/datta-home.js',
   '../fonts/frankruhllibre.woff2',
   '../fonts/assistant.woff2',
   '../fonts/newsreader.woff2',
 ];
 const FRESH = /(?:\/|\.html|\.js|\.css|\.webmanifest)$/;
+const STATIC = /\.(?:woff2|png|svg|jpg|webp|ico)$/;
+const API = '/api/';
 const SLOW_MS = 3000;
 const NAVIGATE = 'navigate';
 const GET = 'GET';
@@ -70,11 +75,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== GET) return;
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || url.pathname.includes(API)) return; // the server's answers are never cached
   if (request.mode === NAVIGATE || FRESH.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
+  if (!STATIC.test(url.pathname)) return;
   // Fonts and icons: from the cache, refreshed in the background.
   event.respondWith(caches.match(request).then((cached) => {
     const network = fetch(request).then((response) => keep(request, response)).catch(() => cached);

@@ -88,6 +88,8 @@ body.home .topbar, body.home #tools, body.home #zoom { visibility: hidden; }
 .cta.small { min-width: 0; padding: 11px 22px; font-size: 16px; }
 .ghost { padding: 11px 18px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg); font-weight: 600; font-size: 15px; background: rgba(255,255,255,.04); }
 .link { color: var(--fg-2); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.25); }
+.omg-home { position: absolute; z-index: 2; top: max(10px, env(safe-area-inset-top)); inset-inline-start: 8px; --datta-home-color: var(--fg-2); --datta-home-font: 500 12px/1 "IBM Plex Mono", monospace; }
+.omg-sheet-home { flex: none; --datta-home-color: var(--fg-2); --datta-home-pad: .5em; --datta-home-font: 500 12px/1 "IBM Plex Mono", monospace; }
 .start-foot { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
 .start-foot .dot { color: var(--fg-3); }
 .note { margin: 0; font-size: 12px; color: var(--fg-3); }

@@ -9,6 +9,7 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="../favicon.svg">
 <title>The Well-Tempered Clavier, Book I — support the recordings · DATTA</title>
+<script type="module" src="../shared/datta-home.js"></script>
 <meta name="description" content="Support page for Michael Alberto Boggio's complete recording of Bach's Well-Tempered Clavier, Book I">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 <style>@font-face{font-family:"Frank Ruhl Libre";src:url("../fonts/frankruhllibre.woff2") format("woff2");font-weight:300 700;font-display:swap}</style>
@@ -28,6 +29,8 @@
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
+  .wtc-home { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 10px; --datta-home-color: var(--gold); --datta-home-font: 500 15px/1 var(--display); }
+  .wtc-home a, .wtc-home a:hover, .wtc-home a:focus-visible { border-bottom: 0; }
   body { background: var(--bg); color: var(--fg); margin: 0; font-family: var(--hebrew), var(--display); font-size: 17px; line-height: 1.55; }
   .wrap { max-width: 720px; margin: 0 auto; padding-block: 56px 72px; padding-inline: 20px; }
   .eyebrow { font-family: var(--display); font-size: 14px; letter-spacing: .34em; text-transform: uppercase; color: var(--gold); text-align: center; }
@@ -76,6 +79,7 @@
 
 </head>
 <body>
+<datta-home class="wtc-home"></datta-home>
 <div class="wrap">
   <p class="eyebrow">J. S. Bach</p>
   <h1><em>The Well-Tempered Clavier</em><br>Book I</h1>

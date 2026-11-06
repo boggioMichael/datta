@@ -12,3 +12,4 @@ screenshots/
 .sites-runtime/
 *.tsbuildinfo
 games/omg/target/
+server/piggy/data/

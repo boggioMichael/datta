@@ -25,6 +25,9 @@ export const SOUND = deepFreeze({
   TICK: 'tick',
 });
 
+/** Who can see a bank: only its owner, everyone, or everyone without its name. */
+export const VISIBILITY = deepFreeze({ PRIVATE: 'private', PUBLIC: 'public', UNNAMED: 'unnamed' });
+
 /** Web Audio node types the recipes use (API enum values). */
 export const WAVE = deepFreeze({ SINE: 'sine', TRIANGLE: 'triangle' });
 export const FILTER = deepFreeze({ BANDPASS: 'bandpass', LOWPASS: 'lowpass', HIGHPASS: 'highpass' });
@@ -40,7 +43,7 @@ export const CONFIG = deepFreeze({
     fileName: 'piggy-backup-{date}.json',
     mime: 'application/json',
   },
-  site: { home: '../{locale}/', title: '{app} · DATTA' },
+  site: { title: '{app} · DATTA', url: 'https://boggiomichael.github.io/datta/piggy/' },
   serviceWorker: './sw.js',
   media: { reducedMotion: '(prefers-reduced-motion: reduce)' },
 
@@ -83,6 +86,31 @@ export const CONFIG = deepFreeze({
   ],
   defaultGlaze: 'rose',
   gilded: { light: '#FFF6C8', base: '#EFC556', dark: '#BE8E22', deep: '#6F500B', blush: '#FF8C5A' },
+
+  defaultVisibility: VISIBILITY.PRIVATE,
+
+  /* Sharing. The server runs on the studio's own computer for now; the site finds it through a
+   * pointer file the server publishes when it starts. Without a server the bank stays on the device. */
+  cloud: {
+    pointer: 'https://raw.githubusercontent.com/boggioMichael/datta/piggy-server/server.json',
+    pointerCacheMinutes: 1,
+    api: '/api/piggy',
+    keyStorage: 'datta.piggy.device',
+    queueStorage: 'datta.piggy.outbox',
+    serverStorage: 'datta.piggy.server',
+    keyBytes: 32,
+    keyPattern: '^[A-Za-z0-9_-]{32,128}$',
+    timeoutMs: 6000,
+    pushDelayMs: 1500,
+    retryMs: 15000,
+    retryMaxMs: 300000,
+    watchMs: 10000,
+    liveWithinMs: 600000,
+    liveDrops: 5,
+    shareParam: 'p',
+  },
+
+  report: { periods: [14, 30, 90], defaultPeriod: 30, height: 150 },
 
   limits: {
     plans: 24,
