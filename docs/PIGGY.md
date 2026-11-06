@@ -42,18 +42,19 @@ each time it starts (`CONFIG.cloud.pointer`).
 
 ### Running the server (Windows, for now)
 
-Needs Node.js 20+ and, for a public address, cloudflared:
+Once, in PowerShell: Node.js 20+, cloudflared (for the public address) and git, then a copy of
+the site (open a new window after the installs, so git is on the path):
 
 ```powershell
-winget install OpenJS.NodeJS.LTS
-winget install --id Cloudflare.cloudflared
+winget install -e --id OpenJS.NodeJS.LTS
+winget install -e --id Cloudflare.cloudflared
+winget install -e --id Git.Git
+git clone https://github.com/boggioMichael/datta "$HOME\GitHub\datta"
 ```
 
-Then double-click `server/piggy/start-piggy-server.cmd`, or:
-
-```powershell
-node server/piggy/server.mjs
-```
+Then double-click `server/piggy/start-piggy-server.cmd` (or run `node server/piggy/server.mjs`).
+The launcher first fast-forwards the copy to the latest `main`, so the server always matches the
+live page, then starts the server.
 
 It serves the site's `public/` folder at `http://localhost:8787/piggy/`, opens a Cloudflare
 quick tunnel (a new `https://….trycloudflare.com` address on every start), and pushes that
